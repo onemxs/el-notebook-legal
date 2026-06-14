@@ -175,7 +175,7 @@ function ingestMessage(fileName: string, res: ExtractedCase): ChatMessage {
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [view, setView] = useState<AppView>("dashboard");
-  const [cases, setCases] = useState<CaseSummary[]>(SEED_CASES);
+  const [cases, setCases] = useState<CaseSummary[]>([]);
   const [caseModalOpen, setCaseModalOpen] = useState(false);
   const [caseModalPreset, setCaseModalPreset] = useState<BranchId | null>(null);
   const [intakeFile, setIntakeFile] = useState<File | null>(null);
@@ -291,21 +291,28 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
     const branch = branchRef.current;
     void (async () => {
-      // Real analysis with Claude when configured; demo responder otherwise.
-      const res =
-        (await analyzeDocument(file, branch)) ??
-        (await analyzeExpediente(fileName, undefined, branch));
-      setFiles((prev) =>
-        prev.map((f) => (f.id === id ? { ...f, analyzing: false, size: "expediente" } : f)),
-      );
-      const events = res.keyDates.map((d) => fieldToEvent(d, fileName));
-      setIngestedEvents((prev) => [...prev, ...events]);
-      setTimeline((prev) =>
-        prev
-          ? [...prev, ...events].sort((a, b) => +new Date(a.iso) - +new Date(b.iso))
-          : prev,
-      );
-      setMessages((prev) => [...prev, ingestMessage(fileName, res)]);
+      try {
+        // Real analysis with Claude when configured; demo responder otherwise.
+        const res =
+          (await analyzeDocument(file, branch)) ??
+          (await analyzeExpediente(fileName, undefined, branch));
+        setFiles((prev) =>
+          prev.map((f) => (f.id === id ? { ...f, analyzing: false, size: "expediente" } : f)),
+        );
+        const events = res.keyDates.map((d) => fieldToEvent(d, fileName));
+        setIngestedEvents((prev) => [...prev, ...events]);
+        setTimeline((prev) =>
+          prev
+            ? [...prev, ...events].sort((a, b) => +new Date(a.iso) - +new Date(b.iso))
+            : prev,
+        );
+        setMessages((prev) => [...prev, ingestMessage(fileName, res)]);
+      } catch (error) {
+        console.error("Error ingesting document:", error);
+        setFiles((prev) =>
+          prev.map((f) => (f.id === id ? { ...f, analyzing: false, size: "error" } : f)),
+        );
+      }
     })();
   }, []);
 
