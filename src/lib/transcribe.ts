@@ -1,6 +1,9 @@
+import type { BranchId } from "./types";
+import { createClient } from "@supabase/supabase-js";
+
 export interface TranscriptionProgress {
   status: "uploading" | "processing" | "transcribing" | "formatting" | "complete" | "error";
-  progress: number; // 0-100
+  progress: number;
   message: string;
   error?: string;
 }
@@ -8,9 +11,9 @@ export interface TranscriptionProgress {
 export interface VideoTranscription {
   id: string;
   fileName: string;
-  duration: number; // seconds
-  transcription: string; // with timestamps [HH:MM:SS] format
-  language: string; // "es-MX"
+  duration: number;
+  transcription: string;
+  language: string;
   createdAt: number;
 }
 
@@ -51,8 +54,20 @@ export async function transcribeVideo(
       return null;
     }
 
-    // Import Supabase client
-    const { supabase } = await import("./supabase");
+    const url = import.meta.env.VITE_SUPABASE_URL;
+    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+    if (!url || !anonKey) {
+      onProgress({
+        status: "error",
+        progress: 0,
+        message: "Supabase no configurado",
+        error: "Verifica VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY",
+      });
+      return null;
+    }
+
+    const supabase = createClient(url, anonKey);
 
     onProgress({
       status: "uploading",
@@ -67,6 +82,7 @@ export async function transcribeVideo(
       .upload(fileName, file, { upsert: false });
 
     if (uploadError || !uploadData) {
+      console.error("Upload error:", uploadError);
       onProgress({
         status: "error",
         progress: 0,
@@ -90,12 +106,23 @@ export async function transcribeVideo(
       },
     );
 
-    if (funcError || !funcData) {
+    if (funcError) {
+      console.error("Edge Function error:", funcError);
       onProgress({
         status: "error",
         progress: 0,
         message: "Error al transcribir",
         error: funcError?.message || "Error en Edge Function",
+      });
+      return null;
+    }
+
+    if (!funcData) {
+      onProgress({
+        status: "error",
+        progress: 0,
+        message: "Sin respuesta de Edge Function",
+        error: "La función no retornó datos",
       });
       return null;
     }
@@ -122,6 +149,7 @@ export async function transcribeVideo(
     };
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
+    console.error("Transcribe error:", msg);
     onProgress({
       status: "error",
       progress: 0,
