@@ -171,9 +171,11 @@ export function claudeProxy(): Plugin {
     apply: "serve",
     configureServer(server) {
       const env = loadEnv(server.config.mode, process.cwd(), "");
-      const apiKey = env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
+      const anthropicKey = env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
       const model = env.ANTHROPIC_MODEL || process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
-      const baseURL = env.ANTHROPIC_BASE_URL || process.env.ANTHROPIC_BASE_URL;
+      const anthropicBaseURL = env.ANTHROPIC_BASE_URL || process.env.ANTHROPIC_BASE_URL;
+      const openaiKey = env.OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+      const openaiBaseURL = env.OPENAI_BASE_URL || process.env.OPENAI_BASE_URL;
 
       server.middlewares.use("/api/transcribe-video", (req, res) => {
         const send = (status: number, body: unknown) => {
@@ -184,17 +186,17 @@ export function claudeProxy(): Plugin {
         if (req.method !== "POST") return send(405, { error: "method_not_allowed" });
 
         (async () => {
-          if (!apiKey) {
+          if (!openaiKey) {
             return send(200, { error: "not_configured", message: "OPENAI_API_KEY not set" });
           }
 
-          const whistlebaseURL = baseURL || "https://api.openai.com/v1";
+          const whistlebaseURL = openaiBaseURL || "https://api.openai.com/v1";
 
           let tmpFile: string | null = null;
           try {
             tmpFile = await saveUploadedFile(req);
 
-            const transcription = await transcribeWithWhisper(tmpFile, apiKey, whistlebaseURL);
+            const transcription = await transcribeWithWhisper(tmpFile, openaiKey, whistlebaseURL);
             const result = {
               id: `transcription-${Date.now()}`,
               fileName: "video",
@@ -231,14 +233,14 @@ export function claudeProxy(): Plugin {
         let raw = "";
         req.on("data", (c) => (raw += c));
         req.on("end", async () => {
-          if (!apiKey) return send(200, { error: "not_configured" });
+          if (!anthropicKey) return send(200, { error: "not_configured" });
           try {
             const body: ReqBody = JSON.parse(raw || "{}");
             const content = buildContent(body);
             if (content.length === 0) return send(200, { error: "unsupported_type" });
 
             const { default: Anthropic } = await import("@anthropic-ai/sdk");
-            const client = new Anthropic(baseURL ? { apiKey, baseURL } : { apiKey });
+            const client = new Anthropic(anthropicBaseURL ? { apiKey: anthropicKey, baseURL: anthropicBaseURL } : { apiKey: anthropicKey });
 
             const message = await client.messages.create({
               model,
