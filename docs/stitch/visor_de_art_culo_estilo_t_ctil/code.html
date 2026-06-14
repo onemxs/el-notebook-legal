@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Visor de Artículo - El Notebook Legal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e4e2dd",
+                    "tertiary-fixed": "#ffddb2",
+                    "surface-container": "#f0eee8",
+                    "on-tertiary-fixed-variant": "#60410c",
+                    "surface-container-low": "#f5f3ed",
+                    "on-primary-fixed-variant": "#2d486d",
+                    "on-error": "#ffffff",
+                    "primary-container": "#1e3a5f",
+                    "secondary": "#605e5b",
+                    "on-primary-fixed": "#001c3b",
+                    "tertiary": "#341f00",
+                    "primary-fixed-dim": "#adc8f5",
+                    "on-secondary-container": "#666461",
+                    "on-secondary": "#ffffff",
+                    "tertiary-container": "#503300",
+                    "on-surface-variant": "#43474e",
+                    "inverse-surface": "#30312d",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed-dim": "#cac6c2",
+                    "surface-bright": "#fbf9f3",
+                    "on-surface": "#1b1c18",
+                    "tertiary-fixed-dim": "#edbf7f",
+                    "primary": "#022448",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#e6e2de",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed": "#291800",
+                    "outline-variant": "#c4c6cf",
+                    "surface-tint": "#455f87",
+                    "surface": "#fbf9f3",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#adc8f5",
+                    "surface-container-lowest": "#ffffff",
+                    "background": "#fbf9f3"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.5rem",
+                    "lg": "1rem",
+                    "xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "reading-width": "720px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "ui-medium": ["Hanken Grotesk"],
+                    "label-caps": ["Hanken Grotesk"],
+                    "display-xl": ["EB Garamond"],
+                    "headline-lg": ["EB Garamond"],
+                    "ui-small": ["Hanken Grotesk"],
+                    "headline-md": ["EB Garamond"],
+                    "data-tabular": ["Hanken Grotesk"],
+                    "body-reading": ["EB Garamond"]
+            },
+            "fontSize": {
+                    "ui-medium": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "400"}],
+                    "ui-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-reading": ["19px", {"lineHeight": "32px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .paper-texture {
+            background-color: #FBF9F4;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            background-attachment: fixed;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .relief-low {
+            box-shadow: 
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+                0 1px 3px 0 rgba(0, 0, 0, 0.05),
+                0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .relief-md {
+            box-shadow: 
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.6),
+                0 4px 6px -1px rgba(0, 0, 0, 0.08),
+                0 2px 4px -1px rgba(0, 0, 0, 0.04);
+        }
+        .visor-panel {
+            transform: translateX(-100%);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .visor-panel.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-surface font-ui-medium text-on-surface overflow-hidden">
+<!-- Mock Background Content (The Workspace) -->
+<div class="flex h-screen w-full">
+<!-- Sidebar Shell -->
+<aside class="hidden md:flex flex-col h-full w-64 bg-surface-container-low border-r border-outline-variant py-8 shrink-0">
+<div class="px-6 mb-8">
+<span class="font-display-xl text-display-xl text-primary tracking-tight">El Notebook</span>
+</div>
+<nav class="flex-1 space-y-1">
+<div class="bg-white dark:bg-primary-container text-primary border-l-4 border-primary py-3 px-6 cursor-pointer">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+<span class="font-label-caps text-label-caps">INICIO</span>
+</div>
+<div class="text-secondary font-label-caps text-label-caps py-3 px-6 hover:bg-white transition-all cursor-pointer">
+<span class="material-symbols-outlined mr-3">menu_book</span>
+<span>BIBLIOTECA</span>
+</div>
+<div class="text-secondary font-label-caps text-label-caps py-3 px-6 hover:bg-white transition-all cursor-pointer">
+<span class="material-symbols-outlined mr-3">gavel</span>
+<span>CASOS</span>
+</div>
+</nav>
+<div class="px-6 pt-8 border-t border-outline-variant">
+<div class="flex items-center gap-3 mb-6 p-2 bg-white/50 rounded-lg relief-low">
+<div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-xs">JD</div>
+<div>
+<p class="font-ui-medium text-ui-medium">Despacho Asociado</p>
+<p class="text-[10px] text-secondary">CIUDAD DE MÉXICO</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 p-margin-desktop overflow-y-auto">
+<header class="mb-12">
+<h1 class="font-display-xl text-display-xl text-primary mb-2">Expediente Civil 442/2023</h1>
+<p class="font-ui-medium text-secondary">Borrador de Demanda Ejecutiva Mercantil</p>
+</header>
+<div class="max-w-reading-width space-y-8">
+<div class="p-8 bg-white rounded-xl relief-md border border-outline-variant/30">
+<p class="font-body-reading text-body-reading leading-relaxed text-on-surface mb-6">
+                    ... de conformidad con lo establecido en el <span class="text-primary border-b border-primary cursor-pointer hover:bg-primary/5 px-1 rounded-sm transition-colors" onclick="document.getElementById('articleVisor').classList.add('open')">Artículo 1391</span> del Código de Comercio vigente, procedo a solicitar la ejecución del título de crédito...
+                </p>
+<div class="h-4 bg-surface-container w-3/4 mb-4 rounded-full"></div>
+<div class="h-4 bg-surface-container w-full mb-4 rounded-full"></div>
+<div class="h-4 bg-surface-container w-5/6 rounded-full"></div>
+</div>
+<button class="flex items-center gap-3 border border-primary px-8 py-4 text-primary font-label-caps text-label-caps hover:bg-primary hover:text-white transition-all uppercase tracking-widest rounded-xl relief-low" onclick="document.getElementById('articleVisor').classList.add('open')">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+                Simular Apertura de Visor
+            </button>
+</div>
+</main>
+</div>
+<!-- Visor de Artículo Overlay Panel -->
+<div class="visor-panel fixed inset-y-0 left-0 w-full md:w-[540px] paper-texture shadow-2xl z-50 flex flex-col border-r border-outline-variant open" id="articleVisor">
+<!-- Top Navigation -->
+<div class="px-8 py-6 flex items-center justify-between border-b border-outline-variant/50 bg-white/40 backdrop-blur-md">
+<button class="flex items-center gap-2 text-secondary hover:text-primary transition-colors group px-3 py-1.5 rounded-lg hover:bg-white/50" onclick="document.getElementById('articleVisor').classList.remove('open')">
+<span class="material-symbols-outlined text-[20px] group-hover:-translate-x-1 transition-transform" data-icon="arrow_back">arrow_back</span>
+<span class="font-label-caps text-label-caps tracking-[0.2em]">VOLVER</span>
+</button>
+<div class="flex items-center gap-2 px-4 py-2 bg-white/80 border border-[#DCE5DB] rounded-full relief-low">
+<span class="material-symbols-outlined text-[16px] text-[#3D663D] fill-1" data-icon="verified">verified</span>
+<span class="text-[#3D663D] text-[10px] font-label-caps font-bold">TEXTO LITERAL VERIFICADO</span>
+</div>
+</div>
+<!-- Header Information -->
+<div class="px-margin-desktop pt-14 pb-8">
+<span class="font-label-caps text-label-caps text-secondary tracking-[0.25em] block mb-4 opacity-70">CÓD. COMERCIO · ARTÍCULO 1391</span>
+<h2 class="font-display-xl text-display-xl text-primary leading-tight">Del Procedimiento Ejecutivo</h2>
+</div>
+<!-- Content Body (Scrollable) -->
+<div class="flex-1 overflow-y-auto px-margin-desktop pb-12">
+<article class="font-body-reading text-body-reading text-on-surface leading-[1.8] space-y-8">
+<div class="p-6 bg-white/30 rounded-xl relief-low border border-white/50">
+<p>
+<span class="font-bold text-primary mr-2">Art. 1391.</span> El procedimiento ejecutivo tiene lugar cuando la demanda se funda en documento que traiga aparejada ejecución.
+                </p>
+</div>
+<p class="px-2 italic text-secondary">Traen aparejada ejecución:</p>
+<ol class="list-decimal list-outside ml-8 space-y-6">
+<li class="pl-2">La sentencia ejecutoriada o pasada en autoridad de cosa juzgada y la arbitral que sea inapelable, conforme al artículo 1346, observándose lo dispuesto en el 1348;</li>
+<li class="pl-2">Los instrumentos públicos, así como los testimonios y copias certificadas de los mismos que expidan los fedatarios públicos;</li>
+<li class="pl-2">La confesión judicial del deudor, hecha conforme al artículo 1288;</li>
+<li class="pl-2">Los títulos de crédito;</li>
+<li class="pl-2">Las pólizas de seguros conforme a la ley de la materia;</li>
+<li class="pl-2">La decisión de los peritos designados en los seguros para fijar el importe de las pérdidas, sin perjuicio de que se pueda oponer la excepción de dolo en el juicio respectivo;</li>
+<li class="pl-2">Las facturas, cuentas corrientes y cualesquiera otros contratos de comercio firmados y reconocidos judicialmente por el deudor;</li>
+<li class="pl-2">Los convenios celebrados en los procedimientos conciliatorios ante la Procuraduría Federal del Consumidor, así como los laudos arbitrales que ésta emita.</li>
+</ol>
+</article>
+<!-- Source Footer -->
+<div class="mt-16 pt-8 border-t border-outline-variant/30 flex flex-col gap-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-secondary" data-icon="history_edu">history_edu</span>
+</div>
+<span class="font-label-caps text-label-caps text-secondary tracking-widest">DOF · TEXTO VIGENTE · CORPUS FEDERAL</span>
+</div>
+<p class="text-[11px] text-secondary/60 italic ml-11">Última reforma publicada: 28-03-2018</p>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="p-8 border-t border-outline-variant/20 bg-white/40 backdrop-blur-md">
+<button class="w-full flex items-center justify-center gap-3 bg-primary text-white py-5 px-6 rounded-xl relief-md hover:scale-[1.01] transition-all group active:scale-[0.98]">
+<span class="material-symbols-outlined text-[20px]" data-icon="content_copy">content_copy</span>
+<span class="font-label-caps text-label-caps tracking-[0.2em] uppercase">Copiar Texto Literal</span>
+</button>
+</div>
+</div>
+<!-- Right Margin Annotation -->
+<div class="fixed right-0 top-0 h-full w-12 hidden xl:flex flex-col items-center py-12 border-l border-outline-variant bg-surface pointer-events-none">
+<span class="rotate-90 origin-center whitespace-nowrap text-[10px] font-label-caps text-secondary tracking-[0.4em] opacity-40 uppercase">El Notebook Legal · Lex Lux Intelligencia</span>
+</div>
+<!-- Atmospheric Overlay -->
+<div class="fixed inset-0 pointer-events-none opacity-[0.04] mix-blend-multiply bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+<script>
+    const visor = document.getElementById('articleVisor');
+    
+    function toggleVisor() {
+        visor.classList.toggle('open');
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && visor.classList.contains('open')) {
+            visor.classList.remove('open');
+        }
+    });
+
+    const copyBtn = visor.querySelector('button.w-full');
+    copyBtn.addEventListener('click', () => {
+        const textSpan = copyBtn.querySelector('span:last-child');
+        const originalText = textSpan.innerText;
+        textSpan.innerText = 'COPIADO AL PORTAPAPELES';
+        copyBtn.classList.replace('bg-primary', 'bg-emerald-800');
+        setTimeout(() => {
+            textSpan.innerText = originalText;
+            copyBtn.classList.replace('bg-emerald-800', 'bg-primary');
+        }, 2000);
+    });
+</script>
+</body></html>

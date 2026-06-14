@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Archivo Digital | El Notebook Legal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&amp;family=Hanken+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        body {
+            background-color: #fbf9f3;
+            -webkit-font-smoothing: antialiased;
+        }
+        .hairline-border {
+            border: 1px solid #E6E3DC;
+        }
+        .hairline-bottom {
+            border-bottom: 1px solid #E6E3DC;
+        }
+        .hairline-right {
+            border-right: 1px solid #E6E3DC;
+        }
+        .hairline-top {
+            border-top: 1px solid #E6E3DC;
+        }
+        /* Custom scrollbar for editorial feel */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fbf9f3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E6E3DC;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed-variant": "#2d486d",
+                      "primary-fixed": "#d5e3ff",
+                      "on-tertiary-fixed-variant": "#60410c",
+                      "on-primary-fixed": "#001c3b",
+                      "error": "#ba1a1a",
+                      "primary-fixed-dim": "#adc8f5",
+                      "surface-bright": "#fbf9f3",
+                      "primary-container": "#1e3a5f",
+                      "on-error-container": "#93000a",
+                      "on-secondary-fixed": "#1c1b19",
+                      "primary": "#022448",
+                      "tertiary-fixed": "#ffddb2",
+                      "on-tertiary-fixed": "#291800",
+                      "inverse-on-surface": "#f3f1eb",
+                      "secondary-container": "#e6e2de",
+                      "on-surface": "#1b1c18",
+                      "surface-dim": "#dcdad4",
+                      "surface-container-highest": "#e4e2dd",
+                      "error-container": "#ffdad6",
+                      "background": "#fbf9f3",
+                      "on-primary": "#ffffff",
+                      "on-primary-container": "#8aa4cf",
+                      "on-background": "#1b1c18",
+                      "outline": "#74777f",
+                      "surface-tint": "#455f87",
+                      "inverse-surface": "#30312d",
+                      "on-tertiary-container": "#c69b5f",
+                      "surface": "#fbf9f3",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#eae8e2",
+                      "inverse-primary": "#adc8f5",
+                      "on-secondary-fixed-variant": "#484644",
+                      "tertiary-fixed-dim": "#edbf7f",
+                      "secondary": "#605e5b",
+                      "tertiary-container": "#503300",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-low": "#f5f3ed",
+                      "tertiary": "#341f00",
+                      "secondary-fixed": "#e6e2de",
+                      "secondary-fixed-dim": "#cac6c2",
+                      "outline-variant": "#c4c6cf",
+                      "surface-container": "#f0eee8",
+                      "on-surface-variant": "#43474e",
+                      "on-error": "#ffffff",
+                      "surface-variant": "#e4e2dd",
+                      "on-secondary-container": "#666461",
+                      "on-secondary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0px",
+                      "lg": "0px",
+                      "xl": "0px",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "64px",
+                      "reading-width": "720px",
+                      "gutter": "24px",
+                      "unit": "4px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "data-tabular": ["Hanken Grotesk"],
+                      "display-xl": ["EB Garamond"],
+                      "headline-md": ["EB Garamond"],
+                      "body-reading": ["EB Garamond"],
+                      "ui-medium": ["Hanken Grotesk"],
+                      "headline-lg": ["EB Garamond"],
+                      "label-caps": ["Hanken Grotesk"],
+                      "ui-small": ["Hanken Grotesk"]
+              },
+              "fontSize": {
+                      "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                      "body-reading": ["19px", {"lineHeight": "32px", "fontWeight": "400"}],
+                      "ui-medium": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "400"}],
+                      "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                      "ui-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="font-body-reading text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 z-50 flex justify-between items-center w-full px-margin-desktop py-4 max-w-full bg-background hairline-bottom">
+<div class="font-display-xl text-display-xl text-primary tracking-tight">El Notebook Legal</div>
+<div class="hidden md:flex space-x-8">
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors duration-300" href="#">Expedientes</a>
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors duration-300" href="#">Jurisprudencia</a>
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors duration-300" href="#">Borradores</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-label-caps text-label-caps" href="#">Archivo</a>
+</div>
+<div class="flex items-center space-x-4">
+<span class="material-symbols-outlined text-primary cursor-pointer">notifications</span>
+<span class="material-symbols-outlined text-primary cursor-pointer">account_circle</span>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 pt-24 pb-8 flex flex-col hairline-right bg-surface-container-low hidden md:flex">
+<div class="px-6 mb-10">
+<h2 class="font-ui-medium text-ui-medium text-primary">Despacho Asociado</h2>
+<p class="font-label-caps text-label-caps text-secondary">Ciudad de México</p>
+</div>
+<nav class="flex-grow">
+<div class="mb-4">
+<p class="px-6 mb-2 font-label-caps text-label-caps text-outline uppercase tracking-widest text-[10px]">Navegación</p>
+<a class="flex items-center space-x-3 text-secondary font-label-caps text-label-caps py-3 px-6 hover:bg-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Inicio</span>
+</a>
+<a class="flex items-center space-x-3 text-secondary font-label-caps text-label-caps py-3 px-6 hover:bg-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span>Biblioteca</span>
+</a>
+<a class="flex items-center space-x-3 text-secondary font-label-caps text-label-caps py-3 px-6 hover:bg-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined">gavel</span>
+<span>Casos</span>
+</a>
+<a class="flex items-center space-x-3 bg-white text-primary border-l-4 border-primary font-label-caps text-label-caps py-3 px-6" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+<span>Archivo Digital</span>
+</a>
+<a class="flex items-center space-x-3 text-secondary font-label-caps text-label-caps py-3 px-6 hover:bg-white transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Configuración</span>
+</a>
+</div>
+<div class="px-6 mt-8">
+<button class="w-full py-3 hairline-border text-primary font-label-caps text-label-caps hover:bg-primary hover:text-white transition-all">
+                    NUEVA CONSULTA
+                </button>
+</div>
+</nav>
+<div class="px-6 mt-auto flex flex-col space-y-2">
+<a class="flex items-center space-x-3 text-secondary font-label-caps text-label-caps py-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+<span>Ayuda</span>
+</a>
+<a class="flex items-center space-x-3 text-secondary font-label-caps text-label-caps py-1 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Cerrar Sesión</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 min-h-screen bg-background">
+<div class="px-margin-mobile md:px-margin-desktop py-12 max-w-7xl">
+<!-- Header Section -->
+<header class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary mb-2">Archivo Digital</h1>
+<p class="text-secondary font-body-reading max-w-xl">Bóveda digital de alta seguridad para la gestión de expedientes judiciales y documentos notariales.</p>
+</div>
+<div class="flex space-x-4">
+<button class="px-6 py-2 hairline-border bg-primary text-white font-label-caps text-label-caps tracking-widest hover:bg-on-primary-fixed-variant transition-colors">
+                        SUBIR ARCHIVO
+                    </button>
+<button class="p-2 hairline-border text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</header>
+<!-- Categorías (Asymmetric Bento-ish Grid) -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-16">
+<div class="md:col-span-4 p-8 hairline-border bg-surface-container-low flex flex-col justify-between group hover:bg-white transition-all cursor-pointer">
+<div>
+<span class="material-symbols-outlined text-primary mb-4 text-3xl">description</span>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Escritos</h3>
+<p class="font-ui-small text-ui-small text-secondary">Demandas, contestaciones y recursos legales.</p>
+</div>
+<div class="mt-8 flex justify-between items-baseline">
+<span class="font-data-tabular text-data-tabular text-primary">124 Archivos</span>
+<span class="font-label-caps text-label-caps text-outline group-hover:text-primary transition-colors">VER TODO →</span>
+</div>
+</div>
+<div class="md:col-span-4 p-8 hairline-border bg-surface-container-low flex flex-col justify-between group hover:bg-white transition-all cursor-pointer">
+<div>
+<span class="material-symbols-outlined text-primary mb-4 text-3xl">fact_check</span>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Pruebas</h3>
+<p class="font-ui-small text-ui-small text-secondary">Evidencia documental, periciales y testimoniales.</p>
+</div>
+<div class="mt-8 flex justify-between items-baseline">
+<span class="font-data-tabular text-data-tabular text-primary">89 Archivos</span>
+<span class="font-label-caps text-label-caps text-outline group-hover:text-primary transition-colors">VER TODO →</span>
+</div>
+</div>
+<div class="md:col-span-4 p-8 hairline-border bg-surface-container-low flex flex-col justify-between group hover:bg-white transition-all cursor-pointer">
+<div>
+<span class="material-symbols-outlined text-primary mb-4 text-3xl">campaign</span>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Notificaciones</h3>
+<p class="font-ui-small text-ui-small text-secondary">Acuerdos judiciales y avisos de autoridad.</p>
+</div>
+<div class="mt-8 flex justify-between items-baseline">
+<span class="font-data-tabular text-data-tabular text-primary">45 Archivos</span>
+<span class="font-label-caps text-label-caps text-outline group-hover:text-primary transition-colors">VER TODO →</span>
+</div>
+</div>
+</section>
+<!-- Table View -->
+<section class="bg-surface-container-lowest hairline-border overflow-hidden">
+<div class="px-6 py-4 hairline-bottom bg-surface flex justify-between items-center">
+<h2 class="font-label-caps text-label-caps text-primary tracking-[0.2em]">DOCUMENTOS RECIENTES</h2>
+<div class="flex items-center space-x-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="bg-transparent border-b border-outline-variant focus:border-primary transition-colors font-label-caps text-[10px] pl-8 pr-2 py-1 outline-none" placeholder="BUSCAR EN ARCHIVO..." type="text"/>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="px-6 py-3 font-label-caps text-[10px] text-secondary tracking-widest hairline-bottom">NOMBRE DEL ARCHIVO</th>
+<th class="px-6 py-3 font-label-caps text-[10px] text-secondary tracking-widest hairline-bottom">CATEGORÍA</th>
+<th class="px-6 py-3 font-label-caps text-[10px] text-secondary tracking-widest hairline-bottom">FECHA DE CARGA</th>
+<th class="px-6 py-3 font-label-caps text-[10px] text-secondary tracking-widest hairline-bottom">TAMAÑO</th>
+<th class="px-6 py-3 font-label-caps text-[10px] text-secondary tracking-widest hairline-bottom text-right">ACCIONES</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#E6E3DC]">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-6 py-4 flex items-center space-x-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">picture_as_pdf</span>
+<span class="font-ui-medium text-ui-medium text-primary">Demanda_Civil_Exp452_2023.pdf</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-surface-container font-label-caps text-[9px] text-secondary border border-outline-variant">ESCRITOS</span>
+</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary">24 OCT 2023</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary">2.4 MB</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-outline hover:text-primary">more_vert</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-6 py-4 flex items-center space-x-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">image</span>
+<span class="font-ui-medium text-ui-medium text-primary">Evidencia_Fotografica_LoteA.jpg</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-surface-container font-label-caps text-[9px] text-secondary border border-outline-variant">PRUEBAS</span>
+</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary">15 NOV 2023</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary">15.8 MB</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-outline hover:text-primary">more_vert</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-6 py-4 flex items-center space-x-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">article</span>
+<span class="font-ui-medium text-ui-medium text-primary">Acuerdo_Admision_Juzgado_5.pdf</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-surface-container font-label-caps text-[9px] text-secondary border border-outline-variant">NOTIFICACIONES</span>
+</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary">02 DIC 2023</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary">842 KB</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-outline hover:text-primary">more_vert</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-6 py-4 flex items-center space-x-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">inventory_2</span>
+<span class="font-ui-medium text-ui-medium text-primary">Escritura_Publica_1209_Notaria8.pdf</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-surface-container font-label-caps text-[9px] text-secondary border border-outline-variant">NOTARIAL</span>
+</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary">12 ENE 2024</td>
+<td class="px-6 py-4 font-data-tabular text-data-tabular text-secondary">4.1 MB</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-outline hover:text-primary">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination / Footer of Table -->
+<div class="px-6 py-4 bg-surface-container-low hairline-top flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="font-label-caps text-[10px] text-secondary">MOSTRANDO 1-4 DE 258 ARCHIVOS</p>
+<div class="flex items-center space-x-2">
+<button class="p-1 hairline-border hover:bg-white transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<span class="font-data-tabular text-[12px] px-3">1</span>
+<button class="p-1 hairline-border hover:bg-white transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Storage Analytics Asymmetric Section -->
+<section class="mt-16 grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<div class="md:col-span-8 p-10 hairline-border bg-white relative overflow-hidden">
+<div class="relative z-10">
+<h2 class="font-headline-md text-headline-md text-primary mb-6">Estado de la Bóveda</h2>
+<div class="flex flex-col space-y-6">
+<div>
+<div class="flex justify-between mb-2">
+<span class="font-label-caps text-label-caps text-secondary">CAPACIDAD UTILIZADA (45.2 GB / 100 GB)</span>
+<span class="font-data-tabular text-data-tabular text-primary">45%</span>
+</div>
+<div class="w-full h-1 bg-surface-container overflow-hidden">
+<div class="h-full bg-primary w-[45%]"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+<div>
+<p class="font-label-caps text-[10px] text-outline mb-1">PDF</p>
+<p class="font-data-tabular text-headline-md text-primary">28 GB</p>
+</div>
+<div>
+<p class="font-label-caps text-[10px] text-outline mb-1">IMÁGENES</p>
+<p class="font-data-tabular text-headline-md text-primary">12 GB</p>
+</div>
+<div>
+<p class="font-label-caps text-[10px] text-outline mb-1">MULTIMEDIA</p>
+<p class="font-data-tabular text-headline-md text-primary">4.2 GB</p>
+</div>
+<div>
+<p class="font-label-caps text-[10px] text-outline mb-1">OTROS</p>
+<p class="font-data-tabular text-headline-md text-primary">1 GB</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Decorative hairline grid in background -->
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<div class="grid grid-cols-6 h-full w-full">
+<div class="border-r border-primary h-full"></div>
+<div class="border-r border-primary h-full"></div>
+<div class="border-r border-primary h-full"></div>
+<div class="border-r border-primary h-full"></div>
+<div class="border-r border-primary h-full"></div>
+</div>
+</div>
+</div>
+<div class="md:col-span-4 p-10 hairline-border bg-primary-container text-white flex flex-col justify-center items-center text-center">
+<span class="material-symbols-outlined text-4xl mb-4" style="font-variation-settings: 'FILL' 1;">security</span>
+<h3 class="font-headline-md text-headline-md mb-2">Encriptación Militar</h3>
+<p class="font-ui-small text-ui-small text-on-primary-container mb-6">Sus archivos están protegidos bajo el estándar AES-256 y cumplen con la Ley Federal de Protección de Datos.</p>
+<button class="px-6 py-2 border border-on-primary-container font-label-caps text-label-caps hover:bg-white hover:text-primary transition-all">GESTIONAR LLAVES</button>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="md:ml-64 bg-background hairline-top mt-12">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-margin-desktop py-8 max-w-full">
+<div class="mb-4 md:mb-0">
+<span class="font-ui-small text-ui-small font-bold text-primary">El Notebook Legal</span>
+<span class="font-label-caps text-label-caps text-secondary ml-4">© 2024 Hecho en México.</span>
+</div>
+<div class="flex space-x-8">
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors" href="#">Privacidad</a>
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors" href="#">Términos</a>
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors" href="#">Ética Profesional</a>
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors" href="#">Contacto</a>
+</div>
+</div>
+</footer>
+<!-- FAB (Suppressed logic: Only on Home/Dashboard. We render it here as a Contextual Action for 'Upload') -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white flex items-center justify-center hover:scale-105 active:scale-95 transition-transform shadow-lg md:hidden">
+<span class="material-symbols-outlined">add</span>
+</button>
+<script>
+        // Micro-interaction for table rows
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SPAN') {
+                    console.log('Open file detail');
+                }
+            });
+        });
+    </script>
+</body></html>

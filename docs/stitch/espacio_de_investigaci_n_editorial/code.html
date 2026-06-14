@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bóveda de Investigación | El Notebook Legal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed-variant": "#2d486d",
+                    "primary-fixed": "#d5e3ff",
+                    "on-tertiary-fixed-variant": "#60410c",
+                    "on-primary-fixed": "#001c3b",
+                    "error": "#ba1a1a",
+                    "primary-fixed-dim": "#adc8f5",
+                    "surface-bright": "#fbf9f3",
+                    "primary-container": "#1e3a5f",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed": "#1c1b19",
+                    "primary": "#022448",
+                    "tertiary-fixed": "#ffddb2",
+                    "on-tertiary-fixed": "#291800",
+                    "inverse-on-surface": "#f3f1eb",
+                    "secondary-container": "#e6e2de",
+                    "on-surface": "#1b1c18",
+                    "surface-dim": "#dcdad4",
+                    "surface-container-highest": "#e4e2dd",
+                    "error-container": "#ffdad6",
+                    "background": "#fbf9f3",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#8aa4cf",
+                    "on-background": "#1b1c18",
+                    "outline": "#74777f",
+                    "surface-tint": "#455f87",
+                    "inverse-surface": "#30312d",
+                    "on-tertiary-container": "#c69b5f",
+                    "surface": "#fbf9f3",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-high": "#eae8e2",
+                    "inverse-primary": "#adc8f5",
+                    "on-secondary-fixed-variant": "#484644",
+                    "tertiary-fixed-dim": "#edbf7f",
+                    "secondary": "#605e5b",
+                    "tertiary-container": "#503300",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#f5f3ed",
+                    "tertiary": "#341f00",
+                    "secondary-fixed": "#e6e2de",
+                    "secondary-fixed-dim": "#cac6c2",
+                    "outline-variant": "#c4c6cf",
+                    "surface-container": "#f0eee8",
+                    "on-surface-variant": "#43474e",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#e4e2dd",
+                    "on-secondary-container": "#666461",
+                    "on-secondary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "64px",
+                    "reading-width": "720px",
+                    "gutter": "24px",
+                    "unit": "4px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "data-tabular": ["Hanken Grotesk"],
+                    "display-xl": ["EB Garamond"],
+                    "headline-md": ["EB Garamond"],
+                    "body-reading": ["Spectral", "serif"],
+                    "ui-medium": ["Hanken Grotesk"],
+                    "headline-lg": ["EB Garamond"],
+                    "label-caps": ["Hanken Grotesk"],
+                    "ui-small": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "body-reading": ["19px", {"lineHeight": "32px", "fontWeight": "400"}],
+                    "ui-medium": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "ui-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fbf9f3;
+            color: #1b1c18;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .paper-texture {
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            background-repeat: repeat;
+        }
+        .hairline-b { border-bottom: 1px solid #E6E3DC; }
+        .hairline-r { border-right: 1px solid #E6E3DC; }
+        .hairline-l { border-left: 1px solid #E6E3DC; }
+        .hairline-t { border-top: 1px solid #E6E3DC; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E6E3DC; border-radius: 2px; }
+        .active-tab { border-bottom: 2px solid #022448; }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+<!-- Top Navigation Bar (Shared Component Anchor) -->
+<nav class="bg-background dark:bg-background border-b border-outline-variant dark:border-outline flex justify-between items-center w-full px-margin-desktop py-4 max-w-full z-50">
+<div class="font-display-xl text-display-xl text-primary dark:text-primary-fixed tracking-tight">
+            El Notebook Legal
+        </div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="font-label-caps text-label-caps text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed transition-colors duration-300" href="#">Expedientes</a>
+<a class="font-label-caps text-label-caps text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed pb-1" href="#">Jurisprudencia</a>
+<a class="font-label-caps text-label-caps text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed transition-colors duration-300" href="#">Borradores</a>
+<a class="font-label-caps text-label-caps text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed transition-colors duration-300" href="#">Archivo</a>
+</div>
+<div class="flex items-center space-x-6 text-primary">
+<button class="material-symbols-outlined hover:opacity-70 transition-opacity">notifications</button>
+<button class="material-symbols-outlined hover:opacity-70 transition-opacity">account_circle</button>
+</div>
+</nav>
+<!-- Main Workspace Layout -->
+<div class="flex flex-1 overflow-hidden">
+<!-- Left Sidebar: Contextual Tools (SideNavBar Anchor mapping) -->
+<aside class="hidden lg:flex flex-col w-64 bg-surface-container-low dark:bg-surface-container-high border-r border-outline-variant dark:border-outline py-8">
+<div class="px-6 mb-10">
+<h2 class="font-ui-medium text-ui-medium text-primary mb-1">Bóveda de Investigación</h2>
+<p class="font-label-caps text-label-caps text-secondary">PROYECTO: AMPARO 452/2023</p>
+</div>
+<nav class="flex-1">
+<a class="flex items-center space-x-4 bg-white dark:bg-primary-container text-primary dark:text-on-primary-container border-l-4 border-primary py-3 px-6 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-label-caps text-label-caps">Biblioteca</span>
+</a>
+<a class="flex items-center space-x-4 text-secondary dark:text-secondary-fixed-dim font-label-caps text-label-caps py-3 px-6 hover:bg-white dark:hover:bg-surface-variant transition-all duration-200" href="#">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-label-caps text-label-caps">Casos</span>
+</a>
+<a class="flex items-center space-x-4 text-secondary dark:text-secondary-fixed-dim font-label-caps text-label-caps py-3 px-6 hover:bg-white dark:hover:bg-surface-variant transition-all duration-200" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-caps text-label-caps">Minutas</span>
+</a>
+<div class="mt-8 px-6">
+<button class="w-full py-3 px-4 border border-primary text-primary font-label-caps text-label-caps flex items-center justify-center space-x-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Nueva Consulta</span>
+</button>
+</div>
+</nav>
+<div class="px-6 space-y-4">
+<a class="flex items-center space-x-4 text-secondary font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+<span>Ayuda</span>
+</a>
+<a class="flex items-center space-x-4 text-secondary font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Cerrar Sesión</span>
+</a>
+</div>
+</aside>
+<!-- Central Reading Pane -->
+<main class="flex-1 bg-surface-bright paper-texture overflow-y-auto custom-scrollbar flex justify-center">
+<article class="max-w-[720px] w-full px-8 py-16 md:py-24">
+<header class="mb-12">
+<div class="flex items-center space-x-4 mb-4">
+<span class="font-label-caps text-label-caps bg-secondary-container px-2 py-1">JURISPRUDENCIA</span>
+<span class="font-label-caps text-label-caps text-outline">ACTUALIZADO: 14 OCT 2023</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary leading-tight mb-6">
+                        Análisis de la Interpretación Conforme en Materia de Derechos Humanos y Control de Convencionalidad.
+                    </h1>
+<div class="hairline-b pb-4">
+<p class="font-ui-small text-ui-small text-secondary italic">Por: Despacho Asociado - Ciudad de México</p>
+</div>
+</header>
+<div class="font-body-reading text-body-reading text-on-surface space-y-8 leading-relaxed">
+<p>
+                        El principio de interpretación conforme es un mandato constitucional que obliga a los jueces a preferir aquella interpretación de las normas que sea más acorde con la Constitución y con los tratados internacionales en materia de derechos humanos. Este ejercicio no es meramente técnico, sino que constituye la base del Estado Constitucional de Derecho en México.
+                    </p>
+<p>
+                        De acuerdo con la tesis aislada de la Primera Sala, la aplicación del bloque de constitucionalidad exige que, ante la existencia de varias interpretaciones posibles de una norma, se deba optar por aquella que proteja de manera más amplia a la persona (principio pro personae).
+                    </p>
+<blockquote class="border-l-2 border-primary-container pl-6 py-2 italic text-primary bg-surface-container-low/50">
+                        "Las normas relativas a los derechos humanos se interpretarán de conformidad con esta Constitución y con los tratados internacionales de la materia favoreciendo en todo tiempo a las personas la protección más amplia."
+                        <footer class="mt-2 font-label-caps text-label-caps text-secondary">— Art. 1, Párrafo Segundo, CPEUM.</footer>
+</blockquote>
+<p>
+                        Es imperativo notar que el control de convencionalidad ex officio no implica que el juzgador deba, en todos los casos, inaplicar la ley, sino que debe agotar el recurso de la interpretación conforme antes de declarar una norma como inconstitucional o inconvencional.
+                    </p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 my-12">
+<figure class="group">
+<div class="aspect-[4/3] overflow-hidden hairline-b mb-4">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A detailed close-up shot of an antique leather-bound law book lying on a dark polished wooden table. Soft warm morning light filters through a nearby window, highlighting the texture of the aged paper and the intricate gold-embossed lettering on the spine. The background is a blurred library with rows of timeless legal volumes, creating a mood of serious academic study and deep historical authority. The aesthetic is clean, sophisticated, and editorial." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzUGGtXeMtzuh1Ut8iTgfRwIIWFoY2Ecbk7gxx_K0iz9c5bjeG17iKBfV12ticzCWgpw5Qm_NSFHooW8f7TKCQ-_0C5PPib1cs3SMFVf48nBNLuy2hAcTzt2cxK61I1kj5_S7xO3yIzLLd-0_odLcOPEefNBL9gpKxYEyFc2OQD9qnYk-rljicQe3L5snoGDa6EmD3d1uKyN4cRSsaK534r6rkd6N9qgiqJBMUVX1FK1WjyM_u26Tk4Q0NOqAvWvGYMz37F6HHhws"/>
+</div>
+<figcaption class="font-label-caps text-[10px] text-secondary text-center">FIG 1. ACERVOS HISTÓRICOS DE LA SUPREMA CORTE.</figcaption>
+</figure>
+<figure class="group">
+<div class="aspect-[4/3] overflow-hidden hairline-b mb-4">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A modern minimalist courtroom interior during the golden hour. The space features clean lines, light oak wood paneling, and large glass partitions that reflect the warm setting sun. The atmosphere is quiet, dignified, and serene, reflecting a high-end legal atelier aesthetic. Shadows are long and soft, emphasizing the architectural structural hairlines and the luxury of space. The color palette is composed of ivory, bone-white, and deep navy accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8xJd8BibRi27xkrsJd4CP3-QixWaomoX8z9KLIAUiai7NdwR2RKYdsfyLPv6RKeMJvqCfjBM2valnYhYhCMXdL89aTNQ_y1BtwO1viLhBh5kyMHwRLB6ijfz2BW8Zvcg6_qabRGKKSuRhMjf0YWBPTRZOzA-9YXZ3bW7UH_5D-XBnWjCipBiomWsFlcZzbYF3rjwIhh7hR5uXV5mTOSPQIEOrY-3y2PtgxUBpBSxRZ0j9YCbewjuUbTov145w8pzUDS0l27K0JzI"/>
+</div>
+<figcaption class="font-label-caps text-[10px] text-secondary text-center">FIG 2. ESTRUCTURA DEL PODER JUDICIAL FEDERAL.</figcaption>
+</figure>
+</div>
+<p>
+                        Para el caso que nos ocupa (Amparo 452/2023), la argumentación debe centrarse en la colisión entre la seguridad jurídica y el derecho a la tutela judicial efectiva. Se propone una revisión de los precedentes de la Corte Interamericana en el caso *Cabrera García y Montiel Flores vs. México*.
+                    </p>
+</div>
+<div class="mt-20 pt-10 hairline-t">
+<h3 class="font-ui-medium text-ui-medium text-primary mb-6">Referencias Adicionales</h3>
+<ul class="space-y-4">
+<li class="flex justify-between items-center group cursor-pointer">
+<span class="font-ui-small text-ui-small text-secondary group-hover:text-primary transition-colors">Protocolo de actuación para quienes imparten justicia.</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary">open_in_new</span>
+</li>
+<li class="flex justify-between items-center group cursor-pointer">
+<span class="font-ui-small text-ui-small text-secondary group-hover:text-primary transition-colors">Gaceta del Semanario Judicial de la Federación, Libro 12, Tomo I.</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary">open_in_new</span>
+</li>
+</ul>
+</div>
+</article>
+</main>
+<!-- Right Sidebar: Annotations and Sources -->
+<aside class="hidden xl:flex flex-col w-[320px] bg-white hairline-l overflow-y-auto custom-scrollbar">
+<!-- Tabs -->
+<div class="flex hairline-b">
+<button class="flex-1 py-4 font-label-caps text-label-caps text-primary active-tab" id="tab-anotaciones">Anotaciones</button>
+<button class="flex-1 py-4 font-label-caps text-label-caps text-secondary hover:text-primary transition-colors" id="tab-fuentes">Fuentes Citadas</button>
+</div>
+<!-- Content Area -->
+<div class="p-6 space-y-8">
+<!-- Annotation Entry -->
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-[10px] text-secondary">SECCIÓN 2.4 - 10:45 AM</span>
+<button class="material-symbols-outlined text-[16px] text-outline hover:text-error">delete</button>
+</div>
+<div class="p-4 bg-surface-container-low border-l-2 border-primary-fixed-dim">
+<p class="font-ui-small text-ui-small text-on-surface">Vincular con la tesis 2023541 sobre la inaplicabilidad de la prisión preventiva oficiosa.</p>
+</div>
+</div>
+<!-- Annotation Entry -->
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-[10px] text-secondary">SECCIÓN 4.1 - 11:20 AM</span>
+<button class="material-symbols-outlined text-[16px] text-outline hover:text-error">delete</button>
+</div>
+<div class="p-4 bg-surface-container-low border-l-2 border-primary-fixed-dim">
+<p class="font-ui-small text-ui-small text-on-surface">Revisar traducción oficial de la sentencia CoIDH para evitar ambigüedades en el concepto de "razonabilidad".</p>
+</div>
+</div>
+<!-- Input Box -->
+<div class="pt-6 hairline-t">
+<label class="block font-label-caps text-label-caps text-secondary mb-2 uppercase">Nueva Anotación</label>
+<textarea class="w-full bg-transparent border-0 border-b border-outline-variant focus:ring-0 focus:border-primary font-ui-small text-ui-small p-0 pb-2 placeholder:text-outline-variant resize-none" placeholder="Escribe aquí..." rows="3"></textarea>
+<div class="flex justify-end mt-4">
+<button class="bg-primary text-on-primary font-label-caps text-[10px] px-4 py-2 hover:bg-primary-container transition-colors">GUARDAR</button>
+</div>
+</div>
+<!-- Sources Preview (Quick List) -->
+<div class="pt-8">
+<h4 class="font-label-caps text-label-caps text-secondary uppercase mb-4">Bibliografía Recomendada</h4>
+<div class="space-y-4">
+<div class="p-4 border border-outline-variant hover:border-primary transition-colors cursor-pointer group">
+<p class="font-ui-small text-ui-small text-primary font-medium">Carbonell, M. (2022)</p>
+<p class="font-label-caps text-[10px] text-secondary mt-1">LOS DERECHOS FUNDAMENTALES EN MÉXICO</p>
+</div>
+<div class="p-4 border border-outline-variant hover:border-primary transition-colors cursor-pointer group">
+<p class="font-ui-small text-ui-small text-primary font-medium">Fix-Zamudio, H. (2021)</p>
+<p class="font-label-caps text-[10px] text-secondary mt-1">EL CONTROL DE CONSTITUCIONALIDAD</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+<!-- Footer (Shared Component Anchor) -->
+<footer class="bg-background dark:bg-background border-t border-outline-variant dark:border-outline flex justify-between items-center w-full px-margin-desktop py-6 z-50">
+<div class="font-label-caps text-label-caps text-secondary dark:text-secondary-fixed-dim">
+            © 2024 El Notebook Legal. Hecho en México.
+        </div>
+<div class="flex space-x-8">
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed transition-colors font-label-caps text-label-caps uppercase" href="#">Privacidad</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed transition-colors font-label-caps text-label-caps uppercase" href="#">Términos</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed transition-colors font-label-caps text-label-caps uppercase" href="#">Ética Profesional</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed transition-colors font-label-caps text-label-caps uppercase" href="#">Contacto</a>
+</div>
+<div class="font-ui-small text-ui-small font-bold text-primary">
+            LEX • VERITAS
+        </div>
+</footer>
+<!-- Micro-interactions Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = [document.getElementById('tab-anotaciones'), document.getElementById('tab-fuentes')];
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => {
+                        t.classList.remove('active-tab', 'text-primary');
+                        t.classList.add('text-secondary');
+                    });
+                    tab.classList.add('active-tab', 'text-primary');
+                    tab.classList.remove('text-secondary');
+                });
+            });
+
+            // Smooth fade-in for the main article
+            const article = document.querySelector('article');
+            article.style.opacity = 0;
+            article.style.transform = 'translateY(10px)';
+            article.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+            
+            setTimeout(() => {
+                article.style.opacity = 1;
+                article.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body></html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "surface-bright": "#fbf9f3",
+                "on-secondary-container": "#666461",
+                "secondary-fixed": "#e6e2de",
+                "secondary-container": "#e6e2de",
+                "tertiary-fixed": "#ffddb2",
+                "error": "#ba1a1a",
+                "on-primary-container": "#8aa4cf",
+                "on-primary-fixed": "#001c3b",
+                "surface-dim": "#dcdad4",
+                "primary-container": "#1e3a5f",
+                "surface-tint": "#455f87",
+                "outline-variant": "#c4c6cf",
+                "on-secondary": "#ffffff",
+                "inverse-primary": "#adc8f5",
+                "on-tertiary-fixed": "#291800",
+                "tertiary-container": "#503300",
+                "surface": "#fbf9f3",
+                "surface-container-high": "#eae8e2",
+                "error-container": "#ffdad6",
+                "on-secondary-fixed-variant": "#484644",
+                "on-tertiary-container": "#c69b5f",
+                "on-error": "#ffffff",
+                "surface-container-highest": "#e4e2dd",
+                "surface-variant": "#e4e2dd",
+                "on-error-container": "#93000a",
+                "outline": "#74777f",
+                "primary-fixed-dim": "#adc8f5",
+                "on-surface": "#1b1c18",
+                "tertiary-fixed-dim": "#edbf7f",
+                "tertiary": "#341f00",
+                "on-tertiary-fixed-variant": "#60410c",
+                "on-primary": "#ffffff",
+                "inverse-on-surface": "#f3f1eb",
+                "background": "#fbf9f3",
+                "primary-fixed": "#d5e3ff",
+                "secondary-fixed-dim": "#cac6c2",
+                "on-surface-variant": "#43474e",
+                "on-tertiary": "#ffffff",
+                "surface-container-lowest": "#ffffff",
+                "on-primary-fixed-variant": "#2d486d",
+                "primary": "#022448",
+                "secondary": "#605e5b",
+                "on-secondary-fixed": "#1c1b19",
+                "on-background": "#1b1c18",
+                "surface-container": "#f0eee8",
+                "inverse-surface": "#30312d",
+                "surface-container-low": "#f5f3ed"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "unit": "4px",
+                "margin-mobile": "16px",
+                "margin-desktop": "64px",
+                "gutter": "24px",
+                "reading-width": "720px"
+            },
+            "fontFamily": {
+                "headline-lg": ["EB Garamond"],
+                "headline-md": ["EB Garamond"],
+                "data-tabular": ["Hanken Grotesk"],
+                "ui-medium": ["Hanken Grotesk"],
+                "ui-small": ["Hanken Grotesk"],
+                "body-reading": ["EB Garamond"],
+                "label-caps": ["Hanken Grotesk"],
+                "display-xl": ["EB Garamond"]
+            },
+            "fontSize": {
+                "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "400"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "ui-medium": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                "ui-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "body-reading": ["19px", {"lineHeight": "32px", "fontWeight": "400"}],
+                "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .line-divider { border-color: #E6E3DC; }
+        .bg-paper { background-color: #FBF9F4; }
+        
+        input:focus { outline: none; border-bottom-color: #022448 !important; }
+        
+        .spinning { animation: spin 2s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-background text-on-background font-ui-medium h-screen overflow-hidden flex flex-col">
+<!-- TopNavBar Shell -->
+<header class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-full border-b border-outline-variant bg-background shrink-0">
+<div class="font-display-xl text-display-xl text-primary tracking-tight">El Notebook Legal</div>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-primary border-b-2 border-primary pb-1 font-label-caps text-label-caps" href="#">Expedientes</a>
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors duration-300" href="#">Jurisprudencia</a>
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors duration-300" href="#">Borradores</a>
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors duration-300" href="#">Archivo</a>
+</nav>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer">notifications</span>
+<span class="material-symbols-outlined text-primary cursor-pointer">account_circle</span>
+</div>
+</header>
+<!-- Main Workspace Container -->
+<main class="flex flex-1 overflow-hidden">
+<!-- LEFT PANEL: Archivero Legal (~20%) -->
+<aside class="w-1/5 border-r border-outline-variant flex flex-col bg-surface-container-low p-6 overflow-y-auto hide-scrollbar">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-6 uppercase tracking-widest">Archivero Legal</h2>
+<!-- AI Intake Dropzone -->
+<div class="border-2 border-dashed border-outline-variant rounded p-8 text-center mb-8 hover:bg-surface-container transition-all cursor-pointer">
+<span class="material-symbols-outlined text-secondary block mb-2" style="font-size: 32px;">upload_file</span>
+<p class="font-ui-small text-ui-small text-secondary">Arrastra documentos aquí</p>
+</div>
+<!-- Input: Minimalist Hairline Style -->
+<div class="mb-8">
+<label class="font-label-caps text-label-caps text-secondary block mb-1">BÚSQUEDA</label>
+<input class="w-full bg-transparent border-t-0 border-x-0 border-b border-outline-variant py-2 font-ui-small text-ui-small text-on-surface focus:ring-0" placeholder="Añadir hecho o palabra clave" type="text"/>
+</div>
+<!-- File List -->
+<div class="space-y-4 mb-10">
+<div class="flex items-center gap-3 p-2 hover:bg-white transition-all cursor-pointer group">
+<span class="material-symbols-outlined text-red-700">picture_as_pdf</span>
+<span class="font-data-tabular text-data-tabular truncate">Expediente_452.pdf</span>
+</div>
+<div class="flex items-center gap-3 p-2 hover:bg-white transition-all cursor-pointer group">
+<span class="material-symbols-outlined text-blue-700">description</span>
+<span class="font-data-tabular text-data-tabular truncate">Nota_Entrevista.docx</span>
+</div>
+<div class="flex items-center gap-3 p-2 bg-white/50 border border-outline-variant/30 italic">
+<span class="material-symbols-outlined spinning text-primary">sync</span>
+<span class="font-data-tabular text-data-tabular text-secondary">Analizando con IA…</span>
+</div>
+</div>
+<!-- Filtro de Leyes -->
+<div>
+<h3 class="font-label-caps text-label-caps text-secondary mb-4">FILTRO DE LEYES</h3>
+<div class="bg-primary text-white p-3 mb-4 rounded-sm flex justify-between items-center">
+<span class="font-label-caps text-label-caps">MERCANTIL</span>
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+</div>
+<div class="space-y-3 px-1">
+<div class="flex justify-between items-center">
+<span class="font-ui-small text-ui-small">Cód. Comercio</span>
+<div class="w-8 h-4 bg-primary rounded-full relative cursor-pointer"><div class="absolute right-0.5 top-0.5 w-3 h-3 bg-white rounded-full"></div></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-ui-small text-ui-small text-secondary">LGTOC</span>
+<div class="w-8 h-4 bg-outline-variant rounded-full relative cursor-pointer"><div class="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full"></div></div>
+</div>
+</div>
+</div>
+</aside>
+<!-- CENTER PANEL: Despacho Central (~50%) -->
+<section class="flex-1 flex flex-col bg-surface-bright overflow-hidden">
+<!-- Header & Controls -->
+<div class="px-margin-desktop py-6 border-b border-outline-variant flex flex-col gap-4">
+<div class="flex justify-between items-end">
+<h1 class="font-headline-lg text-headline-lg text-primary">García vs. Inmobiliaria CDMX</h1>
+<div class="flex bg-surface-container p-1 rounded-sm">
+<button class="px-4 py-1.5 font-label-caps text-label-caps bg-white text-primary shadow-sm">EDITOR</button>
+<button class="px-4 py-1.5 font-label-caps text-label-caps text-secondary hover:text-primary transition-all">LÍNEA DEL TIEMPO</button>
+</div>
+</div>
+<!-- Toolbar -->
+<div class="flex justify-between items-center pt-2">
+<div class="flex gap-4 items-center text-secondary">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary">format_bold</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary">format_italic</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary">format_list_bulleted</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary">history</span>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 border border-primary text-primary font-label-caps text-label-caps hover:bg-primary/5 transition-all">
+                            GENERAR <span class="material-symbols-outlined text-[14px]">expand_more</span>
+</button>
+<button class="px-6 py-2 bg-[#1E3A5F] text-white font-label-caps text-label-caps hover:bg-opacity-90 transition-all">
+                            EXPORTAR
+                        </button>
+</div>
+</div>
+</div>
+<!-- Content Canvas -->
+<div class="flex-1 overflow-y-auto p-12 flex justify-center bg-surface-container-low/30 scroll-smooth">
+<div class="bg-paper w-full max-w-[800px] min-h-screen shadow-sm border border-outline-variant p-[80px] font-body-reading text-body-reading text-on-surface leading-relaxed text-justify">
+<p class="mb-8 font-label-caps text-label-caps text-center tracking-[0.2em] text-secondary">ESCRITO DE DEMANDA INICIAL</p>
+<p class="mb-6 font-bold">C. JUEZ DE LO CIVIL EN TURNO EN LA CIUDAD DE MÉXICO.</p>
+<p class="mb-6">
+<span class="font-bold">LUIS GARCÍA ROMERO</span>, por mi propio derecho, señalando como domicilio para oír y recibir toda clase de notificaciones el ubicado en Calle Reforma No. 500, Despacho 402, Colonia Juárez, Alcaldía Cuauhtémoc, autorizando para tales efectos a los Licenciados en Derecho que se mencionan al rubro, ante Usted, con el debido respeto comparezco y expongo:
+                    </p>
+<p class="mb-6 italic">
+                        Que por medio del presente libelo, vengo a demandar en la VÍA ORDINARIA CIVIL a la moral denominada INMOBILIARIA CDMX S.A. DE C.V., el cumplimiento de las siguientes prestaciones:
+                    </p>
+<ol class="list-decimal ml-8 space-y-4 mb-8">
+<li>La rescisión del contrato de compraventa celebrado con fecha 12 de enero de 2023.</li>
+<li>El pago de la cantidad de $2,500,000.00 (Dos millones quinientos mil pesos 00/100 M.N.) por concepto de devolución de enganche.</li>
+<li>El pago de daños y perjuicios derivados del incumplimiento contractual.</li>
+</ol>
+<p class="mb-6">
+                        Fundo mi pretensión en los siguientes hechos y consideraciones de derecho:
+                    </p>
+<p class="mb-6 text-on-surface/80">
+                        I. Con fecha 12 de enero de 2023, las partes celebramos contrato de compraventa respecto del inmueble ubicado en Av. Insurgentes Sur 1500, departamento 402. Sin embargo, a la fecha de entrega pactada, la demandada omitió realizar la entrega material y jurídica del bien, argumentando vicios estructurales no reportados previamente...
+                    </p>
+</div>
+</div>
+</section>
+<!-- RIGHT PANEL: Asistente de IA (~30%) -->
+<aside class="w-[30%] border-l border-outline-variant flex flex-col bg-background">
+<div class="p-6 border-b border-outline-variant">
+<h2 class="font-label-caps text-label-caps text-primary uppercase tracking-widest">Asistente de IA</h2>
+<p class="font-label-caps text-[10px] text-secondary mt-1">Fundamentación estricta · cero alucinaciones</p>
+</div>
+<!-- Tabs -->
+<div class="flex border-b border-outline-variant px-6">
+<button class="py-3 px-4 font-label-caps text-label-caps text-secondary border-b-2 border-transparent hover:text-primary transition-all">GUÍAS RÁPIDAS</button>
+<button class="py-3 px-4 font-label-caps text-label-caps text-primary border-b-2 border-primary">CONSULTA</button>
+</div>
+<!-- Chat History -->
+<div class="flex-1 overflow-y-auto p-6 space-y-6 hide-scrollbar bg-surface-bright">
+<!-- User Bubble -->
+<div class="flex flex-col items-end">
+<div class="bg-[#1E3A5F] text-white p-4 rounded-sm max-w-[85%] text-ui-small font-ui-medium leading-normal">
+                        ¿Cuál es el sustento legal para demandar la rescisión por incumplimiento en la entrega en un contrato mercantil?
+                    </div>
+<span class="text-[10px] font-label-caps text-secondary mt-2">14:02 PM</span>
+</div>
+<!-- Assistant Bubble -->
+<div class="flex flex-col items-start">
+<div class="bg-[#FBFAF7] border border-outline-variant text-primary p-4 rounded-sm max-w-[90%] text-ui-small font-ui-medium leading-normal">
+                        Para la rescisión de un contrato mercantil por incumplimiento en la entrega, el sustento principal se encuentra en el Código de Comercio. La mora del vendedor faculta al comprador para rescindir el contrato o exigir su cumplimiento, con el resarcimiento de daños.
+                        
+                        <div class="mt-4 pt-4 border-t border-outline-variant">
+<p class="font-label-caps text-[10px] text-secondary mb-2">SUSTENTO LEGAL Y FUENTES</p>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-container px-2 py-1 text-[11px] font-label-caps text-primary border border-outline-variant cursor-pointer hover:bg-white transition-all">CPEUM - Art. 16</span>
+<span class="bg-surface-container px-2 py-1 text-[11px] font-label-caps text-primary border border-outline-variant cursor-pointer hover:bg-white transition-all">Cód. Comercio - Art. 1391</span>
+<span class="bg-surface-container px-2 py-1 text-[11px] font-label-caps text-primary border border-outline-variant cursor-pointer hover:bg-white transition-all">Cód. Comercio - Art. 376</span>
+</div>
+</div>
+</div>
+<span class="text-[10px] font-label-caps text-secondary mt-2">IA LEGAL · PROCESADO</span>
+</div>
+</div>
+<!-- AI Input -->
+<div class="p-6 bg-background border-t border-outline-variant">
+<div class="relative">
+<textarea class="w-full bg-surface-container-low border border-outline-variant p-4 text-ui-small font-ui-medium focus:ring-0 focus:border-primary resize-none h-24" placeholder="Consulta el caso… (Enter para enviar)"></textarea>
+<button class="absolute bottom-4 right-4 text-primary">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</aside>
+</main>
+<!-- Footer Shell -->
+<footer class="flex justify-between items-center w-full px-margin-desktop py-4 bg-background border-t border-outline-variant shrink-0">
+<div class="font-ui-small text-ui-small font-bold text-secondary">© 2024 El Notebook Legal. Hecho en México.</div>
+<div class="flex gap-6">
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors" href="#">Privacidad</a>
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors" href="#">Términos</a>
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors" href="#">Ética Profesional</a>
+<a class="text-secondary font-label-caps text-label-caps hover:text-primary transition-colors" href="#">Contacto</a>
+</div>
+</footer>
+<script>
+        // Micro-interaction for tabs and toggles
+        document.querySelectorAll('.material-symbols-outlined').forEach(icon => {
+            icon.addEventListener('mousedown', () => {
+                icon.style.transform = 'scale(0.92)';
+            });
+            icon.addEventListener('mouseup', () => {
+                icon.style.transform = 'scale(1)';
+            });
+        });
+
+        // Simple mock for text editor focus
+        const sheet = document.querySelector('.bg-paper');
+        sheet.addEventListener('click', () => {
+            sheet.style.borderColor = '#022448';
+        });
+        document.addEventListener('click', (e) => {
+            if(!sheet.contains(e.target)) {
+                sheet.style.borderColor = '#E6E3DC';
+            }
+        });
+    </script>
+</body></html>

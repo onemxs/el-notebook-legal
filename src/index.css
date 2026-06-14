@@ -1,0 +1,266 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   El Notebook Legal — "Lex Lux Intelligencia" (Atelier Legal)
+   Premium editorial legal theme. Light is the firm default.
+   Rule: never pure black (#000), never gold.
+   ============================================================ */
+:root {
+  --canvas: #fbf9f3; /* warm bone / parchment */
+  --panel: #ffffff;
+  --panel-solid: #ffffff;
+  --aside: #f5f3ed; /* parchment sidebar surface */
+  --elevated: #f0eee8; /* hover / segmented track */
+  --paper: #fbf9f4; /* premium reading stock (editor, article viewer) */
+  --hairline: #e4e1d8; /* warm 1px divider */
+
+  --ink: #1b1c18; /* warm near-black */
+  --ink-muted: #5b5852; /* warm graphite */
+  --ink-subtle: #8c887e;
+
+  --accent: #022448; /* deep midnight navy */
+  --accent-hover: #1e3a5f;
+  --accent-soft: rgba(2, 36, 72, 0.07);
+  --accent-ring: rgba(2, 36, 72, 0.35);
+  --titanium: #5b6470;
+
+  --success: #2f6b4f; /* deep green */
+  --warning: #9a6b1f; /* burnt amber (NOT gold) */
+  --danger: #ba1a1a; /* brick red */
+  --danger-soft: rgba(186, 26, 26, 0.08);
+
+  --scrollbar-thumb: #d8d3c6;
+  --scrollbar-thumb-hover: #c2bcab;
+
+  color-scheme: light;
+}
+
+.dark {
+  --canvas: #1a1813; /* warm near-black slate */
+  --panel: #232019;
+  --panel-solid: #232019;
+  --aside: #1f1c16;
+  --elevated: #2b2820;
+  --paper: #221f18;
+  --hairline: rgba(255, 255, 255, 0.10);
+
+  --ink: #f3f1eb; /* bone */
+  --ink-muted: #bdb9ad;
+  --ink-subtle: #8a8478;
+
+  --accent: #adc8f5; /* soft light blue */
+  --accent-hover: #c6d8fa;
+  --accent-soft: rgba(173, 200, 245, 0.14);
+  --accent-ring: rgba(173, 200, 245, 0.45);
+  --titanium: #9aa3b0;
+
+  --success: #6ee7a8;
+  --warning: #edbf7f;
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.15);
+
+  --scrollbar-thumb: #34302a;
+  --scrollbar-thumb-hover: #423d35;
+
+  color-scheme: dark;
+}
+
+* {
+  border-color: var(--hairline);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--canvas);
+  color: var(--ink);
+  font-family: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---- Utilities specific to the theme ---- */
+.paper {
+  background-color: var(--paper);
+}
+
+/* Small-caps metadata labels — the "filing system" feel */
+.label-caps {
+  font-family: "Hanken Grotesk", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tactile press feedback (Lex Lux relief) */
+.tactile:active {
+  box-shadow: inset 0 2px 4px rgba(2, 12, 24, 0.22);
+  transform: translateY(1px);
+}
+
+/* Legacy panel class kept solid (no blur) for the editorial flat look */
+.panel-glass {
+  background-color: var(--panel);
+}
+
+/* ---- Scrollbars ---- */
+.scroll-zone {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+.scroll-zone::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.scroll-zone::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-zone::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.scroll-zone::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--canvas), 0 0 0 4px var(--accent-ring);
+  border-radius: 8px;
+}
+
+/* ============================================================
+   Legal reading typography — EB Garamond, generous measure.
+   ============================================================ */
+.prose-legal {
+  font-family: "EB Garamond", Georgia, Cambria, serif;
+  font-size: 19px;
+  line-height: 1.68;
+  color: var(--ink);
+}
+.prose-legal p {
+  margin: 0 0 1rem;
+  max-width: 68ch;
+}
+.prose-legal h1,
+.prose-legal h2,
+.prose-legal h3 {
+  font-family: "EB Garamond", Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  margin: 1.6rem 0 0.75rem;
+}
+.prose-legal h1 {
+  font-size: 1.7rem;
+}
+.prose-legal h2 {
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.prose-legal h3 {
+  font-size: 1.1rem;
+}
+.prose-legal strong {
+  font-weight: 600;
+}
+.prose-legal ul,
+.prose-legal ol {
+  margin: 0 0 1rem;
+  padding-left: 1.5rem;
+}
+.prose-legal li {
+  margin-bottom: 0.35rem;
+}
+.prose-legal blockquote {
+  border-left: 2px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.25rem 0 0.25rem 1rem;
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+[contenteditable][data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  color: var(--ink-subtle);
+  pointer-events: none;
+}
+
+/* Loading shimmer */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(2, 36, 72, 0.06), transparent);
+  animation: shimmer 1.4s infinite;
+}
+
+.typing-dot {
+  animation: dot-pulse 1.2s infinite ease-in-out both;
+}
+
+.sign-canvas {
+  touch-action: none;
+  cursor: crosshair;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .shimmer::after {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Print — judicial document layout (wide left margin for binding)
+   ============================================================ */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #print-root,
+  #print-root * {
+    visibility: visible;
+  }
+  #print-root {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    color: #1b1c18;
+  }
+  @page {
+    size: letter;
+    margin: 2.5cm 2.5cm 2.5cm 4cm;
+  }
+}

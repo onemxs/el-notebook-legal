@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=375, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        body {
+            background-color: #fbf9f3;
+            -webkit-font-smoothing: antialiased;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 2px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E6E3DC;
+        }
+        .relief-card {
+            box-shadow: 0 2px 8px -2px rgba(2, 36, 72, 0.08), 0 1px 2px -1px rgba(2, 36, 72, 0.04);
+        }
+        .relief-chip {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#fbf9f3",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001c3b",
+                        "on-tertiary-container": "#c69b5f",
+                        "tertiary-fixed-dim": "#edbf7f",
+                        "on-tertiary-fixed-variant": "#60410c",
+                        "on-primary-container": "#8aa4cf",
+                        "surface-tint": "#455f87",
+                        "tertiary": "#341f00",
+                        "tertiary-container": "#503300",
+                        "secondary-container": "#e6e2de",
+                        "primary": "#022448",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#dcdad4",
+                        "outline": "#74777f",
+                        "secondary-fixed": "#e6e2de",
+                        "primary-fixed": "#d5e3ff",
+                        "on-surface-variant": "#43474e",
+                        "on-surface": "#1b1c18",
+                        "surface-container-high": "#eae8e2",
+                        "primary-container": "#1e3a5f",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f5f3ed",
+                        "on-secondary-container": "#666461",
+                        "on-background": "#1b1c18",
+                        "secondary-fixed-dim": "#cac6c2",
+                        "inverse-on-surface": "#f3f1eb",
+                        "tertiary-fixed": "#ffddb2",
+                        "outline-variant": "#c4c6cf",
+                        "secondary": "#605e5b",
+                        "surface-container": "#f0eee8",
+                        "primary-fixed-dim": "#adc8f5",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fbf9f3",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e4e2dd",
+                        "background": "#fbf9f3",
+                        "surface-variant": "#e4e2dd",
+                        "on-secondary-fixed-variant": "#484644",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#291800",
+                        "on-primary-fixed-variant": "#2d486d",
+                        "inverse-primary": "#adc8f5",
+                        "on-secondary-fixed": "#1c1b19",
+                        "inverse-surface": "#30312d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "reading-width": "720px",
+                        "unit": "4px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "ui-small": ["Hanken Grotesk"],
+                        "ui-medium": ["Hanken Grotesk"],
+                        "display-xl": ["EB Garamond"],
+                        "headline-md": ["EB Garamond"],
+                        "data-tabular": ["Hanken Grotesk"],
+                        "headline-lg": ["EB Garamond"],
+                        "body-reading": ["EB Garamond"],
+                        "label-caps": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "ui-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "ui-medium": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "400"}],
+                        "body-reading": ["19px", {"lineHeight": "32px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-surface font-ui-small text-on-surface w-[375px] mx-auto min-h-screen relative shadow-2xl overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-sm border-b border-secondary-container flex justify-between items-center h-16 px-margin-mobile">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">gavel</span>
+<h1 class="font-headline-md text-primary tracking-widest uppercase text-[16px]">EL NOTEBOOK LEGAL</h1>
+</div>
+<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</button>
+</header>
+<main class="pt-24 pb-24 px-margin-mobile">
+<!-- Page Title & Editorial Context -->
+<section class="mb-8">
+<h2 class="font-headline-lg text-primary mb-1">Archivero Legal</h2>
+<p class="font-body-reading text-on-surface-variant italic opacity-70">Repositorio central de expedientes y doctrina.</p>
+</section>
+<!-- Intake Dropzone -->
+<section class="mb-8">
+<div class="border border-dashed border-outline-variant bg-surface-container-low p-8 rounded-xl flex flex-col items-center justify-center text-center transition-all hover:bg-surface-container-high group cursor-pointer relief-card">
+<span class="material-symbols-outlined text-primary mb-3 scale-125 group-hover:translate-y-[-2px] transition-transform">upload_file</span>
+<p class="font-label-caps text-on-primary-fixed mb-1">ARRASTRAR O SELECCIONAR</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">PDF, DOCX hasta 25MB</p>
+</div>
+</section>
+<!-- Search Input -->
+<section class="mb-6">
+<div class="relative bg-surface-container-low rounded-full px-4 relief-chip">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant scale-90">search</span>
+<input class="w-full bg-transparent border-none py-3 pl-8 pr-2 focus:ring-0 text-ui-small placeholder:italic placeholder:text-outline-variant" placeholder="Añadir hecho o palabra clave" type="text"/>
+</div>
+</section>
+<!-- Filter Chips -->
+<section class="mb-8 flex gap-3 overflow-x-auto pb-2 custom-scrollbar no-scrollbar">
+<button class="px-5 py-2 bg-primary text-on-primary font-label-caps text-[10px] whitespace-nowrap rounded-full relief-chip shadow-sm">TODO</button>
+<button class="px-5 py-2 bg-surface-container-highest text-on-secondary-container font-label-caps text-[10px] whitespace-nowrap rounded-full border border-outline-variant/30 hover:border-primary transition-colors relief-chip">MERCANTIL</button>
+<button class="px-5 py-2 bg-surface-container-highest text-on-secondary-container font-label-caps text-[10px] whitespace-nowrap rounded-full border border-outline-variant/30 hover:border-primary transition-colors relief-chip">CIVIL</button>
+<button class="px-5 py-2 bg-surface-container-highest text-on-secondary-container font-label-caps text-[10px] whitespace-nowrap rounded-full border border-outline-variant/30 hover:border-primary transition-colors relief-chip">AMPARO</button>
+</section>
+<!-- Document List -->
+<section class="space-y-4">
+<!-- Item 1: Analyzing State -->
+<div class="p-4 bg-surface-container-lowest rounded-xl relief-card group active:bg-surface-container-low transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-14 bg-primary-container/10 rounded-lg flex items-center justify-center relative overflow-hidden flex-shrink-0">
+<span class="material-symbols-outlined text-primary opacity-60">description</span>
+<div class="absolute bottom-0 left-0 h-1 bg-tertiary-fixed-dim animate-[width_2s_ease-in-out_infinite]" style="width: 40%;"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-0.5">
+<h3 class="font-ui-medium text-primary truncate pr-2">Contrato_Maestro_vF.pdf</h3>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-[12px] text-on-surface-variant font-ui-small">hace 2 min • 4.2 MB</p>
+<span class="font-label-caps text-[9px] text-on-tertiary-container animate-pulse">ANALIZANDO CON IA...</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="p-4 bg-surface-container-lowest rounded-xl relief-card group active:bg-surface-container-low transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-14 bg-surface-container rounded-lg border border-outline-variant/30 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-secondary opacity-70">article</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-0.5">
+<h3 class="font-ui-medium text-primary truncate pr-2">Demanda_Civil_Sánchez.docx</h3>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-[12px] text-on-surface-variant font-ui-small">14 Oct 2023 • 1.1 MB</p>
+<span class="font-label-caps text-[9px] text-on-surface-variant/60 tracking-wider">CIVIL</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="p-4 bg-surface-container-lowest rounded-xl relief-card group active:bg-surface-container-low transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-14 bg-surface-container rounded-lg border border-outline-variant/30 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-secondary opacity-70">history_edu</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-0.5">
+<h3 class="font-ui-medium text-primary truncate pr-2">Escritura_Notarial_772.pdf</h3>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-[12px] text-on-surface-variant font-ui-small">08 Oct 2023 • 12.8 MB</p>
+<span class="font-label-caps text-[9px] text-on-surface-variant/60 tracking-wider">MERCANTIL</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="p-4 bg-surface-container-lowest rounded-xl relief-card group active:bg-surface-container-low transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-14 bg-surface-container rounded-lg border border-outline-variant/30 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-secondary opacity-70">balance</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start mb-0.5">
+<h3 class="font-ui-medium text-primary truncate pr-2">Jurisprudencia_2023_SCJN.pdf</h3>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-[12px] text-on-surface-variant font-ui-small">01 Oct 2023 • 2.5 MB</p>
+<span class="font-label-caps text-[9px] text-on-surface-variant/60 tracking-wider">DOCTRINA</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-margin-mobile bg-surface-bright/95 backdrop-blur-md border-t border-secondary-container z-50">
+<a class="flex flex-col items-center justify-center text-primary pt-2 transition-all relative" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">folder_open</span>
+<span class="font-label-caps text-[10px] mt-1">Archivero</span>
+<div class="absolute -top-px left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full"></div>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 opacity-50 hover:opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label-caps text-[10px] mt-1">Despacho</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 opacity-50 hover:opacity-100 transition-all" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-caps text-[10px] mt-1">Asistente</span>
+</a>
+</nav>
+<!-- Floating Atmosphere Elements -->
+<div class="fixed top-1/4 -right-12 w-64 h-64 bg-primary-container opacity-[0.04] rounded-full blur-3xl pointer-events-none"></div>
+<div class="fixed bottom-1/4 -left-12 w-48 h-48 bg-tertiary-container opacity-[0.03] rounded-full blur-3xl pointer-events-none"></div>
+<script>
+        // Search Input focus effect
+        const searchInput = document.querySelector('input');
+        const searchContainer = searchInput.parentElement;
+        searchInput.addEventListener('focus', () => {
+            searchContainer.classList.add('ring-1', 'ring-primary/20', 'bg-surface-container');
+            searchContainer.querySelector('span').style.color = '#022448';
+        });
+        searchInput.addEventListener('blur', () => {
+            searchContainer.classList.remove('ring-1', 'ring-primary/20', 'bg-surface-container');
+            searchContainer.querySelector('span').style.color = '#c4c6cf';
+        });
+    </script>
+</body></html>

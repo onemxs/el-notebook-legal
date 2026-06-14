@@ -1,0 +1,13 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.local
+.DS_Store
+.claude-flow
+
+# Corpus jurídico: fuentes oficiales y dataset generado (regenerables con
+# `npm run corpus:build`). No conviene versionar megas de leyes.
+data/leyes_fuente/
+data/leyes_articulos.json

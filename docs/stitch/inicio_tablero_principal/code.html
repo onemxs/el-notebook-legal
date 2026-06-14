@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fbf9f3; /* Matching bone/ivory from design system */
+            -webkit-font-smoothing: antialiased;
+        }
+        .hairline-border { border: 1px solid #E6E3DC; }
+        .hairline-b { border-bottom: 1px solid #E6E3DC; }
+        .hairline-r { border-right: 1px solid #E6E3DC; }
+        .asymmetric-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+        }
+        .luxury-shadow { box-shadow: 0 4px 20px -12px rgba(0,0,0,0.08); }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e4e2dd",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#503300",
+                        "tertiary": "#341f00",
+                        "on-surface": "#1b1c18",
+                        "secondary-container": "#e6e2de",
+                        "on-tertiary-fixed": "#291800",
+                        "surface-bright": "#fbf9f3",
+                        "primary-fixed-dim": "#adc8f5",
+                        "on-tertiary-fixed-variant": "#60410c",
+                        "inverse-primary": "#adc8f5",
+                        "surface-container-high": "#eae8e2",
+                        "on-tertiary-container": "#c69b5f",
+                        "on-primary-container": "#8aa4cf",
+                        "tertiary-fixed-dim": "#edbf7f",
+                        "secondary-fixed": "#e6e2de",
+                        "outline": "#74777f",
+                        "secondary-fixed-dim": "#cac6c2",
+                        "on-secondary-fixed-variant": "#484644",
+                        "tertiary-fixed": "#ffddb2",
+                        "inverse-on-surface": "#f3f1eb",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#dcdad4",
+                        "background": "#fbf9f3",
+                        "surface": "#fbf9f3",
+                        "error-container": "#ffdad6",
+                        "primary": "#022448",
+                        "secondary": "#605e5b",
+                        "on-background": "#1b1c18",
+                        "primary-fixed": "#d5e3ff",
+                        "surface-container-low": "#f5f3ed",
+                        "surface-container": "#f0eee8",
+                        "primary-container": "#1e3a5f",
+                        "on-surface-variant": "#43474e",
+                        "surface-variant": "#e4e2dd",
+                        "outline-variant": "#c4c6cf",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#666461",
+                        "surface-tint": "#455f87",
+                        "inverse-surface": "#30312d",
+                        "on-primary-fixed-variant": "#2d486d",
+                        "on-primary-fixed": "#001c3b",
+                        "on-secondary-fixed": "#1c1b19"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-desktop": "64px",
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "reading-width": "720px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Hanken Grotesk"],
+                        "headline-md": ["EB Garamond"],
+                        "data-tabular": ["Hanken Grotesk"],
+                        "headline-lg": ["EB Garamond"],
+                        "ui-medium": ["Hanken Grotesk"],
+                        "display-xl": ["EB Garamond"],
+                        "ui-small": ["Hanken Grotesk"],
+                        "body-reading": ["EB Garamond"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "400"}],
+                        "ui-medium": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "ui-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-reading": ["19px", {"lineHeight": "32px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- Sidebar Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant flex flex-col py-8 z-50">
+<div class="px-6 mb-12">
+<div class="flex items-center gap-3">
+<img alt="Logo El Notebook Legal" class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8ORCIO-pwEv7A1fQuO7_mxEErxUe0nXxek0JnuUSsyVqJ1XvjtviZALVnMyXW0KpBXqOFDx44kH-ZecyJCUUh1DGQnIRLgXXxjjaJEJi-h9UyTwAZSXFqnmrBrxMrRckohK8yRAM8x7vhq-jKDpV6-M19owgq3xkTirMAJwCr6Qam51W2cFsXZEvW00Gsy_shXVDYt8Uj66JPxG6uGqaS_quMp5O0KUPu9_BE29tvgvF4ZDB0Hzv6GgK0tjvM-t0f0AItaPAAUMA"/>
+<div>
+<h2 class="font-ui-medium text-ui-medium text-primary">Despacho Asociado</h2>
+<p class="font-label-caps text-[10px] text-secondary tracking-widest uppercase">Ciudad de México</p>
+</div>
+</div>
+</div>
+<nav class="flex-grow">
+<ul class="space-y-1">
+<li class="bg-white dark:bg-primary-container text-primary border-l-4 border-primary py-3 px-6 cursor-pointer">
+<a class="flex items-center gap-4" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps uppercase">Inicio</span>
+</a>
+</li>
+<li class="text-secondary font-label-caps text-label-caps py-3 px-6 hover:bg-white transition-all cursor-pointer">
+<a class="flex items-center gap-4" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="uppercase">Biblioteca</span>
+</a>
+</li>
+<li class="text-secondary font-label-caps text-label-caps py-3 px-6 hover:bg-white transition-all cursor-pointer">
+<a class="flex items-center gap-4" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+<span class="uppercase">Casos</span>
+</a>
+</li>
+<li class="text-secondary font-label-caps text-label-caps py-3 px-6 hover:bg-white transition-all cursor-pointer">
+<a class="flex items-center gap-4" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="uppercase">Minutas</span>
+</a>
+</li>
+<li class="text-secondary font-label-caps text-label-caps py-3 px-6 hover:bg-white transition-all cursor-pointer">
+<a class="flex items-center gap-4" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="uppercase">Configuración</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="mt-auto px-6 border-t border-outline-variant pt-6">
+<button class="w-full border border-primary text-primary font-label-caps text-label-caps py-3 px-4 flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all mb-6">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                NUEVA CONSULTA
+            </button>
+<ul class="space-y-4">
+<li class="text-secondary flex items-center gap-4 cursor-pointer hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="help_outline">help_outline</span>
+<span class="font-label-caps text-label-caps uppercase">Ayuda</span>
+</li>
+<li class="text-secondary flex items-center gap-4 cursor-pointer hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="logout">logout</span>
+<span class="font-label-caps text-label-caps uppercase">Cerrar Sesión</span>
+</li>
+</ul>
+</div>
+</aside>
+<!-- Top AppBar Shell -->
+<header class="fixed top-0 right-0 left-64 bg-background border-b border-outline-variant flex justify-between items-center px-margin-desktop py-4 z-40">
+<div class="flex items-center gap-4">
+<img alt="Logo" class="w-8 h-8 opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8ORCIO-pwEv7A1fQuO7_mxEErxUe0nXxek0JnuUSsyVqJ1XvjtviZALVnMyXW0KpBXqOFDx44kH-ZecyJCUUh1DGQnIRLgXXxjjaJEJi-h9UyTwAZSXFqnmrBrxMrRckohK8yRAM8x7vhq-jKDpV6-M19owgq3xkTirMAJwCr6Qam51W2cFsXZEvW00Gsy_shXVDYt8Uj66JPxG6uGqaS_quMp5O0KUPu9_BE29tvgvF4ZDB0Hzv6GgK0tjvM-t0f0AItaPAAUMA"/>
+<h1 class="font-label-caps text-label-caps text-secondary tracking-[0.2em] uppercase">El Notebook Legal <span class="mx-2">·</span> Inteligencia Jurídica · México</h1>
+</div>
+<div class="flex items-center gap-6">
+<button class="bg-primary text-white font-label-caps text-label-caps px-6 py-2.5 flex items-center gap-2 hover:opacity-90 transition-all uppercase">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                Nuevo Caso
+            </button>
+<div class="flex items-center gap-4 text-secondary">
+<button class="hover:text-primary transition-colors cursor-pointer material-symbols-outlined" data-icon="contrast">contrast</button>
+<button class="hover:text-primary transition-colors cursor-pointer material-symbols-outlined" data-icon="notifications">notifications</button>
+<button class="hover:text-primary transition-colors cursor-pointer material-symbols-outlined" data-icon="account_circle">account_circle</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 mt-20 px-margin-desktop py-12">
+<!-- Asymmetric Hero Section -->
+<section class="asymmetric-grid gap-gutter mb-16">
+<div class="col-span-12 md:col-span-7 flex flex-col justify-center">
+<span class="font-label-caps text-label-caps text-primary uppercase mb-2 tracking-widest">Sábado, 13 de Junio</span>
+<h2 class="font-display-xl text-display-xl text-primary mb-4">Bienvenido de vuelta, Lic. Estrada</h2>
+<p class="font-body-reading text-body-reading text-secondary max-w-lg">
+                    Inicie una nueva investigación cargando archivos pertinentes <a class="text-primary underline underline-offset-4 hover:opacity-80 transition-opacity" href="#">o cree un expediente manualmente</a>.
+                </p>
+</div>
+<div class="col-span-12 md:col-span-5">
+<div class="bg-white border-2 border-dashed border-outline-variant p-8 flex flex-col items-center justify-center text-center group cursor-pointer hover:border-primary transition-colors duration-300">
+<span class="material-symbols-outlined text-4xl text-outline mb-4 group-hover:text-primary transition-colors" data-icon="cloud_upload">cloud_upload</span>
+<p class="font-ui-medium text-ui-medium text-on-surface mb-2">Arrastra el expediente del cliente</p>
+<p class="font-ui-small text-ui-small text-secondary mb-6">PDF, Word o imagen. La IA crea el caso, detecta la rama y carga el documento.</p>
+<div class="bg-surface-container-highest px-3 py-1 font-label-caps text-[10px] tracking-wider uppercase flex items-center gap-2 text-primary border border-outline-variant">
+<span class="material-symbols-outlined text-xs" data-icon="bolt">bolt</span>
+                        Analizar con IA
+                    </div>
+</div>
+</div>
+</section>
+<!-- Metrics Grid -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-16">
+<div class="bg-white p-6 hairline-border">
+<span class="font-label-caps text-label-caps text-secondary uppercase block mb-4">Expedientes activos</span>
+<div class="flex items-baseline gap-2">
+<span class="font-display-xl text-4xl text-primary">04</span>
+<span class="font-label-caps text-label-caps text-outline">+1 este mes</span>
+</div>
+</div>
+<div class="bg-white p-6 hairline-border">
+<span class="font-label-caps text-label-caps text-secondary uppercase block mb-4">Plazos por vigilar</span>
+<div class="flex items-baseline gap-2">
+<span class="font-display-xl text-4xl text-error">03</span>
+<span class="material-symbols-outlined text-error text-xl" data-icon="warning">warning</span>
+</div>
+</div>
+<div class="bg-white p-6 hairline-border">
+<span class="font-label-caps text-label-caps text-secondary uppercase block mb-4">Ramas del derecho</span>
+<div class="flex items-baseline gap-2">
+<span class="font-display-xl text-4xl text-primary">09</span>
+<span class="font-ui-small text-ui-small text-outline">Activas</span>
+</div>
+</div>
+<div class="bg-white p-6 hairline-border">
+<span class="font-label-caps text-label-caps text-secondary uppercase block mb-4">Dataset actualizado</span>
+<div class="flex items-center gap-2">
+<span class="font-data-tabular text-data-tabular text-primary">13.06.2024</span>
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+</div>
+</div>
+</section>
+<!-- Navigation Tabs: Iniciar por rama -->
+<section class="mb-16">
+<h3 class="font-label-caps text-label-caps text-secondary uppercase mb-6 tracking-widest">Iniciar por rama</h3>
+<div class="flex flex-wrap gap-3">
+<button class="px-5 py-2 hairline-border bg-white font-label-caps text-label-caps text-primary hover:bg-primary hover:text-white transition-all uppercase">Civil</button>
+<button class="px-5 py-2 hairline-border bg-white font-label-caps text-label-caps text-primary hover:bg-primary hover:text-white transition-all uppercase">Mercantil</button>
+<button class="px-5 py-2 hairline-border bg-white font-label-caps text-label-caps text-primary hover:bg-primary hover:text-white transition-all uppercase">Amparo</button>
+<button class="px-5 py-2 hairline-border bg-white font-label-caps text-label-caps text-primary hover:bg-primary hover:text-white transition-all uppercase">Laboral</button>
+<button class="px-5 py-2 hairline-border bg-white font-label-caps text-label-caps text-primary hover:bg-primary hover:text-white transition-all uppercase">Penal</button>
+<button class="px-5 py-2 hairline-border bg-white font-label-caps text-label-caps text-primary hover:bg-primary hover:text-white transition-all uppercase">Administrativo</button>
+<button class="px-5 py-2 hairline-border bg-white font-label-caps text-label-caps text-primary hover:bg-primary hover:text-white transition-all uppercase">Familiar</button>
+<button class="px-5 py-2 hairline-border bg-white font-label-caps text-label-caps text-primary hover:bg-primary hover:text-white transition-all uppercase">Fiscal</button>
+<button class="px-5 py-2 hairline-border bg-white font-label-caps text-label-caps text-primary hover:bg-primary hover:text-white transition-all uppercase">Propiedad Intelectual</button>
+</div>
+</section>
+<!-- Expedientes Grid -->
+<section>
+<div class="flex justify-between items-end mb-8 border-b border-outline-variant pb-4">
+<h3 class="font-headline-lg text-headline-lg text-primary">Mis expedientes</h3>
+<a class="font-label-caps text-label-caps text-primary uppercase tracking-widest hover:opacity-70" href="#">Ver archivo completo →</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Case Card 1 -->
+<div class="bg-white hairline-border p-6 flex flex-col group hover:border-primary transition-colors cursor-pointer">
+<div class="flex justify-between items-start mb-6">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="balance">balance</span>
+<span class="font-label-caps text-[10px] tracking-widest text-primary bg-surface-container px-2 py-0.5 uppercase">Civil</span>
+</div>
+</div>
+<span class="font-label-caps text-[10px] text-error border border-error px-2 py-0.5 uppercase">Crítico</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-primary mb-2 group-hover:text-primary/80">Sucesorio Intestamentario - Fam. Mendoza</h4>
+<p class="font-label-caps text-[11px] text-secondary uppercase mb-8">Última actividad: 11 Jun 2024</p>
+<div class="mt-auto pt-4 border-t border-outline-variant flex items-center justify-between">
+<span class="font-label-caps text-[10px] text-error uppercase">Prescripción 2 meses · art. 518</span>
+<span class="material-symbols-outlined text-secondary group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Case Card 2 -->
+<div class="bg-white hairline-border p-6 flex flex-col group hover:border-primary transition-colors cursor-pointer">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="gavel">gavel</span>
+<span class="font-label-caps text-[10px] tracking-widest text-primary bg-surface-container px-2 py-0.5 uppercase">Penal</span>
+</div>
+</div>
+<h4 class="font-headline-md text-headline-md text-primary mb-2 group-hover:text-primary/80">Amparo Indirecto - 452/2024 - Constructora S.A.</h4>
+<p class="font-label-caps text-[11px] text-secondary uppercase mb-8">Última actividad: 12 Jun 2024</p>
+<div class="mt-auto pt-4 border-t border-outline-variant flex items-center justify-between">
+<span class="font-label-caps text-[10px] text-secondary uppercase">Sin plazos pendientes</span>
+<span class="material-symbols-outlined text-secondary group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Case Card 3 -->
+<div class="bg-white hairline-border p-6 flex flex-col group hover:border-primary transition-colors cursor-pointer">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="business_center">business_center</span>
+<span class="font-label-caps text-[10px] tracking-widest text-primary bg-surface-container px-2 py-0.5 uppercase">Mercantil</span>
+</div>
+</div>
+<h4 class="font-headline-md text-headline-md text-primary mb-2 group-hover:text-primary/80">Juicio Ejecutivo - Pagaré 091-B - Refaccionaria Ruiz</h4>
+<p class="font-label-caps text-[11px] text-secondary uppercase mb-8">Última actividad: 09 Jun 2024</p>
+<div class="mt-auto pt-4 border-t border-outline-variant flex items-center justify-between">
+<span class="font-label-caps text-[10px] text-error uppercase">Término para desahogo · 3 días</span>
+<span class="material-symbols-outlined text-secondary group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Shell -->
+<footer class="ml-64 bg-background border-t border-outline-variant py-8 px-margin-desktop flex justify-between items-center mt-20">
+<div>
+<p class="font-label-caps text-[10px] text-secondary uppercase tracking-[0.2em]">© 2024 El Notebook Legal. Hecho en México.</p>
+</div>
+<div class="flex gap-8">
+<a class="font-label-caps text-[10px] text-secondary hover:text-primary transition-colors uppercase tracking-widest" href="#">Privacidad</a>
+<a class="font-label-caps text-[10px] text-secondary hover:text-primary transition-colors uppercase tracking-widest" href="#">Términos</a>
+<a class="font-label-caps text-[10px] text-secondary hover:text-primary transition-colors uppercase tracking-widest" href="#">Ética Profesional</a>
+<a class="font-label-caps text-[10px] text-secondary hover:text-primary transition-colors uppercase tracking-widest" href="#">Contacto</a>
+</div>
+</footer>
+<script>
+        // Micro-interactions for dashboard
+        document.querySelectorAll('.hairline-border').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.borderColor = '#022448';
+                card.style.transform = 'translateY(-2px)';
+                card.style.transition = 'all 0.3s ease';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.borderColor = '#E6E3DC';
+                card.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Theme toggle logic (placeholder for actual functionality)
+        const themeToggle = document.querySelector('[data-icon="contrast"]');
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+    </script>
+</body></html>

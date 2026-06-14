@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Hanken+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#fbf9f3",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#001c3b",
+                    "on-tertiary-container": "#c69b5f",
+                    "tertiary-fixed-dim": "#edbf7f",
+                    "on-tertiary-fixed-variant": "#60410c",
+                    "on-primary-container": "#8aa4cf",
+                    "surface-tint": "#455f87",
+                    "tertiary": "#341f00",
+                    "tertiary-container": "#503300",
+                    "secondary-container": "#e6e2de",
+                    "primary": "#022448",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#dcdad4",
+                    "outline": "#74777f",
+                    "secondary-fixed": "#e6e2de",
+                    "primary-fixed": "#d5e3ff",
+                    "on-surface-variant": "#43474e",
+                    "on-surface": "#1b1c18",
+                    "surface-container-high": "#eae8e2",
+                    "primary-container": "#1e3a5f",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#f5f3ed",
+                    "on-secondary-container": "#666461",
+                    "on-background": "#1b1c18",
+                    "secondary-fixed-dim": "#cac6c2",
+                    "inverse-on-surface": "#f3f1eb",
+                    "tertiary-fixed": "#ffddb2",
+                    "outline-variant": "#c4c6cf",
+                    "secondary": "#605e5b",
+                    "surface-container": "#f0eee8",
+                    "primary-fixed-dim": "#adc8f5",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#fbf9f3",
+                    "error-container": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-highest": "#e4e2dd",
+                    "background": "#fbf9f3",
+                    "surface-variant": "#e4e2dd",
+                    "on-secondary-fixed-variant": "#484644",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed": "#291800",
+                    "on-primary-fixed-variant": "#2d486d",
+                    "inverse-primary": "#adc8f5",
+                    "on-secondary-fixed": "#1c1b19",
+                    "inverse-surface": "#30312d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "reading-width": "720px",
+                    "unit": "4px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "ui-small": ["Hanken Grotesk"],
+                    "ui-medium": ["Hanken Grotesk"],
+                    "display-xl": ["EB Garamond"],
+                    "headline-md": ["EB Garamond"],
+                    "data-tabular": ["Hanken Grotesk"],
+                    "headline-lg": ["EB Garamond"],
+                    "body-reading": ["EB Garamond"],
+                    "label-caps": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "ui-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "ui-medium": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "400"}],
+                    "body-reading": ["19px", {"lineHeight": "32px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fbf9f3;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .paper-sheet {
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            min-height: 100vh;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-ui-small text-on-background">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-secondary-container flex justify-between items-center h-16 px-margin-mobile">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="gavel">gavel</span>
+<h1 class="font-headline-md text-headline-md-mobile text-primary tracking-tight">García vs. Inmobiliaria</h1>
+</div>
+<button class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="more_vert">more_vert</span>
+</button>
+</header>
+<main class="pt-16 pb-32">
+<!-- Segmented Control -->
+<div class="px-margin-mobile py-4 bg-surface/80 backdrop-blur-sm sticky top-16 z-40">
+<div class="flex w-full bg-secondary-container p-1 rounded-none border border-outline-variant/30">
+<button class="flex-1 py-2 font-label-caps text-label-caps bg-surface text-primary border border-outline-variant/20 shadow-sm transition-all">
+                    EDITOR
+                </button>
+<button class="flex-1 py-2 font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors">
+                    LÍNEA DEL TIEMPO
+                </button>
+</div>
+</div>
+<!-- Formatting Toolbar -->
+<div class="px-margin-mobile py-2 flex items-center justify-between border-b border-secondary-container bg-surface-container-low overflow-x-auto no-scrollbar">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="format_bold">format_bold</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="format_italic">format_italic</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="format_underlined">format_underlined</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="format_align_left">format_align_left</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="format_list_bulleted">format_list_bulleted</span>
+</div>
+<div class="h-4 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="history">history</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="spellcheck">spellcheck</span>
+</div>
+</div>
+<!-- Virtual Paper Sheet -->
+<section class="px-4 py-8 max-w-[375px] mx-auto">
+<article class="paper-sheet bg-surface-container-lowest p-8 border border-secondary-container">
+<header class="mb-12 text-right">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Expediente 442/2023</p>
+<p class="font-ui-small text-ui-small italic text-on-surface-variant">Ciudad de México, a 14 de Octubre de 2023</p>
+</header>
+<div class="mb-8">
+<h2 class="font-headline-md text-headline-md-mobile text-primary mb-4">DEMANDA INICIAL DE JUICIO ORDINARIO CIVIL</h2>
+<p class="font-ui-small text-ui-small font-bold uppercase mb-2">C. JUEZ DE LO CIVIL EN TURNO</p>
+<p class="font-ui-small text-ui-small font-medium">P R E S E N T E .</p>
+</div>
+<div class="font-body-reading text-body-reading text-on-surface leading-relaxed text-justify space-y-6">
+<p>
+<span class="font-bold">LUIS GARCÍA ROMERO</span>, por mi propio derecho, señalando como domicilio para oír y recibir toda clase de notificaciones el ubicado en la calle...
+                    </p>
+<p>
+                        Vengo por medio del presente escrito, en la vía Ordinaria Civil, a demandar de <span class="font-bold">INMOBILIARIA DEL VALLE S.A. DE C.V.</span>, el cumplimiento de las siguientes:
+                    </p>
+<ul class="list-none pl-4 space-y-2 italic">
+<li>A) El pago de la cantidad de $1,200,000.00...</li>
+<li>B) La rescisión del contrato de compraventa...</li>
+</ul>
+<p>
+                        Fundo mi demanda en los siguientes hechos y consideraciones de derecho:
+                    </p>
+<p class="border-l-2 border-primary-container pl-4 italic text-on-surface-variant">
+                        "El contrato celebrado el día 12 de enero de 2022 estipulaba claramente la entrega de la posesión..."
+                    </p>
+</div>
+</article>
+</section>
+<!-- Quick Actions Floating -->
+<div class="fixed bottom-24 right-margin-mobile flex flex-col gap-3">
+<button class="bg-primary text-on-primary w-12 h-12 flex items-center justify-center border border-primary shadow-sm active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="smart_toy" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</button>
+</div>
+</main>
+<!-- Bottom Action Bar (Transactional) -->
+<div class="fixed bottom-20 left-0 w-full bg-surface-container-high border-t border-secondary-container px-4 py-3 flex gap-3 z-50">
+<button class="flex-1 bg-surface border border-primary text-primary font-label-caps text-label-caps py-3 hover:opacity-80 active:scale-95 transition-all">
+            GENERAR
+        </button>
+<button class="flex-1 bg-primary text-on-primary font-label-caps text-label-caps py-3 hover:opacity-90 active:scale-95 transition-all">
+            EXPORTAR
+        </button>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-margin-mobile bg-surface border-t border-secondary-container z-50">
+<div class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline pt-2 hover:text-primary-fixed-variant transition-colors active:opacity-70">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="font-label-caps text-label-caps mt-1">Archivero</span>
+</div>
+<div class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed border-t-2 border-primary pt-2 hover:text-primary-fixed-variant transition-colors active:opacity-70">
+<span class="material-symbols-outlined" data-icon="account_balance" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+<span class="font-label-caps text-label-caps mt-1">Despacho</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline pt-2 hover:text-primary-fixed-variant transition-colors active:opacity-70">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-caps text-label-caps mt-1">Asistente</span>
+</div>
+</nav>
+<script>
+        // Simple micro-interaction for the virtual sheet
+        const sheet = document.querySelector('.paper-sheet');
+        sheet.addEventListener('touchstart', () => {
+            sheet.style.borderColor = '#1E3A5F';
+        });
+        sheet.addEventListener('touchend', () => {
+            setTimeout(() => {
+                sheet.style.borderColor = '#e6e2de';
+            }, 300);
+        });
+    </script>
+</body></html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&amp;family=Hanken+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed-variant": "#2d486d",
+                    "primary-fixed": "#d5e3ff",
+                    "on-tertiary-fixed-variant": "#60410c",
+                    "on-primary-fixed": "#001c3b",
+                    "error": "#ba1a1a",
+                    "primary-fixed-dim": "#adc8f5",
+                    "surface-bright": "#fbf9f3",
+                    "primary-container": "#1e3a5f",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed": "#1c1b19",
+                    "primary": "#022448",
+                    "tertiary-fixed": "#ffddb2",
+                    "on-tertiary-fixed": "#291800",
+                    "inverse-on-surface": "#f3f1eb",
+                    "secondary-container": "#e6e2de",
+                    "on-surface": "#1b1c18",
+                    "surface-dim": "#dcdad4",
+                    "surface-container-highest": "#e4e2dd",
+                    "error-container": "#ffdad6",
+                    "background": "#fbf9f3",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#8aa4cf",
+                    "on-background": "#1b1c18",
+                    "outline": "#74777f",
+                    "surface-tint": "#455f87",
+                    "inverse-surface": "#30312d",
+                    "on-tertiary-container": "#c69b5f",
+                    "surface": "#fbf9f3",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-high": "#eae8e2",
+                    "inverse-primary": "#adc8f5",
+                    "on-secondary-fixed-variant": "#484644",
+                    "tertiary-fixed-dim": "#edbf7f",
+                    "secondary": "#605e5b",
+                    "tertiary-container": "#503300",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#f5f3ed",
+                    "tertiary": "#341f00",
+                    "secondary-fixed": "#e6e2de",
+                    "secondary-fixed-dim": "#cac6c2",
+                    "outline-variant": "#c4c6cf",
+                    "surface-container": "#f0eee8",
+                    "on-surface-variant": "#43474e",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#e4e2dd",
+                    "on-secondary-container": "#666461",
+                    "on-secondary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "2xl": "1rem",
+                    "3xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "boxShadow": {
+                "soft": "0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 10px -2px rgba(0, 0, 0, 0.02)",
+                "relief": "inset 0 1px 0 0 rgba(255, 255, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.05)"
+            },
+            "spacing": {
+                    "margin-desktop": "64px",
+                    "reading-width": "720px",
+                    "gutter": "24px",
+                    "unit": "4px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "data-tabular": ["Hanken Grotesk"],
+                    "display-xl": ["EB Garamond"],
+                    "headline-md": ["EB Garamond"],
+                    "body-reading": ["EB Garamond"],
+                    "ui-medium": ["Hanken Grotesk"],
+                    "headline-lg": ["EB Garamond"],
+                    "label-caps": ["Hanken Grotesk"],
+                    "ui-small": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "body-reading": ["19px", {"lineHeight": "32px", "fontWeight": "400"}],
+                    "ui-medium": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "ui-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fbf9f3;
+            color: #1b1c18;
+            -webkit-font-smoothing: antialiased;
+        }
+        .hairline-b { border-bottom: 1px solid #E6E3DC; }
+        .hairline-r { border-right: 1px solid #E6E3DC; }
+        .hairline-l { border-left: 1px solid #E6E3DC; }
+        .hairline-t { border-top: 1px solid #E6E3DC; }
+        .hairline-all { border: 1px solid #E6E3DC; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="font-body-reading overflow-x-hidden selection:bg-primary-fixed selection:text-primary">
+<!-- TopNavBar -->
+<header class="fixed top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-outline-variant px-margin-desktop py-4 flex justify-between items-center">
+<div class="flex items-center gap-8">
+<span class="font-display-xl text-display-xl text-primary tracking-tight">El Notebook Legal</span>
+<nav class="hidden md:flex gap-6">
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors pb-1 border-b-2 border-transparent" href="#">Expedientes</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors pb-1 border-b-2 border-transparent" href="#">Jurisprudencia</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors pb-1 border-b-2 border-transparent" href="#">Borradores</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors pb-1 border-b-2 border-transparent" href="#">Archivo</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary p-2 hover:bg-surface-container rounded-full transition-colors">notifications</button>
+<button class="material-symbols-outlined text-primary p-2 hover:bg-surface-container rounded-full transition-colors">account_circle</button>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 pt-24 bg-surface-container-low/50 backdrop-blur-sm border-r border-outline-variant hidden md:flex flex-col">
+<div class="px-6 mb-10">
+<h2 class="font-ui-medium text-ui-medium text-primary">Despacho Asociado</h2>
+<p class="font-label-caps text-label-caps text-secondary uppercase">Ciudad de México</p>
+</div>
+<nav class="flex-grow space-y-1 px-3">
+<a class="flex items-center gap-4 py-3 px-4 text-secondary font-label-caps text-label-caps hover:bg-surface-container-lowest hover:shadow-soft rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span> Inicio
+        </a>
+<a class="flex items-center gap-4 py-3 px-4 text-secondary font-label-caps text-label-caps hover:bg-surface-container-lowest hover:shadow-soft rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined">menu_book</span> Biblioteca
+        </a>
+<a class="flex items-center gap-4 py-3 px-4 bg-surface-container-lowest shadow-soft text-primary border-l-4 border-primary font-label-caps text-label-caps rounded-2xl" href="#">
+<span class="material-symbols-outlined">gavel</span> Casos
+        </a>
+<a class="flex items-center gap-4 py-3 px-4 text-secondary font-label-caps text-label-caps hover:bg-surface-container-lowest hover:shadow-soft rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined">description</span> Minutas
+        </a>
+<a class="flex items-center gap-4 py-3 px-4 text-secondary font-label-caps text-label-caps hover:bg-surface-container-lowest hover:shadow-soft rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined">settings</span> Configuración
+        </a>
+</nav>
+<div class="px-6 pb-8">
+<button class="w-full bg-primary text-on-primary py-3 px-4 font-label-caps text-label-caps text-center rounded-full shadow-relief hover:opacity-90 transition-all active:scale-[0.98]">
+            Nueva Consulta
+        </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="md:ml-64 pt-32 pb-24 px-margin-mobile md:px-margin-desktop">
+<div class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Page Header / Case Identity -->
+<div class="md:col-span-9 mb-12">
+<span class="font-label-caps text-label-caps text-secondary mb-2 block uppercase tracking-widest">Expediente No. 2024/742-MX</span>
+<h1 class="font-display-xl text-display-xl text-primary mb-4 leading-tight">Consorcio Energético vs. Secretaría de Infraestructura</h1>
+<div class="flex flex-wrap gap-2">
+<span class="px-4 py-1.5 bg-surface-container-highest/50 backdrop-blur-sm text-secondary font-label-caps text-label-caps rounded-full">Litigio Administrativo</span>
+<span class="px-4 py-1.5 bg-surface-container-highest/50 backdrop-blur-sm text-secondary font-label-caps text-label-caps rounded-full">Prioridad Alta</span>
+<span class="px-4 py-1.5 bg-primary text-on-primary font-label-caps text-label-caps uppercase rounded-full shadow-relief">Activo</span>
+</div>
+</div>
+<!-- Left Column: Details & Team -->
+<div class="md:col-span-4 space-y-12">
+<!-- Detalles del Caso -->
+<section class="bg-surface-container-lowest p-6 rounded-3xl shadow-soft">
+<div class="hairline-b pb-2 mb-6">
+<h3 class="font-ui-medium text-ui-medium text-primary uppercase tracking-wider">Detalles del Caso</h3>
+</div>
+<div class="space-y-6">
+<div>
+<label class="font-label-caps text-label-caps text-secondary block mb-1">Cliente</label>
+<p class="font-body-reading text-on-surface">Consorcio Energético del Norte S.A. de C.V.</p>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-secondary block mb-1">Juzgado</label>
+<p class="font-body-reading text-on-surface">Segundo Tribunal Colegiado en Materia Administrativa</p>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-secondary block mb-1">Cuantía Estimada</label>
+<p class="font-data-tabular text-data-tabular text-primary font-semibold text-lg">$42,500,000.00 MXN</p>
+</div>
+<div class="pt-4">
+<button class="w-full border border-primary/20 bg-surface-container-low text-primary py-3 font-label-caps text-label-caps rounded-full hover:bg-primary hover:text-white transition-all shadow-soft active:scale-[0.98]">
+                            Descargar Resumen Ejecutivo
+                        </button>
+</div>
+</div>
+</section>
+<!-- Integrantes del Despacho -->
+<section>
+<div class="hairline-b pb-2 mb-6 px-1">
+<h3 class="font-ui-medium text-ui-medium text-primary uppercase tracking-wider">Integrantes del Despacho</h3>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-4 p-4 bg-surface-container-lowest shadow-soft rounded-2xl border border-outline-variant/30 hover:border-primary/20 transition-all cursor-default">
+<img alt="Socio Principal" class="w-12 h-12 rounded-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSbj_duxuv0uRKqmgwqs3ADOVW4mf7zMspfewghxzH8YkYvM77CMYQz0CH3o8pEa-_zryHUAvmbri9kEwdG-v7lAajnt8RCXDDYMSagCxcdDT9afZg7pyJs9euNmH91vTGJZbA-3h1drjWyS_46jUrgFxbch5xPJuwAKhD36REesDnocMgfMyDvYbVqYdCTzWTXAwjB7Z6RgKR9K0J2FokzVjtKvZKRXXZ7mLo0_nfVJSZ4Yuj5C-rrR1BjBh32mTpSAjucuFokB0"/>
+<div>
+<p class="font-ui-medium text-ui-medium text-primary leading-tight">Lic. Alejandro G. Valdés</p>
+<p class="font-label-caps text-label-caps text-secondary">Socio Director</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-4 bg-surface-container-lowest shadow-soft rounded-2xl border border-outline-variant/30 hover:border-primary/20 transition-all cursor-default">
+<img alt="Asociada Senior" class="w-12 h-12 rounded-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtE0u77HjbImPZQKkw2njT8L-kiyfugVGbSIBRarIf51LzfHZIwWQDo_LeCq0zHr5X-EQuPy7SSgd3aDY9UvKLa-vkm2IeJduxH-VlbQTlEitsSb-ISR3Fxdrq3IcOl-u8xnYTSW-lBIGvRKkuuFJgB5K_VJtrD5Y5W-FF7WhpFuq0RELtmtKpAvX1aEE-8O1-oFN7lb7jCSfAO1Sk5iVO_9daoK-y3GoYikjRmwmrtfDjCUsqUiCwAnpweSStjhSS7laPAheq8iU"/>
+<div>
+<p class="font-ui-medium text-ui-medium text-primary leading-tight">Mtra. Elena Ruiz</p>
+<p class="font-label-caps text-label-caps text-secondary">Asociada Senior</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-4 bg-surface-container-lowest shadow-soft rounded-2xl border border-outline-variant/30 hover:border-primary/20 transition-all cursor-default">
+<img alt="Pasante" class="w-12 h-12 rounded-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8l_wy3R8a-HnkONU-quBKGXiARgA-RlS9qwH50SOCvA4YspnqJFf442KXxYmXqphu0fbSeG88rNsvF8Yoi5geHDm_Bq7d9IQtMLigHSpKD86B4IEL4Gj69djLuxA9ZvhydC_qa6bFgbKZgwnZ5OYyHgvy3V6Vz4LjdytroS54N62D-YqbtIugHfPuhaNXRc7YMhORDxG1PLLpwWi74aiTpGO2iWrjB1atb5KgLiscys4XEOggZShtW6UJZTSBEGeGa9Jjlle7b7A"/>
+<div>
+<p class="font-ui-medium text-ui-medium text-primary leading-tight">Carlos Mondragón</p>
+<p class="font-label-caps text-label-caps text-secondary">Pasante Jurídico</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Timeline & Notes -->
+<div class="md:col-span-8 md:pl-12">
+<!-- Línea de Tiempo Procesal -->
+<section class="bg-surface-container-low/30 p-8 rounded-3xl">
+<div class="hairline-b pb-4 mb-8 flex justify-between items-end">
+<h3 class="font-ui-medium text-ui-medium text-primary uppercase tracking-wider">Línea de Tiempo Procesal</h3>
+<span class="font-label-caps text-label-caps text-secondary">Última actualización: 12 Oct 2024</span>
+</div>
+<div class="relative space-y-12 before:absolute before:left-[11px] before:top-2 before:bottom-0 before:w-px before:bg-outline-variant/50">
+<!-- Timeline Item 1 -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-1.5 w-[24px] h-[24px] bg-primary rounded-full border-4 border-background shadow-relief flex items-center justify-center"></div>
+<div class="mb-2">
+<span class="font-label-caps text-label-caps text-primary bg-primary-fixed/50 backdrop-blur-sm px-3 py-1 rounded-full">Hito Actual</span>
+<span class="ml-4 font-data-tabular text-data-tabular text-secondary">15 Octubre, 2024</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-primary mb-3">Desahogo de Pruebas Periciales</h4>
+<p class="font-body-reading text-on-surface-variant max-w-2xl leading-relaxed">
+                            Citación para la comparecencia de los peritos en materia de impacto ambiental e ingeniería civil. Se requiere la presencia del equipo técnico del cliente para soporte inmediato.
+                        </p>
+<div class="mt-6 p-5 bg-surface-container-lowest rounded-2xl shadow-soft flex items-center justify-between border border-outline-variant/20">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary bg-primary-fixed/20 p-2 rounded-full">calendar_today</span>
+<span class="font-ui-small text-ui-small font-medium">Recordatorio: 09:00 AM - Sala C</span>
+</div>
+<button class="text-primary font-label-caps text-label-caps hover:bg-primary-fixed/30 px-4 py-2 rounded-full transition-all">Ver Citatorio</button>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative pl-12 opacity-80 group">
+<div class="absolute left-0 top-1.5 w-[24px] h-[24px] bg-secondary/50 rounded-full border-4 border-background group-hover:bg-secondary transition-colors"></div>
+<div class="mb-2">
+<span class="font-data-tabular text-data-tabular text-secondary">28 Septiembre, 2024</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-primary mb-2">Contestación de Demanda</h4>
+<p class="font-body-reading text-on-surface-variant max-w-2xl">
+                            Se presentó en tiempo y forma la respuesta a las excepciones interpuestas por la contraparte. El tribunal ha dado por recibida la documentación folio 4482/24.
+                        </p>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative pl-12 opacity-80 group">
+<div class="absolute left-0 top-1.5 w-[24px] h-[24px] bg-secondary/50 rounded-full border-4 border-background group-hover:bg-secondary transition-colors"></div>
+<div class="mb-2">
+<span class="font-data-tabular text-data-tabular text-secondary">05 Agosto, 2024</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-primary mb-2">Admisión de la Demanda</h4>
+<p class="font-body-reading text-on-surface-variant max-w-2xl">
+                            El Juez de Distrito admite la demanda de amparo indirecto. Se concede la suspensión provisional de los actos reclamados.
+                        </p>
+</div>
+</div>
+</section>
+<!-- Annotation Area -->
+<section class="mt-24 pt-12 border-t border-outline-variant/30">
+<h3 class="font-ui-medium text-ui-medium text-secondary uppercase tracking-widest mb-6">Notas Internas</h3>
+<div class="relative bg-surface-container-low/20 p-6 rounded-3xl shadow-relief">
+<textarea class="w-full bg-transparent border-none focus:ring-0 font-body-reading p-0 mb-4 placeholder:text-outline-variant/70 min-h-[150px] resize-none" placeholder="Escriba sus anotaciones sobre la estrategia del caso aquí..."></textarea>
+<div class="flex justify-end gap-4 border-t border-outline-variant/10 pt-4">
+<button class="px-6 py-2 font-label-caps text-label-caps text-secondary hover:text-primary hover:bg-surface-container rounded-full transition-all">Descartar</button>
+<button class="px-8 py-2 font-label-caps text-label-caps bg-primary text-on-primary rounded-full shadow-relief hover:opacity-90 active:scale-95 transition-all">Guardar Nota</button>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full px-margin-desktop py-12 bg-surface-container-low/50 border-t border-outline-variant mt-auto">
+<div class="max-w-screen-xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex flex-col md:flex-row items-center gap-8">
+<span class="font-display-xl text-2xl text-primary tracking-tight">El Notebook Legal</span>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors" href="#">Privacidad</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors" href="#">Términos</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors" href="#">Ética Profesional</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors" href="#">Contacto</a>
+</div>
+</div>
+<p class="font-label-caps text-label-caps text-secondary">© 2024 El Notebook Legal. Hecho en México.</p>
+</div>
+</footer>
+<!-- Micro-interaction Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const observerOptions = {
+            threshold: 0.1
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-4');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section, main > div > div').forEach(el => {
+            el.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-4');
+            observer.observe(el);
+        });
+    });
+</script>
+</body></html>

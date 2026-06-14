@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Visor de Artículo - El Notebook Legal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f5f3ed",
+                    "on-primary-fixed": "#001c3b",
+                    "inverse-on-surface": "#f3f1eb",
+                    "on-error-container": "#93000a",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed": "#1c1b19",
+                    "on-error": "#ffffff",
+                    "tertiary": "#341f00",
+                    "secondary": "#605e5b",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#fbf9f3",
+                    "primary": "#022448",
+                    "surface-bright": "#fbf9f3",
+                    "surface-dim": "#dcdad4",
+                    "outline": "#74777f",
+                    "surface-tint": "#455f87",
+                    "on-surface-variant": "#43474e",
+                    "primary-fixed-dim": "#adc8f5",
+                    "inverse-surface": "#30312d",
+                    "on-surface": "#1b1c18",
+                    "on-secondary-container": "#666461",
+                    "surface-container-highest": "#e4e2dd",
+                    "on-primary-fixed-variant": "#2d486d",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#503300",
+                    "tertiary-fixed": "#ffddb2",
+                    "on-tertiary-container": "#c69b5f",
+                    "on-primary-container": "#8aa4cf",
+                    "on-secondary-fixed-variant": "#484644",
+                    "surface-container": "#f0eee8",
+                    "primary-fixed": "#d5e3ff",
+                    "secondary-container": "#e6e2de",
+                    "inverse-primary": "#adc8f5",
+                    "secondary-fixed": "#e6e2de",
+                    "outline-variant": "#c4c6cf",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#e4e2dd",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#60410c",
+                    "surface-container-high": "#eae8e2",
+                    "on-tertiary-fixed": "#291800",
+                    "on-tertiary": "#ffffff",
+                    "on-background": "#1b1c18",
+                    "background": "#fbf9f3",
+                    "tertiary-fixed-dim": "#edbf7f",
+                    "primary-container": "#1e3a5f",
+                    "secondary-fixed-dim": "#cac6c2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "reading-width": "720px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "display-xl": ["EB Garamond"],
+                    "headline-lg": ["EB Garamond"],
+                    "data-tabular": ["Hanken Grotesk"],
+                    "ui-small": ["Hanken Grotesk"],
+                    "headline-md": ["EB Garamond"],
+                    "body-reading": ["EB Garamond"],
+                    "ui-medium": ["Hanken Grotesk"],
+                    "label-caps": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "400"}],
+                    "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "ui-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "body-reading": ["19px", {"lineHeight": "32px", "fontWeight": "400"}],
+                    "ui-medium": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .paper-texture {
+            background-color: #FBF9F4;
+            background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            background-attachment: fixed;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .hairline-b { border-bottom: 1px solid #E6E3DC; }
+        .hairline-r { border-right: 1px solid #E6E3DC; }
+        .hairline-all { border: 1px solid #E6E3DC; }
+        
+        /* Transition for the slide effect */
+        .visor-panel {
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .visor-panel.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-surface font-ui-medium text-on-surface overflow-hidden">
+<!-- Mock Background Content (The Workspace) -->
+<div class="flex h-screen w-full">
+<!-- Sidebar Shell (From JSON) -->
+<aside class="hidden md:flex flex-col h-full w-64 bg-surface-container-low border-r border-outline-variant py-8 shrink-0">
+<div class="px-6 mb-8">
+<span class="font-display-xl text-display-xl text-primary tracking-tight">El Notebook</span>
+</div>
+<nav class="flex-1 space-y-1">
+<div class="bg-white dark:bg-primary-container text-primary border-l-4 border-primary py-3 px-6 cursor-pointer">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+<span class="font-label-caps text-label-caps">INICIO</span>
+</div>
+<div class="text-secondary font-label-caps text-label-caps py-3 px-6 hover:bg-white transition-all cursor-pointer">
+<span class="material-symbols-outlined mr-3">menu_book</span>
+<span>BIBLIOTECA</span>
+</div>
+<div class="text-secondary font-label-caps text-label-caps py-3 px-6 hover:bg-white transition-all cursor-pointer">
+<span class="material-symbols-outlined mr-3">gavel</span>
+<span>CASOS</span>
+</div>
+</nav>
+<div class="px-6 pt-8 border-t border-outline-variant">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-xs">JD</div>
+<div>
+<p class="font-ui-medium text-ui-medium">Despacho Asociado</p>
+<p class="text-[10px] text-secondary">CIUDAD DE MÉXICO</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 p-margin-desktop overflow-y-auto">
+<header class="mb-12">
+<h1 class="font-display-xl text-display-xl text-primary mb-2">Expediente Civil 442/2023</h1>
+<p class="font-ui-medium text-secondary">Borrador de Demanda Ejecutiva Mercantil</p>
+</header>
+<div class="max-w-reading-width space-y-8">
+<div class="p-8 bg-white hairline-all">
+<p class="font-body-reading text-body-reading leading-relaxed text-on-surface mb-6">
+                        ... de conformidad con lo establecido en el <span class="text-primary border-b border-primary cursor-pointer hover:bg-primary/5 px-1" onclick="document.getElementById('articleVisor').classList.add('open')">Artículo 1391</span> del Código de Comercio vigente, procedo a solicitar la ejecución del título de crédito...
+                    </p>
+<div class="h-4 bg-surface-container w-3/4 mb-4"></div>
+<div class="h-4 bg-surface-container w-full mb-4"></div>
+<div class="h-4 bg-surface-container w-5/6"></div>
+</div>
+<button class="flex items-center gap-2 border border-primary px-6 py-3 text-primary font-label-caps text-label-caps hover:bg-primary hover:text-white transition-colors uppercase tracking-widest" onclick="document.getElementById('articleVisor').classList.add('open')">
+                    Simular Apertura de Visor
+                </button>
+</div>
+</main>
+</div>
+<!-- Visor de Artículo Overlay Panel -->
+<div class="visor-panel fixed inset-y-0 left-0 w-full md:w-[520px] paper-texture shadow-2xl z-50 flex flex-col border-r border-outline-variant open" id="articleVisor">
+<!-- Top Navigation -->
+<div class="px-8 py-6 flex items-center justify-between hairline-b bg-transparent">
+<button class="flex items-center gap-2 text-secondary hover:text-primary transition-colors group" onclick="document.getElementById('articleVisor').classList.remove('open')">
+<span class="material-symbols-outlined text-[20px] group-hover:-translate-x-1 transition-transform" data-icon="arrow_back">arrow_back</span>
+<span class="font-label-caps text-label-caps tracking-[0.2em]">VOLVER</span>
+</button>
+<div class="flex items-center gap-2 px-3 py-1 bg-[#F0F4EF] border border-[#DCE5DB]">
+<span class="material-symbols-outlined text-[16px] text-[#3D663D]" data-icon="verified" data-weight="fill">verified</span>
+<span class="text-[#3D663D] text-[10px] font-label-caps font-bold">TEXTO LITERAL VERIFICADO</span>
+</div>
+</div>
+<!-- Header Information -->
+<div class="px-margin-desktop pt-12 pb-8">
+<span class="font-label-caps text-label-caps text-secondary tracking-[0.25em] block mb-4">CÓD. COMERCIO · ARTÍCULO 1391</span>
+<h2 class="font-display-xl text-display-xl text-primary leading-tight">Del Procedimiento Ejecutivo</h2>
+</div>
+<!-- Content Body (Scrollable) -->
+<div class="flex-1 overflow-y-auto px-margin-desktop pb-12">
+<article class="font-body-reading text-body-reading text-on-surface leading-[1.8] space-y-6">
+<p>
+<span class="font-bold text-primary mr-2">Art. 1391.</span> El procedimiento ejecutivo tiene lugar cuando la demanda se funda en documento que traiga aparejada ejecución.
+                </p>
+<p>
+                    Traen aparejada ejecución:
+                </p>
+<ol class="list-decimal list-outside ml-6 space-y-4">
+<li>La sentencia ejecutoriada o pasada en autoridad de cosa juzgada y la arbitral que sea inapelable, conforme al artículo 1346, observándose lo dispuesto en el 1348;</li>
+<li>Los instrumentos públicos, así como los testimonios y copias certificadas de los mismos que expidan los fedatarios públicos;</li>
+<li>La confesión judicial del deudor, hecha conforme al artículo 1288;</li>
+<li>Los títulos de crédito;</li>
+<li>Las pólizas de seguros conforme a la ley de la materia;</li>
+<li>La decisión de los peritos designados en los seguros para fijar el importe de las pérdidas, sin perjuicio de que se pueda oponer la excepción de dolo en el juicio respectivo;</li>
+<li>Las facturas, cuentas corrientes y cualesquiera otros contratos de comercio firmados y reconocidos judicialmente por el deudor;</li>
+<li>Los convenios celebrados en los procedimientos conciliatorios ante la Procuraduría Federal del Consumidor, así como los laudos arbitrales que ésta emita.</li>
+</ol>
+</article>
+<!-- Source Footer -->
+<div class="mt-16 pt-8 border-t border-outline-variant/30 flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-secondary" data-icon="history_edu">history_edu</span>
+<span class="font-label-caps text-label-caps text-secondary tracking-widest">DOF · TEXTO VIGENTE · CORPUS FEDERAL</span>
+</div>
+<p class="text-[11px] text-secondary/60 italic">Última reforma publicada: 28-03-2018</p>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="p-8 hairline-t bg-[#FBF9F4]/80 backdrop-blur-sm">
+<button class="w-full flex items-center justify-center gap-3 border border-primary text-primary py-4 px-6 hover:bg-primary hover:text-white transition-all group active:scale-[0.98]">
+<span class="material-symbols-outlined text-[20px]" data-icon="content_copy">content_copy</span>
+<span class="font-label-caps text-label-caps tracking-[0.2em] uppercase">Copiar Texto Literal</span>
+</button>
+</div>
+</div>
+<!-- Right Margin Annotation (Editorial touch) -->
+<div class="fixed right-0 top-0 h-full w-12 hidden xl:flex flex-col items-center py-12 border-l border-outline-variant bg-surface pointer-events-none">
+<span class="rotate-90 origin-center whitespace-nowrap text-[10px] font-label-caps text-secondary tracking-[0.4em] opacity-40">EL NOTEBOOK LEGAL · ATELIER DIGITAL</span>
+</div>
+<!-- Atmospheric Overlay (Subtle noise/texture) -->
+<div class="fixed inset-0 pointer-events-none opacity-[0.03] mix-blend-multiply bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+<script>
+        // Simple Interaction logic for the visor
+        const visor = document.getElementById('articleVisor');
+        
+        // Function to toggle visor state (could be expanded for a real app)
+        function toggleVisor() {
+            visor.classList.toggle('open');
+        }
+
+        // Add escape key listener to close visor
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && visor.classList.contains('open')) {
+                visor.classList.remove('open');
+            }
+        });
+
+        // Copy interaction simulation
+        const copyBtn = visor.querySelector('button.w-full');
+        copyBtn.addEventListener('click', () => {
+            const originalText = copyBtn.querySelector('span:last-child').innerText;
+            copyBtn.querySelector('span:last-child').innerText = 'COPIADO AL PORTAPAPELES';
+            copyBtn.classList.add('bg-primary', 'text-white');
+            setTimeout(() => {
+                copyBtn.querySelector('span:last-child').innerText = originalText;
+                copyBtn.classList.remove('bg-primary', 'text-white');
+            }, 2000);
+        });
+    </script>
+</body></html>

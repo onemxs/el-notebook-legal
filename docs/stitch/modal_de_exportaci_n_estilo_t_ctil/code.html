@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Exportación y Firma | El Notebook Legal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&amp;family=Hanken+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .paper-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+        .judicial-page {
+            aspect-ratio: 8.5 / 11;
+            padding: 2.5cm 1.5cm 2.5cm 3.5cm; /* Strict judicial binding margin */
+        }
+        .signature-canvas {
+            background-image: linear-gradient(to right, #E6E3DC 50%, rgba(255,255,255,0) 0%);
+            background-position: bottom;
+            background-size: 10px 1px;
+            background-repeat: repeat-x;
+        }
+        .backdrop-blur-atelier {
+            backdrop-filter: blur(12px);
+            background-color: rgba(251, 249, 243, 0.7);
+        }
+        .subtle-relief {
+            box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.5), 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+        }
+        .modal-elevation {
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0,0,0,0.1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#022448",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#1e3a5f",
+                        "on-primary-container": "#8aa4cf",
+                        "secondary": "#605e5b",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#e6e2de",
+                        "on-secondary-container": "#666461",
+                        "surface": "#fbf9f3",
+                        "surface-dim": "#dcdad4",
+                        "surface-bright": "#fbf9f3",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f5f3ed",
+                        "surface-container": "#f0eee8",
+                        "surface-container-high": "#eae8e2",
+                        "surface-container-highest": "#e4e2dd",
+                        "outline": "#74777f",
+                        "outline-variant": "#c4c6cf",
+                        "background": "#fbf9f3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1.25rem",
+                        "2xl": "1.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "ui-small": ["Hanken Grotesk"],
+                        "ui-medium": ["Hanken Grotesk"],
+                        "label-caps": ["Hanken Grotesk"],
+                        "headline-md": ["EB Garamond"],
+                        "body-reading": ["EB Garamond"],
+                        "display-xl": ["EB Garamond"]
+                    },
+                    "fontSize": {
+                        "ui-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "ui-medium": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "body-reading": ["19px", {"lineHeight": "32px", "fontWeight": "400"}],
+                        "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface-container font-ui-medium text-primary m-0 p-0 overflow-hidden">
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 backdrop-blur-atelier flex items-center justify-center z-50 p-6">
+<!-- Modal Container -->
+<div class="bg-surface w-full max-w-6xl h-[921px] flex flex-col border border-outline-variant rounded-2xl modal-elevation overflow-hidden">
+<!-- Header (Close Action) -->
+<div class="flex justify-between items-center px-10 py-5 border-b border-outline-variant bg-surface-bright">
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">Protocolo de Finalización</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary">close</span>
+</button>
+</div>
+<!-- Content Split -->
+<div class="flex-1 flex overflow-hidden">
+<!-- LEFT: Print Preview -->
+<div class="w-7/12 bg-surface-container-low overflow-y-auto flex justify-center py-12 px-8 border-r border-outline-variant">
+<div class="w-full max-w-[580px]">
+<!-- Document Page -->
+<div class="judicial-page bg-white border border-outline-variant paper-shadow text-justify rounded-sm">
+<div class="flex justify-between mb-12">
+<div class="w-16 h-16 border border-primary flex items-center justify-center">
+<span class="font-display-xl text-primary scale-50">EL</span>
+</div>
+<div class="text-right">
+<p class="font-ui-small text-ui-small text-secondary mb-1">EXPEDIENTE: 452/2023</p>
+<p class="font-ui-small text-ui-small text-secondary uppercase">ORDINARIO CIVIL</p>
+</div>
+</div>
+<h1 class="font-headline-md text-headline-md mb-8 text-center uppercase tracking-tight">Escrito de Demanda - Caso 452/2023</h1>
+<div class="font-body-reading text-body-reading text-primary space-y-6">
+<p class="font-bold">C. JUEZ DE LO CIVIL EN TURNO EN LA CIUDAD DE MÉXICO</p>
+<p>PRESENTE.—</p>
+<p>LIC. RICARDO DE LA VEGA, por mi propio derecho, señalando como domicilio para oír y recibir toda clase de notificaciones el ubicado en la calle Paseo de la Reforma 115, Torre A, Piso 12, ante usted con el debido respeto comparezco y expongo:</p>
+<p>Que por medio del presente escrito, vengo a demandar en la vía ORDINARIA CIVIL a la persona moral denominada "Sistemas Globales S.A. de C.V.", por el cumplimiento de las siguientes prestaciones:</p>
+<p>A) El pago de la cantidad de $1,250,000.00 (Un millón doscientos cincuenta mil pesos 00/100 M.N.) por concepto de honorarios profesionales devengados y no pagados conforme al contrato de prestación de servicios...</p>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT: Configuration & Signature -->
+<div class="w-5/12 p-12 flex flex-col justify-between bg-surface-bright">
+<div class="space-y-12">
+<header>
+<h2 class="font-label-caps text-label-caps text-secondary mb-8">CONFIGURACIÓN DE FIRMA</h2>
+</header>
+<!-- Input Field -->
+<div class="space-y-3 group">
+<label class="font-label-caps text-label-caps text-secondary block ml-1">NOMBRE DEL FIRMANTE</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all py-3.5 px-4 font-body-reading text-primary placeholder:text-outline/40 subtle-relief" placeholder="Lic. Ricardo de la Vega" type="text"/>
+</div>
+<!-- Signature Canvas -->
+<div class="space-y-4">
+<label class="font-label-caps text-label-caps text-secondary block ml-1">RÚBRICA AUTÓGRAFA</label>
+<div class="relative w-full aspect-video bg-surface-container-low border border-outline-variant rounded-2xl group cursor-crosshair overflow-hidden subtle-relief">
+<div class="absolute inset-x-8 bottom-12 h-px signature-canvas opacity-30"></div>
+<canvas class="absolute inset-0 w-full h-full" id="sig-canvas"></canvas>
+<!-- Placeholder prompt if no signature -->
+<div class="absolute inset-0 flex flex-col items-center justify-center opacity-40 group-hover:opacity-10 transition-opacity pointer-events-none">
+<span class="material-symbols-outlined text-4xl mb-2">draw</span>
+<span class="font-ui-small text-ui-small">Firme aquí utilizando su puntero o tableta</span>
+</div>
+<button class="absolute top-4 right-4 w-9 h-9 flex items-center justify-center bg-white/80 backdrop-blur border border-outline-variant rounded-full hover:bg-white transition-colors" title="Limpiar firma">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<!-- e.firma reference -->
+<div class="flex items-start space-x-4 p-5 bg-surface-container-low border border-outline-variant rounded-2xl subtle-relief">
+<div class="bg-surface-container-highest p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<div class="space-y-1">
+<p class="font-ui-medium text-ui-medium text-primary">Vinculación de Archivo SAT</p>
+<p class="font-ui-small text-ui-small text-secondary italic">e.firma (disponible próximamente) vinculado a {{DATA:DOCUMENT:DOC_1}}</p>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="flex flex-col space-y-4">
+<button class="w-full py-4.5 rounded-xl border border-primary text-primary font-label-caps text-label-caps hover:bg-surface-container transition-all duration-300 tracking-widest uppercase subtle-relief font-semibold">
+                            Exportar a Word
+                        </button>
+<button class="w-full py-4.5 rounded-xl bg-primary text-white font-label-caps text-label-caps hover:bg-primary-container shadow-lg shadow-primary/20 transition-all duration-300 tracking-widest uppercase font-semibold">
+                            Exportar a PDF
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Background Decorative Elements -->
+<div class="fixed inset-0 -z-10 overflow-hidden bg-surface-container">
+<div class="absolute top-20 left-20 w-96 h-96 border border-outline-variant/30 rounded-[4rem] rotate-12"></div>
+<div class="absolute bottom-20 right-20 w-64 h-64 border border-outline-variant/30 rounded-[3rem] -rotate-6"></div>
+<div class="absolute inset-0 bg-gradient-to-tr from-surface-container via-transparent to-surface-container-high opacity-50"></div>
+</div>
+<script>
+        // Micro-interaction for the signature canvas
+        const canvas = document.getElementById('sig-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+
+            const resizeCanvas = () => {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                ctx.strokeStyle = '#022448';
+                ctx.lineWidth = 2.5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+            };
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            const startDrawing = (e) => {
+                drawing = true;
+                draw(e);
+            };
+
+            const stopDrawing = () => {
+                drawing = false;
+                ctx.beginPath();
+            };
+
+            const draw = (e) => {
+                if (!drawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+                const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            };
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            window.addEventListener('mouseup', stopDrawing);
+            
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+            canvas.addEventListener('touchend', stopDrawing);
+
+            // Clear button functionality
+            document.querySelector('[title="Limpiar firma"]').addEventListener('click', () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+        }
+    </script>
+</body></html>

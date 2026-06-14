@@ -1,0 +1,123 @@
+export type ThemeMode = "light" | "dark";
+
+export type BranchId =
+  | "penal"
+  | "electoral"
+  | "laboral"
+  | "civil"
+  | "mercantil"
+  | "administrativo"
+  | "fiscal"
+  | "amparo"
+  | "constitucional";
+
+export interface Law {
+  id: string;
+  name: string;
+  shortName: string;
+  enabled: boolean;
+}
+
+export interface LegalBranch {
+  id: BranchId;
+  name: string;
+  tagline: string;
+  laws: Law[];
+  guideQuestions: string[];
+}
+
+/** A literal article as stored in the verified corpus (Supabase: leyes_articulos). */
+export interface Article {
+  code: string; // short code, e.g. "CPEUM"
+  fullCode: string; // "Constitución Política de los Estados Unidos Mexicanos"
+  article: string; // "16"
+  heading: string;
+  text: string;
+  source: string; // provenance / last update
+}
+
+export interface Citation {
+  id: string;
+  code: string; // "CPEUM"
+  article: string; // "16"
+  label: string; // "CPEUM - Art. 16"
+}
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  citations?: Citation[];
+  timestamp: number;
+  pending?: boolean;
+}
+
+export type CaseFileKind = "pdf" | "text" | "image" | "doc" | "video";
+
+export interface CaseFile {
+  id: string;
+  name: string;
+  kind: CaseFileKind;
+  size: string;
+  addedAt: number;
+  analyzing?: boolean;
+}
+
+export type TimelineSeverity = "info" | "warning" | "deadline";
+
+export interface TimelineEvent {
+  id: string;
+  date: string; // display date
+  iso: string; // sortable
+  title: string;
+  detail: string;
+  severity: TimelineSeverity;
+}
+
+export interface ExtractedField {
+  label: string;
+  value: string;
+}
+
+/** Result of AI intake: reads a dropped expediente and proposes a case. */
+export interface ExtractedCase {
+  branch: BranchId;
+  confidence: number; // 0..1
+  caseName: string;
+  asunto: string;
+  parties: ExtractedField[];
+  keyDates: ExtractedField[];
+  summary: string;
+  suggestedLaws: string[];
+  transcripcion?: string; // texto del documento leído por la IA (opcional)
+  source?: "ia" | "demo"; // procedencia del análisis
+}
+
+export interface VideoTranscription {
+  id: string;
+  fileName: string;
+  duration: number;
+  transcription: string;
+  language: string;
+  createdAt: number;
+}
+
+export type AppView = "dashboard" | "workspace";
+
+export interface CaseSummary {
+  id: string;
+  name: string;
+  branch: BranchId;
+  updated: string;
+  deadlineLabel?: string;
+  urgent?: boolean;
+}
+
+export type ModelId = "rapido" | "profundo";
+
+export interface SystemSettings {
+  model: ModelId;
+  temperature: number; // locked at 0.0
+  secureSession: boolean; // borrado automático
+  datasetUpdatedAt: string;
+}

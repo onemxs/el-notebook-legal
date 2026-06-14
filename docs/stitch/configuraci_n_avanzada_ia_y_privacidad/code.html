@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Configuración Avanzada | El Notebook Legal</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&amp;family=Hanken+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "secondary-container": "#e6e2de",
+                        "surface-container": "#f0eee8",
+                        "surface-tint": "#455f87",
+                        "surface-variant": "#e4e2dd",
+                        "on-surface": "#1b1c18",
+                        "on-tertiary-fixed": "#291800",
+                        "on-secondary-container": "#666461",
+                        "tertiary": "#341f00",
+                        "background": "#fbf9f3",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#e6e2de",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#edbf7f",
+                        "on-secondary-fixed-variant": "#484644",
+                        "outline-variant": "#c4c6cf",
+                        "primary-container": "#1e3a5f",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#74777f",
+                        "inverse-on-surface": "#f3f1eb",
+                        "inverse-primary": "#adc8f5",
+                        "primary-fixed": "#d5e3ff",
+                        "on-surface-variant": "#43474e",
+                        "on-primary-container": "#8aa4cf",
+                        "on-primary": "#ffffff",
+                        "on-background": "#1b1c18",
+                        "tertiary-container": "#503300",
+                        "surface-container-low": "#f5f3ed",
+                        "tertiary-fixed": "#ffddb2",
+                        "on-tertiary-fixed-variant": "#60410c",
+                        "on-primary-fixed-variant": "#2d486d",
+                        "inverse-surface": "#30312d",
+                        "on-secondary-fixed": "#1c1b19",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#dcdad4",
+                        "surface-container-highest": "#e4e2dd",
+                        "secondary-fixed-dim": "#cac6c2",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#022448",
+                        "surface": "#fbf9f3",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#fbf9f3",
+                        "primary-fixed-dim": "#adc8f5",
+                        "on-primary-fixed": "#001c3b",
+                        "secondary": "#605e5b",
+                        "on-tertiary-container": "#c69b5f",
+                        "surface-container-high": "#eae8e2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "reading-width": "720px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "ui-small": ["Hanken Grotesk"],
+                        "headline-lg": ["EB Garamond"],
+                        "ui-medium": ["Hanken Grotesk"],
+                        "data-tabular": ["Hanken Grotesk"],
+                        "display-xl": ["EB Garamond"],
+                        "body-reading": ["EB Garamond"],
+                        "label-caps": ["Hanken Grotesk"],
+                        "headline-md": ["EB Garamond"]
+                    },
+                    "fontSize": {
+                        "ui-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "400"}],
+                        "ui-medium": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "body-reading": ["19px", {"lineHeight": "32px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .editorial-shadow {
+            box-shadow: 0 20px 50px -12px rgba(2, 36, 72, 0.15);
+        }
+        .hairline { border: 1px solid #E6E3DC; }
+        .hairline-thick { border: 1.5px solid #022448; }
+        .dashed-dropzone { border: 1px dashed #74777f; }
+        .backdrop-blur-custom { backdrop-filter: blur(8px); background-color: rgba(251, 249, 243, 0.7); }
+        body { background-color: #fbf9f3; }
+        
+        /* Custom scrollbar for editorial feel */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #022448; }
+    </style>
+</head>
+<body class="font-ui-medium text-on-surface overflow-hidden">
+<!-- Workspace Background Mockup (Blurred) -->
+<div class="fixed inset-0 z-0 flex flex-col p-8 opacity-40 select-none pointer-events-none">
+<div class="flex justify-between items-center mb-12">
+<div class="font-display-xl text-display-xl text-primary tracking-tight">El Notebook Legal</div>
+<div class="flex gap-6">
+<span class="font-label-caps text-label-caps text-secondary">EXPEDIENTES</span>
+<span class="font-label-caps text-label-caps text-secondary">JURISPRUDENCIA</span>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-gutter flex-1">
+<div class="col-span-8 border-r border-outline-variant pr-gutter">
+<div class="font-headline-lg text-headline-lg mb-8">Amparo Directo 452/2023</div>
+<div class="space-y-6 font-body-reading text-body-reading text-on-surface-variant">
+<p>Vistos para resolver los autos del juicio de amparo citado al rubro, promovido por...</p>
+<p>Considerando que la autoridad responsable violentó los principios de legalidad y seguridad jurídica contemplados en los artículos 14 y 16 de la Constitución Política...</p>
+</div>
+</div>
+<div class="col-span-4 space-y-8">
+<div class="p-6 bg-surface-container-low border border-outline-variant h-48"></div>
+<div class="p-6 bg-surface-container-low border border-outline-variant h-64"></div>
+</div>
+</div>
+</div>
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-custom p-6">
+<!-- Modal Card -->
+<article class="relative w-full max-w-[680px] bg-surface-container-lowest border-[1.5px] border-primary editorial-shadow flex flex-col max-h-[921px]">
+<!-- Modal Header -->
+<header class="flex justify-between items-center px-10 py-8 border-b border-outline-variant">
+<h1 class="font-headline-md text-headline-md text-primary">Configuración Avanzada</h1>
+<button class="text-primary hover:opacity-70 transition-opacity" onclick="window.history.back()">
+<span class="material-symbols-outlined" style="font-size: 28px;">close</span>
+</button>
+</header>
+<!-- Modal Content (Scrollable) -->
+<div class="flex-1 overflow-y-auto px-10 py-8 space-y-12">
+<!-- (A) Control del modelo de IA -->
+<section class="space-y-6">
+<h2 class="font-label-caps text-label-caps text-secondary uppercase">Control del modelo de IA</h2>
+<div class="grid grid-cols-2 gap-4">
+<!-- Option: Rápido -->
+<button class="flex flex-col items-start p-5 border border-outline-variant bg-surface-container-low hover:bg-surface-container-high transition-all text-left group">
+<div class="flex justify-between w-full mb-3">
+<span class="font-ui-medium text-ui-medium text-primary">Rápido</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary">bolt</span>
+</div>
+<p class="font-ui-small text-ui-small text-secondary">Optimizado para tareas rutinarias, resúmenes breves y redacción de correos.</p>
+</button>
+<!-- Option: Razonamiento Profundo -->
+<button class="flex flex-col items-start p-5 border-2 border-primary bg-surface-container-lowest text-left relative overflow-hidden">
+<div class="absolute top-0 right-0 p-1 bg-primary">
+<span class="material-symbols-outlined text-white" style="font-size: 14px;">check</span>
+</div>
+<div class="flex justify-between w-full mb-3">
+<span class="font-ui-medium text-ui-medium text-primary">Razonamiento profundo</span>
+<span class="material-symbols-outlined text-primary">psychology</span>
+</div>
+<p class="font-ui-small text-ui-small text-secondary">Especializado en análisis de jurisprudencia compleja y detección de contradicciones.</p>
+</button>
+</div>
+<!-- Temperature Governance -->
+<div class="flex items-center justify-between p-4 bg-surface-container border border-outline-variant">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="font-ui-medium text-ui-medium text-primary">Gobernanza de temperatura: 0.0</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-secondary-fixed-variant">PRECISIÓN ABSOLUTA</span>
+</div>
+</section>
+<!-- (B) Gestor del dataset jurídico -->
+<section class="space-y-6">
+<h2 class="font-label-caps text-label-caps text-secondary uppercase">Gestor del dataset jurídico</h2>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></div>
+<span class="font-ui-medium text-ui-medium">Base de datos activa</span>
+</div>
+<div class="grid grid-cols-2 py-4 border-y border-outline-variant">
+<div>
+<span class="block font-label-caps text-[10px] text-secondary">PRECEPTOS INDEXADOS</span>
+<span class="font-data-tabular text-data-tabular text-primary text-lg">142,502</span>
+</div>
+<div class="text-right">
+<span class="block font-label-caps text-[10px] text-secondary">ÚLTIMA ACTUALIZACIÓN</span>
+<span class="font-data-tabular text-data-tabular text-primary">13 JUN 2024</span>
+</div>
+</div>
+<!-- Editorial Dropzone -->
+<div class="dashed-dropzone p-10 flex flex-col items-center justify-center gap-4 bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors" style="font-size: 32px;">upload_file</span>
+<div class="text-center">
+<p class="font-ui-medium text-ui-medium text-primary">Cargar Gacetas / DOF</p>
+<p class="font-ui-small text-ui-small text-secondary mt-1">Arrastre archivos PDF para entrenamiento de contexto personalizado</p>
+</div>
+</div>
+</div>
+</section>
+<!-- (C) Privacidad y secreto profesional -->
+<section class="space-y-6">
+<h2 class="font-label-caps text-label-caps text-secondary uppercase">Privacidad y secreto profesional</h2>
+<div class="flex items-start justify-between gap-8">
+<div class="flex-1 space-y-2">
+<h3 class="font-ui-medium text-ui-medium text-primary">Modo Sesión Segura</h3>
+<p class="font-body-reading text-[15px] leading-relaxed text-secondary italic">
+                                "Los datos de esta sesión no se utilizan para entrenamiento y se purgan al cerrar el navegador."
+                            </p>
+</div>
+<!-- Premium Toggle -->
+<button class="relative w-12 h-6 bg-primary transition-colors flex items-center px-1" onclick="this.classList.toggle('bg-primary'); this.classList.toggle('bg-outline')">
+<div class="absolute right-1 w-4 h-4 bg-white transition-transform"></div>
+</button>
+</div>
+</section>
+</div>
+<!-- Modal Footer -->
+<footer class="px-10 py-6 border-t border-outline-variant bg-surface-container-low flex justify-end gap-6">
+<button class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors tracking-widest" onclick="window.history.back()">CANCELAR</button>
+<button class="px-8 py-3 bg-primary text-white font-label-caps text-label-caps tracking-[0.2em] hover:opacity-90 transition-opacity">GUARDAR CAMBIOS</button>
+</footer>
+</article>
+</div>
+<!-- Micro-interaction Script -->
+<script>
+        // Simple toggle logic for the radio-like cards
+        const cards = document.querySelectorAll('button.group, button.relative.overflow-hidden');
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                // In a real app, this would handle state management
+                // For the demo, we just simulate the selection
+            });
+        });
+    </script>
+</body></html>

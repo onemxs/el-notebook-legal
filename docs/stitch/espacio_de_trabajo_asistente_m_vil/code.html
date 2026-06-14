@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fbf9f3;
+            -webkit-font-smoothing: antialiased;
+        }
+        .chat-container {
+            height: calc(100vh - 64px - 80px - 48px - 72px); /* Adjust based on top bar, tabs, bottom bar, and input */
+        }
+        .editorial-hairline {
+            border-bottom: 1px solid #E6E3DC;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#fbf9f3",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001c3b",
+                        "on-tertiary-container": "#c69b5f",
+                        "tertiary-fixed-dim": "#edbf7f",
+                        "on-tertiary-fixed-variant": "#60410c",
+                        "on-primary-container": "#8aa4cf",
+                        "surface-tint": "#455f87",
+                        "tertiary": "#341f00",
+                        "tertiary-container": "#503300",
+                        "secondary-container": "#e6e2de",
+                        "primary": "#022448",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#dcdad4",
+                        "outline": "#74777f",
+                        "secondary-fixed": "#e6e2de",
+                        "primary-fixed": "#d5e3ff",
+                        "on-surface-variant": "#43474e",
+                        "on-surface": "#1b1c18",
+                        "surface-container-high": "#eae8e2",
+                        "primary-container": "#1e3a5f",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f5f3ed",
+                        "on-secondary-container": "#666461",
+                        "on-background": "#1b1c18",
+                        "secondary-fixed-dim": "#cac6c2",
+                        "inverse-on-surface": "#f3f1eb",
+                        "tertiary-fixed": "#ffddb2",
+                        "outline-variant": "#c4c6cf",
+                        "secondary": "#605e5b",
+                        "surface-container": "#f0eee8",
+                        "primary-fixed-dim": "#adc8f5",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fbf9f3",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e4e2dd",
+                        "background": "#fbf9f3",
+                        "surface-variant": "#e4e2dd",
+                        "on-secondary-fixed-variant": "#484644",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#291800",
+                        "on-primary-fixed-variant": "#2d486d",
+                        "inverse-primary": "#adc8f5",
+                        "on-secondary-fixed": "#1c1b19",
+                        "inverse-surface": "#30312d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "reading-width": "720px",
+                        "unit": "4px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "ui-small": ["Hanken Grotesk"],
+                        "ui-medium": ["Hanken Grotesk"],
+                        "display-xl": ["EB Garamond"],
+                        "headline-md": ["EB Garamond"],
+                        "data-tabular": ["Hanken Grotesk"],
+                        "headline-lg": ["EB Garamond"],
+                        "body-reading": ["EB Garamond"],
+                        "label-caps": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "ui-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "ui-medium": ["16px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "display-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "data-tabular": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "400"}],
+                        "body-reading": ["19px", {"lineHeight": "32px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed-dim selection:text-primary">
+<!-- TopAppBar Component -->
+<header class="fixed top-0 w-full bg-surface z-50 border-b border-secondary-container h-16 flex justify-between items-center px-margin-mobile">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">gavel</span>
+<div class="flex flex-col">
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight leading-none">Asistente de IA</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-70">FUNDAMENTACIÓN ESTRICTA</p>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:opacity-80 active:scale-95 transition-all">more_vert</button>
+</header>
+<main class="pt-16 pb-32">
+<!-- Tabs Navigation -->
+<nav class="flex border-b border-secondary-container bg-surface sticky top-16 z-40">
+<button class="flex-1 py-3 text-center border-b-2 border-transparent text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors">
+                GUÍAS RÁPIDAS
+            </button>
+<button class="flex-1 py-3 text-center border-b-2 border-primary text-primary font-label-caps text-label-caps">
+                CONSULTA
+            </button>
+</nav>
+<!-- Chat Interface -->
+<section class="px-margin-mobile py-6 flex flex-col gap-6 overflow-y-auto no-scrollbar chat-container">
+<!-- User Message -->
+<div class="flex flex-col items-end gap-2 max-w-[85%] self-end">
+<div class="bg-primary-container text-on-primary p-4 rounded-lg shadow-sm border border-primary">
+<p class="font-ui-medium text-ui-medium leading-relaxed">¿Cuál es el sustento legal para la protección de datos personales en una diligencia de embargo?</p>
+</div>
+<span class="font-label-caps text-[9px] text-on-surface-variant opacity-60">11:04 AM</span>
+</div>
+<!-- Assistant Message -->
+<div class="flex flex-col items-start gap-2 max-w-[90%] self-start">
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-secondary-container">
+<p class="font-body-reading text-ui-medium text-on-surface mb-4 leading-relaxed">
+                        En el contexto de una diligencia de embargo, la protección de la información personal se rige por el principio de proporcionalidad y el derecho a la intimidad. La autoridad ejecutora debe limitar la recolección de datos estrictamente a lo necesario para garantizar el crédito fiscal o civil, evitando la divulgación innecesaria de información patrimonial o privada.
+                    </p>
+<!-- Sustento Legal Block -->
+<div class="mt-6 pt-4 border-t border-secondary-container">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">balance</span>
+                            SUSTENTO LEGAL
+                        </h4>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-surface-container text-on-secondary-container font-label-caps text-[10px] border border-secondary-container flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">article</span>
+                                CPEUM ART. 16
+                            </span>
+<span class="px-3 py-1 bg-surface-container text-on-secondary-container font-label-caps text-[10px] border border-secondary-container flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">article</span>
+                                LGPDPPSO ART. 7
+                            </span>
+<span class="px-3 py-1 bg-surface-container text-on-secondary-container font-label-caps text-[10px] border border-secondary-container flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">menu_book</span>
+                                TESIS 2a. LXIII/2018
+                            </span>
+</div>
+</div>
+</div>
+<span class="font-label-caps text-[9px] text-on-surface-variant opacity-60">11:05 AM</span>
+</div>
+<!-- More Assistant responses can be added here -->
+<div class="flex flex-col items-start gap-2 max-w-[90%] self-start">
+<div class="bg-surface-container-lowest p-4 rounded-lg border border-secondary-container italic">
+<p class="font-body-reading text-ui-medium text-on-surface-variant">
+                        Analizando variables adicionales del Código Fiscal de la Federación...
+                    </p>
+</div>
+</div>
+</section>
+<!-- Bottom Input Field -->
+<div class="fixed bottom-20 left-0 w-full bg-surface px-margin-mobile py-3 border-t border-secondary-container flex items-end gap-3 z-40">
+<div class="flex-1 relative">
+<textarea class="w-full bg-transparent border-b border-secondary-variant focus:border-primary focus:ring-0 font-body-reading text-ui-medium py-2 pr-10 resize-none transition-all placeholder:text-outline/50" placeholder="Consulta el caso..." rows="1"></textarea>
+<button class="absolute right-0 bottom-2 text-primary hover:opacity-70 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+<button class="p-2 mb-1 rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar Component -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-margin-mobile bg-surface border-t border-secondary-container z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="font-label-caps text-label-caps mt-1">Archivero</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors pt-2" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label-caps text-label-caps mt-1">Despacho</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary border-t-2 border-primary pt-2" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-label-caps text-label-caps mt-1">Asistente</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for textarea auto-resize
+        const textarea = document.querySelector('textarea');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            if (this.scrollHeight > 120) {
+                this.style.overflowY = 'scroll';
+                this.style.height = '120px';
+            } else {
+                this.style.overflowY = 'hidden';
+            }
+        });
+    </script>
+</body></html>
