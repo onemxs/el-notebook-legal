@@ -1,4 +1,3 @@
-import type { BranchId } from "./types";
 import { createClient } from "@supabase/supabase-js";
 
 export interface TranscriptionProgress {
