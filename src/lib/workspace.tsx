@@ -93,38 +93,6 @@ const welcomeMessage = (branch: BranchId): ChatMessage => ({
   timestamp: Date.now(),
 });
 
-const SEED_CASES: CaseSummary[] = [
-  {
-    id: "c-demo-1",
-    name: "Juicio Ejecutivo Mercantil 482/2026",
-    branch: "mercantil",
-    updated: "hace 2 horas",
-    deadlineLabel: "Prescripción cambiaria · 3 años",
-  },
-  {
-    id: "c-demo-2",
-    name: "Despido · García vs. Industrias del Norte",
-    branch: "laboral",
-    updated: "ayer",
-    deadlineLabel: "Prescripción 2 meses (art. 518)",
-    urgent: true,
-  },
-  {
-    id: "c-demo-3",
-    name: "Amparo indirecto 211/2026",
-    branch: "amparo",
-    updated: "hace 3 días",
-    deadlineLabel: "Plazo 15 días (art. 17)",
-    urgent: true,
-  },
-  {
-    id: "c-demo-4",
-    name: "Revisión de contrato de arrendamiento",
-    branch: "civil",
-    updated: "hace 1 semana",
-  },
-];
-
 const MONTHS: Record<string, number> = {
   ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5,
   jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11,
