@@ -27,7 +27,7 @@ const KIND_ICON: Record<CaseFileKind, typeof FileText> = {
 };
 
 export function ExpedienteDropzone() {
-  const { files, addFiles, ingestDocument, removeFile } = useWorkspace();
+  const { files, addFiles, ingestDocument, removeFile, caseName } = useWorkspace();
   const [dragging, setDragging] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [transcriptionProgress, setTranscriptionProgress] = useState<{
@@ -61,7 +61,7 @@ export function ExpedienteDropzone() {
     addFiles([fileEntry]);
 
     try {
-      const result = await transcribeVideo(videoFile, (progress) => {
+      const result = await transcribeVideo(videoFile, caseName, (progress) => {
         setTranscriptionProgress({
           fileId,
           status: progress.message,

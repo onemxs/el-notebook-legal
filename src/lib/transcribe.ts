@@ -27,6 +27,7 @@ export function getVideoExtension(file: File): string {
 
 export async function transcribeVideo(
   file: File,
+  casoId: string,
   onProgress: (progress: TranscriptionProgress) => void,
 ): Promise<VideoTranscription | null> {
   try {
@@ -50,38 +51,54 @@ export async function transcribeVideo(
       return null;
     }
 
+    // Import Supabase client
+    const { supabase } = await import("./supabase");
+
     onProgress({
       status: "uploading",
-      progress: 10,
-      message: "Preparando video para transcripción...",
+      progress: 20,
+      message: "Subiendo video a almacenamiento...",
     });
 
-    const formData = new FormData();
-    formData.append("video", file);
+    // Upload to Supabase Storage
+    const fileName = `${casoId}/${Date.now()}-${file.name}`;
+    const { error: uploadError, data: uploadData } = await supabase.storage
+      .from("videos")
+      .upload(fileName, file, { upsert: false });
 
-    const response = await fetch("/api/transcribe-video", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
+    if (uploadError || !uploadData) {
       onProgress({
         status: "error",
         progress: 0,
-        message: "Error al procesar video",
-        error: error || "Error desconocido del servidor",
+        message: "Error al subir video",
+        error: uploadError?.message || "Error desconocido",
       });
       return null;
     }
 
     onProgress({
-      status: "transcribing",
-      progress: 50,
-      message: "Transcribiendo audio... Esto puede tomar unos minutos",
+      status: "processing",
+      progress: 40,
+      message: "Iniciando transcripción con Whisper...",
     });
 
-    const result = (await response.json()) as VideoTranscription;
+    // Call Supabase Edge Function
+    const { data: funcData, error: funcError } = await supabase.functions.invoke(
+      "transcribe-video",
+      {
+        body: { videoPath: fileName, casoId },
+      },
+    );
+
+    if (funcError || !funcData) {
+      onProgress({
+        status: "error",
+        progress: 0,
+        message: "Error al transcribir",
+        error: funcError?.message || "Error en Edge Function",
+      });
+      return null;
+    }
 
     onProgress({
       status: "formatting",
@@ -95,7 +112,14 @@ export async function transcribeVideo(
       message: "¡Transcripción completada!",
     });
 
-    return result;
+    return {
+      id: funcData.documentId || `transcription-${Date.now()}`,
+      fileName: file.name,
+      duration: 0,
+      transcription: funcData.transcription,
+      language: "es-MX",
+      createdAt: Date.now(),
+    };
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     onProgress({
