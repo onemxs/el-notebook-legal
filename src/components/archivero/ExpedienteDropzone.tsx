@@ -137,13 +137,13 @@ export function ExpedienteDropzone() {
         <p className="text-sm font-medium text-ink">Arrastra un documento o video</p>
         <p className="flex items-center gap-1 text-xs text-ink-subtle">
           <Sparkles size={11} className="text-accent" />
-          PDF, imagen, texto o video (hasta 2 horas) — la IA lo analiza
+          PDF, Word, imagen, texto o video (hasta 2 horas) — la IA lo analiza
         </p>
         <input
           ref={inputRef}
           type="file"
           multiple
-          accept=".pdf,.txt,.png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.mkv,.webm"
+          accept=".pdf,.txt,.docx,.doc,.png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.mkv,.webm"
           className="hidden"
           onChange={(e) => {
             ingest(e.target.files);

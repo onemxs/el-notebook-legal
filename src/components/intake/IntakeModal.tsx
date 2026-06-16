@@ -10,6 +10,7 @@ import {
   ScrollText,
   ArrowRight,
   CircleCheck,
+  AlertTriangle,
 } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { useWorkspace } from "@/lib/workspace";
@@ -104,6 +105,20 @@ function Review({
   const pct = Math.round(data.confidence * 100);
   return (
     <div className="animate-fade-in">
+      {/* Fallback warning: the AI couldn't read the file, so this is sample data. */}
+      {data.source !== "ia" && (
+        <div className="mb-4 flex items-start gap-2.5 rounded-xl bg-warning-soft px-3.5 py-3 text-warning">
+          <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+          <div>
+            <p className="text-[13px] font-semibold">No pude leer el documento con la IA</p>
+            <p className="text-[12px] leading-relaxed opacity-90">
+              Lo de abajo son datos de ejemplo, no los de tu archivo. Revisa tu conexión o el
+              formato (PDF, imagen o texto) y vuelve a subirlo.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Detected branch banner */}
       <div className="mb-4 flex items-center gap-3 rounded-xl border border-accent/30 bg-accent-soft p-3.5">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-white">

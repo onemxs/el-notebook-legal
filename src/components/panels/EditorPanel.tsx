@@ -42,7 +42,7 @@ function SegBtn({
 }
 
 export function EditorPanel() {
-  const { caseName, editorHtml, editorVersion, setEditorHtml, insertDocument } =
+  const { caseName, caseIsDemo, editorHtml, editorVersion, setEditorHtml, insertDocument } =
     useWorkspace();
   const ref = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<View>("editor");
@@ -75,9 +75,16 @@ export function EditorPanel() {
       <header className="flex items-center gap-3 border-b border-hairline px-4 py-2.5">
         <div className="min-w-0">
           <p className="label-caps text-[10px] text-ink-subtle">Despacho Central</p>
-          <h1 className="truncate font-serif text-lg font-medium leading-tight text-ink">
-            {caseName}
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="truncate font-serif text-lg font-medium leading-tight text-ink">
+              {caseName}
+            </h1>
+            {caseIsDemo && (
+              <span className="shrink-0 rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent">
+                Ejemplo
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="ml-auto flex items-center gap-1 rounded-full bg-elevated p-1">

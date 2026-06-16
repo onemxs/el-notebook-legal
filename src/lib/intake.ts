@@ -188,9 +188,11 @@ export async function analyzeExpediente(
   }
 
   // When enriching an existing case, keep the extraction consistent with its rama.
+  // `source: "demo"` flags this as a fallback so the UI never presents the sample
+  // data as if it were the real document's extraction.
   if (forceBranch) {
-    return { branch: forceBranch, confidence: 0.95, ...TEMPLATES[forceBranch] };
+    return { branch: forceBranch, confidence: 0.95, source: "demo", ...TEMPLATES[forceBranch] };
   }
   const { branch, confidence } = detectBranch(fileName);
-  return { branch, confidence, ...TEMPLATES[branch] };
+  return { branch, confidence, source: "demo", ...TEMPLATES[branch] };
 }

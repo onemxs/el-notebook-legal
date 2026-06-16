@@ -42,6 +42,7 @@ interface WorkspaceState {
   intakeFile: File | null;
   branch: BranchId;
   caseName: string;
+  caseIsDemo: boolean;
   laws: Law[];
   files: CaseFile[];
   messages: ChatMessage[];
@@ -297,6 +298,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [intakeFile, setIntakeFile] = useState<File | null>(null);
   const [branch, setBranch] = useState<BranchId>(DEFAULT_BRANCH);
   const [caseName, setCaseName] = useState("Expediente de demostración");
+  const [caseIsDemo, setCaseIsDemo] = useState(false);
   const [laws, setLaws] = useState<Law[]>(() => cloneLaws(DEFAULT_BRANCH));
   const [files, setFiles] = useState<CaseFile[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
@@ -321,6 +323,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const loadCase = useCallback((next: BranchId, name: string, demo = false) => {
     setBranch(next);
     setCaseName(name.trim() || `Caso ${BRANCHES[next].name}`);
+    setCaseIsDemo(demo);
     setLaws(cloneLaws(next));
     setActiveArticle(null);
     setEditorHtmlState("");
@@ -560,6 +563,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       intakeFile,
       branch,
       caseName,
+      caseIsDemo,
       laws,
       files,
       messages,
@@ -599,6 +603,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       intakeFile,
       branch,
       caseName,
+      caseIsDemo,
       laws,
       files,
       messages,

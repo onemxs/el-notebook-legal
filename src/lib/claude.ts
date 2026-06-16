@@ -7,6 +7,29 @@ import type { BranchId, ExtractedCase } from "./types";
  * the demo responder. The API key never reaches the browser.
  */
 const IMG_TYPES = ["image/png", "image/jpeg", "image/gif", "image/webp"];
+const DOCX_TYPE =
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+function isDocx(file: File): boolean {
+  return file.type === DOCX_TYPE || /\.docx$/i.test(file.name);
+}
+
+/**
+ * Extracts the plain text of a Word (.docx) document in the browser via mammoth,
+ * so it can be analyzed through the text path. Returns null if there's no usable
+ * text (e.g. an empty or image-only doc). Old binary .doc is not supported.
+ */
+async function extractDocxText(file: File): Promise<string | null> {
+  try {
+    const mammoth = await import("mammoth/mammoth.browser.js");
+    const { value } = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+    const text = value.trim();
+    return text.length ? text : null;
+  } catch (e) {
+    console.error("docx extract failed:", e);
+    return null;
+  }
+}
 
 function mediaTypeFor(file: File): string {
   if (file.type) return file.type;
@@ -30,6 +53,11 @@ async function toBase64(file: File): Promise<string> {
 }
 
 async function buildPayload(file: File) {
+  // Word (.docx): extract the text in-browser and analyze it through the text path.
+  if (isDocx(file)) {
+    const text = await extractDocxText(file);
+    return text ? { name: file.name, mediaType: "text/plain", text } : null;
+  }
   const mediaType = mediaTypeFor(file);
   if (mediaType === "text/plain") {
     return { name: file.name, mediaType, text: await file.text() };
@@ -37,7 +65,7 @@ async function buildPayload(file: File) {
   if (mediaType === "application/pdf" || IMG_TYPES.includes(mediaType)) {
     return { name: file.name, mediaType, base64: await toBase64(file) };
   }
-  return null; // unsupported (e.g. .docx) → fall back to demo
+  return null; // unsupported (e.g. old binary .doc) → fall back to demo
 }
 
 export async function analyzeDocument(

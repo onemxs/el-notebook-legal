@@ -84,6 +84,11 @@ function CaseCard({ c, onOpen }: { c: CaseSummary; onOpen: () => void }) {
         <span className="rounded-full bg-elevated px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-ink-muted">
           {b.name}
         </span>
+        {c.demo && (
+          <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent">
+            Ejemplo
+          </span>
+        )}
         <ChevronRight
           size={16}
           className="ml-auto text-ink-subtle transition-transform group-hover:translate-x-0.5 group-hover:text-accent"
@@ -219,6 +224,7 @@ export function DashboardView() {
               <input
                 ref={inputRef}
                 type="file"
+                accept=".pdf,.txt,.docx,.doc,.png,.jpg,.jpeg,.gif,.webp"
                 className="hidden"
                 onChange={(e) => {
                   onFile(e.target.files);
