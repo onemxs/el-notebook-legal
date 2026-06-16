@@ -121,6 +121,7 @@ export interface CaseSummary {
   updated: string;
   deadlineLabel?: string;
   urgent?: boolean;
+  demo?: boolean; // expediente de ejemplo: al abrirlo se hidrata con contenido ilustrativo
 }
 
 export type ModelId = "rapido" | "profundo";

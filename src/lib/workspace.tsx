@@ -65,6 +65,7 @@ interface WorkspaceCtx extends WorkspaceState {
   toggleLaw: (lawId: string) => void;
   addFiles: (files: CaseFile[]) => void;
   ingestDocument: (file: File) => void;
+  seedFromExtraction: (fileName: string, res: ExtractedCase) => void;
   removeFile: (id: string) => void;
   sendMessage: (text: string) => void;
   runTimeline: () => void;
@@ -219,9 +220,78 @@ function ingestMessage(fileName: string, res: ExtractedCase): ChatMessage {
   };
 }
 
+/**
+ * Example cases shown on the dashboard so lawyers can see how the system works.
+ * Flagged `demo: true` — opening one hydrates the workspace with illustrative
+ * documents and an auto-generated timeline. Real cases never carry this flag.
+ */
+const SEED_CASES: CaseSummary[] = [
+  {
+    id: "c-demo-1",
+    name: "Juicio Ejecutivo Mercantil 482/2026",
+    branch: "mercantil",
+    updated: "hace 2 horas",
+    deadlineLabel: "Prescripción cambiaria · 3 años",
+    demo: true,
+  },
+  {
+    id: "c-demo-2",
+    name: "Despido · García vs. Industrias del Norte",
+    branch: "laboral",
+    updated: "ayer",
+    deadlineLabel: "Prescripción 2 meses (art. 518)",
+    urgent: true,
+    demo: true,
+  },
+  {
+    id: "c-demo-3",
+    name: "Amparo indirecto 211/2026",
+    branch: "amparo",
+    updated: "hace 3 días",
+    deadlineLabel: "Plazo 15 días (art. 17)",
+    urgent: true,
+    demo: true,
+  },
+  {
+    id: "c-demo-4",
+    name: "Revisión de contrato de arrendamiento",
+    branch: "civil",
+    updated: "hace 1 semana",
+    demo: true,
+  },
+];
+
+const DEMO_DOCS: Partial<Record<BranchId, string[]>> = {
+  mercantil: ["Pagaré 482-2026.pdf", "Estado de cuenta.pdf", "Requerimiento de pago.pdf"],
+  laboral: ["Demanda laboral.pdf", "Recibos de nómina.pdf", "Aviso de despido.pdf"],
+  amparo: ["Demanda de amparo.pdf", "Acto reclamado.pdf", "Notificación.pdf"],
+  civil: ["Contrato de arrendamiento.pdf", "Notificación de incumplimiento.pdf"],
+};
+
+/** Sample documents for a demo expediente's archivero. */
+function demoFiles(branch: BranchId): CaseFile[] {
+  const names = DEMO_DOCS[branch] ?? ["Escrito inicial.pdf", "Pruebas documentales.pdf"];
+  return names.map((name, i) => ({
+    id: `demo-f-${branch}-${i}`,
+    name,
+    kind: kindFromName(name),
+    size: "expediente",
+    addedAt: Date.now() - i * 60000,
+  }));
+}
+
+/** Short note shown in a demo case explaining it's an illustrative example. */
+const demoNote = (): ChatMessage => ({
+  id: uid("m"),
+  role: "assistant",
+  content:
+    "📁 **Expediente de ejemplo.** Así se ve un caso ya armado: documentos en el Archivero y la **Línea del Tiempo** generada automáticamente con los hechos y plazos. Abre la pestaña «Línea del Tiempo» para verla. Crea un expediente nuevo (arrastra un documento) para trabajar uno real.",
+  timestamp: Date.now(),
+});
+
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [view, setView] = useState<AppView>("dashboard");
-  const [cases, setCases] = useState<CaseSummary[]>([]);
+  const [cases, setCases] = useState<CaseSummary[]>(SEED_CASES);
   const [caseModalOpen, setCaseModalOpen] = useState(false);
   const [caseModalPreset, setCaseModalPreset] = useState<BranchId | null>(null);
   const [intakeFile, setIntakeFile] = useState<File | null>(null);
@@ -248,17 +318,27 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const branchRef = useRef(branch);
   branchRef.current = branch;
 
-  const loadCase = useCallback((next: BranchId, name: string) => {
+  const loadCase = useCallback((next: BranchId, name: string, demo = false) => {
     setBranch(next);
     setCaseName(name.trim() || `Caso ${BRANCHES[next].name}`);
     setLaws(cloneLaws(next));
-    setFiles([]);
-    setTimeline(null);
-    setIngestedEvents([]);
     setActiveArticle(null);
     setEditorHtmlState("");
     setEditorVersion((v) => v + 1);
-    setMessages([welcomeMessage(next)]);
+    if (demo) {
+      // Hydrate the example with sample documents and a ready-made timeline.
+      const seeded = demoFiles(next);
+      const events = [...generateTimeline(next, seeded)].sort(byChrono);
+      setFiles(seeded);
+      setTimeline(events);
+      setIngestedEvents(events);
+      setMessages([welcomeMessage(next), demoNote()]);
+    } else {
+      setFiles([]);
+      setTimeline(null);
+      setIngestedEvents([]);
+      setMessages([welcomeMessage(next)]);
+    }
     setView("workspace");
   }, []);
 
@@ -280,7 +360,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const openCase = useCallback(
     (id: string) => {
       const found = cases.find((c) => c.id === id);
-      if (found) loadCase(found.branch, found.name);
+      if (found) loadCase(found.branch, found.name, found.demo);
     },
     [cases, loadCase],
   );
@@ -357,6 +437,15 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         );
       }
     })();
+  }, []);
+
+  // Seed the timeline from an already-analyzed extraction (e.g. the intake flow),
+  // so the chronology is ready the moment the case is created — no re-analysis.
+  const seedFromExtraction = useCallback((fileName: string, res: ExtractedCase) => {
+    const events = eventsFromExtraction(res, fileName);
+    if (!events.length) return;
+    setIngestedEvents((prev) => mergeEvents(prev, events));
+    setTimeline((prev) => mergeEvents(prev ?? [], events));
   }, []);
 
   const runAssistant = useCallback(
@@ -491,6 +580,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       toggleLaw,
       addFiles,
       ingestDocument,
+      seedFromExtraction,
       removeFile,
       sendMessage,
       runTimeline,
@@ -529,6 +619,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       toggleLaw,
       addFiles,
       ingestDocument,
+      seedFromExtraction,
       removeFile,
       sendMessage,
       runTimeline,

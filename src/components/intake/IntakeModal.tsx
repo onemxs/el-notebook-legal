@@ -205,7 +205,7 @@ function Review({
 }
 
 export function IntakeModal() {
-  const { intakeFile, clearIntake, startCase, addFiles } = useWorkspace();
+  const { intakeFile, clearIntake, startCase, addFiles, seedFromExtraction } = useWorkspace();
   const [current, setCurrent] = useState(0);
   const [data, setData] = useState<ExtractedCase | null>(null);
   const [caseName, setCaseName] = useState("");
@@ -239,7 +239,7 @@ export function IntakeModal() {
   }, [intakeFile]);
 
   const confirm = () => {
-    if (!intakeFile) return;
+    if (!intakeFile || !data) return;
     startCase(selected, caseName);
     const file: CaseFile = {
       id: `f-intake-${(fid++).toString(36)}`,
@@ -249,6 +249,8 @@ export function IntakeModal() {
       addedAt: Date.now(),
     };
     addFiles([file]);
+    // Reuse the analysis we already have to build the timeline immediately.
+    seedFromExtraction(intakeFile.name, data);
     clearIntake();
   };
 

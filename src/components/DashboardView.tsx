@@ -99,7 +99,7 @@ function CaseCard({ c, onOpen }: { c: CaseSummary; onOpen: () => void }) {
       {c.deadlineLabel && (
         <div
           className={`mt-2 flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-medium ${
-            c.urgent ? "bg-danger-soft text-danger" : "bg-warning/10 text-warning"
+            c.urgent ? "bg-danger-soft text-danger" : "bg-warning-soft text-warning"
           }`}
         >
           <AlertTriangle size={12} />
@@ -316,7 +316,7 @@ export function DashboardView() {
                       className="flex items-start gap-2.5 rounded-lg border border-hairline bg-canvas/40 p-2.5 text-left hover:bg-accent-soft/30 transition-colors cursor-pointer"
                       onClick={() => openCase(c.id)}
                     >
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-warning/10 text-[10px] font-bold text-warning">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-warning-soft text-[10px] font-bold text-warning">
                         {idx + 1}
                       </span>
                       <div className="min-w-0 flex-1">
