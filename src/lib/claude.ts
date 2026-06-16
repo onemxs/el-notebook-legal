@@ -1,4 +1,7 @@
-import type { BranchId, ExtractedCase } from "./types";
+import type { BranchId, ExtractedCase, ExtractedField } from "./types";
+import { BRANCHES } from "./branches";
+import { SUPA_CONFIGURED, consultarSemantica, type MatchedArticulo } from "./supabase";
+import { DOC_LABELS, type DocKind } from "./generators";
 
 /**
  * Sends a dropped document to the local /api/analizar proxy (which calls Claude
@@ -66,6 +69,52 @@ async function buildPayload(file: File) {
     return { name: file.name, mediaType, base64: await toBase64(file) };
   }
   return null; // unsupported (e.g. old binary .doc) → fall back to demo
+}
+
+export interface DocGenContext {
+  kind: DocKind;
+  branch: BranchId;
+  caseName: string;
+  parties: ExtractedField[];
+  facts: string[];
+}
+
+export async function generateDocumentAI(ctx: DocGenContext): Promise<string | null> {
+  try {
+    const b = BRANCHES[ctx.branch];
+    let articles: MatchedArticulo[] = [];
+    if (SUPA_CONFIGURED) {
+      try {
+        const query = `${DOC_LABELS[ctx.kind]} ${b.name} ${ctx.caseName}`;
+        articles = await consultarSemantica(query, { rama: ctx.branch, matchCount: 6 });
+      } catch { /* semantic search unavailable — proceed without articles */ }
+    }
+
+    const res = await fetch("/api/generar-documento", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        kind: ctx.kind,
+        kindLabel: DOC_LABELS[ctx.kind],
+        branch: ctx.branch,
+        branchName: b.name,
+        caseName: ctx.caseName,
+        parties: ctx.parties,
+        facts: ctx.facts,
+        articles: articles.map((a) => ({
+          codigo: a.codigo,
+          articulo: a.articulo,
+          texto: a.texto,
+        })),
+        lawName: b.laws[0]?.name ?? "",
+      }),
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json?.html ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function analyzeDocument(

@@ -124,33 +124,54 @@ export function generateTimeline(branch: BranchId, files: CaseFile[]): TimelineE
   );
 }
 
-export type DocKind = "contestacion" | "demanda" | "alegatos" | "amparo";
+export type DocKind =
+  | "demanda" | "contestacion" | "alegatos" | "amparo"
+  | "denuncia" | "alegatos-penales" | "apelacion";
 
 export const DOC_LABELS: Record<DocKind, string> = {
   demanda: "Escrito inicial de demanda",
   contestacion: "Contestación de demanda",
   alegatos: "Alegatos",
   amparo: "Demanda de amparo",
+  denuncia: "Denuncia / Querella por escrito",
+  "alegatos-penales": "Escrito de Alegatos Iniciales",
+  apelacion: "Recurso de Apelación",
 };
+
+const BRANCH_DOC_KINDS: Partial<Record<BranchId, DocKind[]>> = {
+  penal: ["denuncia", "alegatos-penales", "apelacion"],
+};
+
+const DEFAULT_DOC_KINDS: DocKind[] = ["demanda", "contestacion", "alegatos", "amparo"];
+
+export function getDocKindsForBranch(branch: BranchId): DocKind[] {
+  return BRANCH_DOC_KINDS[branch] ?? DEFAULT_DOC_KINDS;
+}
 
 /**
  * Renders a formal Mexican legal document skeleton (Rubro, Autoridad, Proemio,
  * Hechos, Derecho, Puntos Petitorios) as HTML for the editor surface.
  */
+function resolveAuthority(branch: BranchId, kind: DocKind): string {
+  if (branch === "penal") {
+    if (kind === "denuncia") return "C. AGENTE DEL MINISTERIO PÚBLICO EN TURNO";
+    if (kind === "apelacion") return "MAGISTRADO DEL TRIBUNAL DE ALZADA EN TURNO";
+    return "C. JUEZ DE CONTROL EN TURNO";
+  }
+  if (branch === "amparo") return "JUEZ DE DISTRITO EN MATERIA DE AMPARO EN TURNO";
+  if (branch === "laboral") return "TRIBUNAL LABORAL FEDERAL EN TURNO";
+  if (branch === "fiscal" || branch === "administrativo")
+    return "SALA REGIONAL DEL TRIBUNAL FEDERAL DE JUSTICIA ADMINISTRATIVA";
+  return "C. JUEZ COMPETENTE EN TURNO";
+}
+
 export function generateDocument(
   kind: DocKind,
   branch: BranchId,
   caseName: string,
 ): string {
   const b = BRANCHES[branch];
-  const authority =
-    branch === "amparo"
-      ? "JUEZ DE DISTRITO EN MATERIA DE AMPARO EN TURNO"
-      : branch === "laboral"
-        ? "TRIBUNAL LABORAL FEDERAL EN TURNO"
-        : branch === "fiscal" || branch === "administrativo"
-          ? "SALA REGIONAL DEL TRIBUNAL FEDERAL DE JUSTICIA ADMINISTRATIVA"
-          : "C. JUEZ COMPETENTE EN TURNO";
+  const authority = resolveAuthority(branch, kind);
   const title = DOC_LABELS[kind].toUpperCase();
   const law = b.laws[0];
 

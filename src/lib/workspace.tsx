@@ -25,9 +25,9 @@ import type {
 import { BRANCHES } from "./branches";
 import { askAssistant } from "./ai";
 import { analyzeExpediente } from "./intake";
-import { analyzeDocument } from "./claude";
+import { analyzeDocument, generateDocumentAI } from "./claude";
 import { kindFromName } from "./files";
-import { generateTimeline, generateDocument, type DocKind } from "./generators";
+import { generateTimeline, generateDocument, getDocKindsForBranch, type DocKind } from "./generators";
 
 let n = 0;
 const uid = (p: string) => `${p}-${Date.now().toString(36)}-${(n++).toString(36)}`;
@@ -53,6 +53,9 @@ interface WorkspaceState {
   editorVersion: number;
   activeArticle: Citation | null;
   settings: SystemSettings;
+  generatingDoc: boolean;
+  caseParties: ExtractedField[];
+  caseDocContent: string[];
 }
 
 interface WorkspaceCtx extends WorkspaceState {
@@ -75,6 +78,7 @@ interface WorkspaceCtx extends WorkspaceState {
   closeArticle: () => void;
   setEditorHtml: (html: string) => void;
   insertDocument: (kind: DocKind) => void;
+  docKindsForBranch: DocKind[];
   updateSettings: (patch: Partial<SystemSettings>) => void;
 }
 
@@ -312,6 +316,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [editorVersion, setEditorVersion] = useState(0);
   const [activeArticle, setActiveArticle] = useState<Citation | null>(null);
   const [settings, setSettings] = useState<SystemSettings>(initialSettings);
+  const [generatingDoc, setGeneratingDoc] = useState(false);
+  const [caseParties, setCaseParties] = useState<ExtractedField[]>([]);
+  const [caseDocContent, setCaseDocContent] = useState<string[]>([]);
 
   const filesRef = useRef(files);
   filesRef.current = files;
@@ -328,6 +335,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     setActiveArticle(null);
     setEditorHtmlState("");
     setEditorVersion((v) => v + 1);
+    setCaseParties([]);
+    setCaseDocContent([]);
+    setGeneratingDoc(false);
     if (demo) {
       // Hydrate the example with sample documents and a ready-made timeline.
       const seeded = demoFiles(next);
@@ -430,9 +440,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         );
         const events = eventsFromExtraction(res, fileName);
         setIngestedEvents((prev) => mergeEvents(prev, events));
-        // Auto-construcción: la cronología se llena sola conforme llegan documentos.
         setTimeline((prev) => mergeEvents(prev ?? [], events));
         setMessages((prev) => [...prev, ingestMessage(fileName, res)]);
+        if (res.parties?.length) {
+          setCaseParties((prev) => {
+            const keys = new Set(prev.map((p) => `${p.label}|${p.value}`));
+            const next = res.parties.filter((p) => !keys.has(`${p.label}|${p.value}`));
+            return next.length ? [...prev, ...next] : prev;
+          });
+        }
+        const docText = res.transcripcion || res.summary;
+        if (docText) setCaseDocContent((prev) => [...prev, docText]);
       } catch (error) {
         console.error("Error ingesting document:", error);
         setFiles((prev) =>
@@ -446,9 +464,19 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   // so the chronology is ready the moment the case is created — no re-analysis.
   const seedFromExtraction = useCallback((fileName: string, res: ExtractedCase) => {
     const events = eventsFromExtraction(res, fileName);
-    if (!events.length) return;
-    setIngestedEvents((prev) => mergeEvents(prev, events));
-    setTimeline((prev) => mergeEvents(prev ?? [], events));
+    if (events.length) {
+      setIngestedEvents((prev) => mergeEvents(prev, events));
+      setTimeline((prev) => mergeEvents(prev ?? [], events));
+    }
+    if (res.parties?.length) {
+      setCaseParties((prev) => {
+        const keys = new Set(prev.map((p) => `${p.label}|${p.value}`));
+        const next = res.parties.filter((p) => !keys.has(`${p.label}|${p.value}`));
+        return next.length ? [...prev, ...next] : prev;
+      });
+    }
+    const docText = res.transcripcion || res.summary;
+    if (docText) setCaseDocContent((prev) => [...prev, docText]);
   }, []);
 
   const runAssistant = useCallback(
@@ -525,13 +553,48 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   const setEditorHtml = useCallback((html: string) => setEditorHtmlState(html), []);
 
+  const casePartiesRef = useRef(caseParties);
+  casePartiesRef.current = caseParties;
+  const caseDocContentRef = useRef(caseDocContent);
+  caseDocContentRef.current = caseDocContent;
+  const caseNameRef = useRef(caseName);
+  caseNameRef.current = caseName;
+
   const insertDocument = useCallback(
     (kind: DocKind) => {
-      const html = generateDocument(kind, branch, caseName);
-      setEditorHtmlState((prev) => (prev ? `${prev}<hr/>${html}` : html));
-      setEditorVersion((v) => v + 1);
+      const currentBranch = branchRef.current;
+      const currentName = caseNameRef.current;
+      const currentParties = casePartiesRef.current;
+      const currentDocs = caseDocContentRef.current;
+
+      const hasContext = currentParties.length > 0 || currentDocs.length > 0;
+
+      if (!hasContext) {
+        const html = generateDocument(kind, currentBranch, currentName);
+        setEditorHtmlState((prev) => (prev ? `${prev}<hr/>${html}` : html));
+        setEditorVersion((v) => v + 1);
+        return;
+      }
+
+      setGeneratingDoc(true);
+      void (async () => {
+        try {
+          const aiHtml = await generateDocumentAI({
+            kind,
+            branch: currentBranch,
+            caseName: currentName,
+            parties: currentParties,
+            facts: currentDocs,
+          });
+          const html = aiHtml ?? generateDocument(kind, currentBranch, currentName);
+          setEditorHtmlState((prev) => (prev ? `${prev}<hr/>${html}` : html));
+          setEditorVersion((v) => v + 1);
+        } finally {
+          setGeneratingDoc(false);
+        }
+      })();
     },
-    [branch, caseName],
+    [],
   );
 
   const updateSettings = useCallback(
@@ -554,6 +617,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("beforeunload", wipe);
   }, [settings.secureSession]);
 
+  const docKindsForBranch = useMemo(() => getDocKindsForBranch(branch), [branch]);
+
   const value = useMemo<WorkspaceCtx>(
     () => ({
       view,
@@ -574,6 +639,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       editorVersion,
       activeArticle,
       settings,
+      generatingDoc,
+      caseParties,
+      caseDocContent,
       goHome,
       openCase,
       openCaseModal,
@@ -593,6 +661,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       closeArticle,
       setEditorHtml,
       insertDocument,
+      docKindsForBranch,
       updateSettings,
     }),
     [
@@ -614,6 +683,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       editorVersion,
       activeArticle,
       settings,
+      generatingDoc,
+      caseParties,
+      caseDocContent,
       goHome,
       openCase,
       openCaseModal,
@@ -633,6 +705,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       closeArticle,
       setEditorHtml,
       insertDocument,
+      docKindsForBranch,
       updateSettings,
     ],
   );

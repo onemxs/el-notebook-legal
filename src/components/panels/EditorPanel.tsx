@@ -6,6 +6,7 @@ import {
   ChevronDown,
   Sparkles,
   FilePlus2,
+  Loader2,
 } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
@@ -42,8 +43,16 @@ function SegBtn({
 }
 
 export function EditorPanel() {
-  const { caseName, caseIsDemo, editorHtml, editorVersion, setEditorHtml, insertDocument } =
-    useWorkspace();
+  const {
+    caseName,
+    caseIsDemo,
+    editorHtml,
+    editorVersion,
+    setEditorHtml,
+    insertDocument,
+    generatingDoc,
+    docKindsForBranch,
+  } = useWorkspace();
   const ref = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<View>("editor");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -124,13 +133,14 @@ export function EditorPanel() {
                     <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
                     <div className="absolute right-0 z-20 mt-1.5 w-60 overflow-hidden rounded-xl border border-hairline bg-panel-solid shadow-float animate-scale-in">
                       <p className="border-b border-hairline px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-ink-subtle">
-                        Plantilla formal mexicana
+                        Escrito legal contextual
                       </p>
-                      {(Object.keys(DOC_LABELS) as DocKind[]).map((k) => (
+                      {docKindsForBranch.map((k) => (
                         <button
                           key={k}
                           onClick={() => onPickDoc(k)}
-                          className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-accent-soft cursor-pointer"
+                          disabled={generatingDoc}
+                          className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-accent-soft cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <FilePlus2 size={15} className="text-accent" />
                           {DOC_LABELS[k]}
@@ -152,13 +162,33 @@ export function EditorPanel() {
           </div>
 
           <div className="scroll-zone flex-1 overflow-y-auto px-6 py-6">
-            <div className="mx-auto max-w-[760px] rounded-2xl border border-hairline paper px-8 py-9 shadow-card sm:px-12 sm:py-12 min-h-[60vh]">
+            <div className="mx-auto max-w-[760px] rounded-2xl border border-hairline paper px-8 py-9 shadow-card sm:px-12 sm:py-12 min-h-[60vh] relative">
+              {generatingDoc && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-panel-solid/80 backdrop-blur-sm">
+                  <Loader2 size={32} className="animate-spin text-accent mb-4" />
+                  <p className="text-sm font-medium text-ink mb-6 text-center px-4">
+                    Analizando evidencias del expediente y redactando fundamentos legales reales…
+                  </p>
+                  <div className="w-full max-w-[500px] space-y-3 px-8">
+                    <div className="h-4 w-3/4 rounded bg-elevated animate-pulse" />
+                    <div className="h-4 w-full rounded bg-elevated animate-pulse" />
+                    <div className="h-4 w-5/6 rounded bg-elevated animate-pulse" />
+                    <div className="h-6 mt-4 w-1/3 rounded bg-elevated animate-pulse" />
+                    <div className="h-4 w-full rounded bg-elevated animate-pulse" />
+                    <div className="h-4 w-4/5 rounded bg-elevated animate-pulse" />
+                    <div className="h-4 w-full rounded bg-elevated animate-pulse" />
+                    <div className="h-6 mt-4 w-2/5 rounded bg-elevated animate-pulse" />
+                    <div className="h-4 w-full rounded bg-elevated animate-pulse" />
+                    <div className="h-4 w-3/4 rounded bg-elevated animate-pulse" />
+                  </div>
+                </div>
+              )}
               <div
                 ref={ref}
-                contentEditable
+                contentEditable={!generatingDoc}
                 suppressContentEditableWarning
                 onInput={() => setEditorHtml(ref.current?.innerHTML ?? "")}
-                data-placeholder="Empieza a redactar el caso, o usa «Generar» para crear una demanda, contestación, alegatos o amparo con formato legal mexicano…"
+                data-placeholder="Empieza a redactar el caso, o usa «Generar» para crear un escrito legal contextual basado en tu expediente…"
                 className="prose-legal min-h-[50vh] max-w-none outline-none"
                 aria-label="Editor de documento legal"
                 role="textbox"
