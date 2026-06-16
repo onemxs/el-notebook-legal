@@ -21,6 +21,7 @@ export default {
         titanium: "var(--titanium)",
         success: "var(--success)",
         warning: "var(--warning)",
+        "warning-soft": "var(--warning-soft)",
         danger: "var(--danger)",
         "danger-soft": "var(--danger-soft)",
       },

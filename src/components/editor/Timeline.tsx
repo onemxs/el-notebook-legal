@@ -1,20 +1,83 @@
-import { CalendarClock, Sparkles, AlertTriangle, CircleDot, Clock } from "lucide-react";
+import {
+  CalendarClock,
+  Sparkles,
+  AlertTriangle,
+  CircleDot,
+  Clock,
+  FileText,
+  Flag,
+  RotateCw,
+  Inbox,
+} from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
-import type { TimelineSeverity } from "@/lib/types";
+import type { TimelineEvent, TimelineSeverity } from "@/lib/types";
+
+const DAY = 86400000;
+/** Above 7 events the horizontal layout gets cramped, so we switch to vertical. */
+const HORIZONTAL_MAX = 7;
 
 const SEVERITY: Record<
   TimelineSeverity,
-  { dot: string; ring: string; label: string; icon: typeof CircleDot }
+  {
+    dot: string;
+    chip: string;
+    text: string;
+    border: string;
+    label: string;
+    icon: typeof CircleDot;
+  }
 > = {
-  info: { dot: "bg-accent", ring: "ring-accent/20", label: "Hecho", icon: CircleDot },
+  info: {
+    dot: "bg-accent",
+    chip: "bg-accent-soft text-accent",
+    text: "text-accent",
+    border: "border-accent",
+    label: "Hecho",
+    icon: CircleDot,
+  },
   warning: {
     dot: "bg-warning",
-    ring: "ring-warning/20",
+    chip: "bg-warning-soft text-warning",
+    text: "text-warning",
+    border: "border-warning",
     label: "Contradicción",
     icon: AlertTriangle,
   },
-  deadline: { dot: "bg-danger", ring: "ring-danger/20", label: "Plazo", icon: Clock },
+  deadline: {
+    dot: "bg-danger",
+    chip: "bg-danger-soft text-danger",
+    text: "text-danger",
+    border: "border-danger",
+    label: "Plazo",
+    icon: Clock,
+  },
 };
+
+function relDays(iso: string): number | null {
+  if (!iso) return null;
+  return Math.round((+new Date(iso) - Date.now()) / DAY);
+}
+
+function relLabel(d: number): string {
+  if (d === 0) return "hoy";
+  if (d === 1) return "mañana";
+  if (d === -1) return "ayer";
+  return d > 0 ? `en ${d} días` : `hace ${Math.abs(d)} días`;
+}
+
+function yearOf(ev: TimelineEvent): string {
+  return ev.iso ? new Date(ev.iso).getFullYear().toString() : "Por confirmar";
+}
+
+/** Short, uniform date label ("12 mar 2026"); falls back to the raw string. */
+function compactDate(ev: TimelineEvent): string {
+  if (!ev.iso) return ev.date;
+  return new Date(ev.iso).toLocaleDateString("es-MX", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
 
 function Skeleton() {
   return (
@@ -32,12 +95,299 @@ function Skeleton() {
   );
 }
 
+/** Banner highlighting the nearest upcoming deadline (or the most recent overdue one). */
+function NextDeadline({ events }: { events: TimelineEvent[] }) {
+  const deadlines = events.filter((e) => e.severity === "deadline" && e.iso);
+  if (!deadlines.length) return null;
+
+  const future = deadlines
+    .filter((e) => relDays(e.iso)! >= 0)
+    .sort((a, b) => +new Date(a.iso) - +new Date(b.iso));
+  const overdue = deadlines
+    .filter((e) => relDays(e.iso)! < 0)
+    .sort((a, b) => +new Date(b.iso) - +new Date(a.iso));
+  const ev = future[0] ?? overdue[0];
+  const d = relDays(ev.iso)!;
+
+  const tone =
+    d < 0 || d <= 7
+      ? "bg-danger-soft text-danger"
+      : d <= 30
+        ? "bg-warning-soft text-warning"
+        : "bg-accent-soft text-accent";
+
+  return (
+    <div
+      className={`mb-5 flex items-center gap-3 rounded-xl px-4 py-3 animate-scale-in ${tone}`}
+    >
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-panel-solid">
+        <Flag size={17} strokeWidth={2} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-semibold uppercase tracking-wide opacity-80">
+          {d < 0 ? "Plazo vencido" : "Próximo plazo"}
+        </p>
+        <p className="truncate text-sm font-semibold text-ink">{ev.title}</p>
+      </div>
+      <div className="shrink-0 text-right">
+        <p className="text-sm font-bold">{relLabel(d)}</p>
+        <p className="text-[11px] opacity-70">{compactDate(ev)}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────── Vertical layout (many events) ──────────────────────────── */
+
+function EventCard({ ev, index }: { ev: TimelineEvent; index: number }) {
+  const s = SEVERITY[ev.severity];
+  const Icon = s.icon;
+  const d = relDays(ev.iso);
+  const imminent = ev.severity === "deadline" && d !== null && d >= 0 && d <= 7;
+  const showRel = d !== null && (ev.severity === "deadline" || Math.abs(d) <= 14);
+
+  return (
+    <li
+      className="relative mb-4 pl-7 animate-slide-up"
+      style={{ animationDelay: `${Math.min(index, 12) * 55}ms` }}
+    >
+      <span
+        className={`absolute left-[3px] top-1 h-3.5 w-3.5 rounded-full ${s.dot} ring-4 ring-canvas ${
+          imminent ? "animate-pulse" : ""
+        }`}
+      />
+      <div className="rounded-xl border border-hairline bg-panel-solid px-3.5 py-3 shadow-card transition-shadow hover:shadow-float">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-bold text-ink">{compactDate(ev)}</span>
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${s.chip}`}
+          >
+            <Icon size={11} />
+            {s.label}
+          </span>
+          {showRel && (
+            <span
+              className={`ml-auto rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                d! < 0
+                  ? "text-ink-subtle"
+                  : ev.severity === "deadline"
+                    ? "bg-danger-soft text-danger"
+                    : "bg-elevated text-ink-muted"
+              }`}
+            >
+              {relLabel(d!)}
+            </span>
+          )}
+        </div>
+        <p className="mt-1.5 text-sm font-medium leading-snug text-ink">{ev.title}</p>
+        <p className="mt-0.5 text-[13px] leading-relaxed text-ink-muted">{ev.detail}</p>
+        {ev.source && (
+          <p className="mt-2 flex items-center gap-1 text-[11px] text-ink-subtle">
+            <FileText size={11} />
+            <span className="truncate">{ev.source}</span>
+          </p>
+        )}
+      </div>
+    </li>
+  );
+}
+
+function VerticalTimeline({ events }: { events: TimelineEvent[] }) {
+  const now = Date.now();
+  const todayStr = new Date().toLocaleDateString("es-MX", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+  type Row =
+    | { kind: "year"; label: string }
+    | { kind: "today" }
+    | { kind: "event"; ev: TimelineEvent; i: number };
+  const rows: Row[] = [];
+  let lastYear = "";
+  let todayPlaced = false;
+  events.forEach((ev, i) => {
+    const year = yearOf(ev);
+    if (year !== lastYear) {
+      rows.push({ kind: "year", label: year });
+      lastYear = year;
+    }
+    if (!todayPlaced && ev.iso && +new Date(ev.iso) > now) {
+      rows.push({ kind: "today" });
+      todayPlaced = true;
+    }
+    rows.push({ kind: "event", ev, i });
+  });
+
+  return (
+    <div className="relative">
+      {/* Vertical rail connecting the events. */}
+      <span className="pointer-events-none absolute bottom-1 left-[10px] top-1 w-px bg-ink-subtle" />
+      <ol className="relative">
+        {rows.map((row, idx) => {
+          if (row.kind === "year") {
+            return (
+              <li key={`y-${row.label}-${idx}`} className="relative mb-3 mt-1 pl-7">
+                <span className="absolute left-[5px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-hairline bg-canvas" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-ink-subtle">
+                  {row.label}
+                </span>
+              </li>
+            );
+          }
+          if (row.kind === "today") {
+            return (
+              <li key={`today-${idx}`} className="relative mb-4 pl-7">
+                <span className="absolute left-[3px] top-0.5 h-3.5 w-3.5 rounded-full bg-accent ring-4 ring-canvas animate-pulse" />
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                    Hoy
+                  </span>
+                  <span className="text-[11px] font-medium text-ink-muted">{todayStr}</span>
+                  <span className="h-px flex-1 bg-hairline" />
+                </div>
+              </li>
+            );
+          }
+          return <EventCard key={row.ev.id} ev={row.ev} index={row.i} />;
+        })}
+      </ol>
+    </div>
+  );
+}
+
+/* ──────────────────────────── Horizontal layout (few events) ──────────────────────────── */
+
+function HText({ ev, s }: { ev: TimelineEvent; s: (typeof SEVERITY)[TimelineSeverity] }) {
+  const Icon = s.icon;
+  return (
+    <div className="w-[150px] px-1">
+      <span
+        className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${s.chip}`}
+      >
+        <Icon size={9} />
+        {s.label}
+      </span>
+      <p className="mt-1 text-[12px] font-semibold leading-snug text-ink">{ev.title}</p>
+      <p className="mt-0.5 text-[11px] leading-relaxed text-ink-muted">{ev.detail}</p>
+      {ev.source && (
+        <p className="mt-1 flex items-center gap-1 text-[10px] text-ink-subtle">
+          <FileText size={9} />
+          <span className="truncate">{ev.source}</span>
+        </p>
+      )}
+    </div>
+  );
+}
+
+function HColumn({ ev, index }: { ev: TimelineEvent; index: number }) {
+  const s = SEVERITY[ev.severity];
+  const up = index % 2 === 0;
+  const d = relDays(ev.iso);
+  const imminent = ev.severity === "deadline" && d !== null && d >= 0 && d <= 7;
+
+  const pin = <span className={`h-3 w-3 shrink-0 rounded-full border-2 bg-canvas ${s.border}`} />;
+  // A stem that stretches to span the gap between the pin and the central axis.
+  const stem = <span className="w-px flex-1 bg-ink-subtle" />;
+  const spacer = <div className="flex-1" />;
+  const year = (
+    <div className="px-1 text-center leading-none">
+      <p className={`text-lg font-extrabold ${s.text}`}>{compactDate(ev)}</p>
+      {ev.severity === "deadline" && d !== null && (
+        <p className="mt-0.5 text-[10px] font-semibold text-ink-subtle">{relLabel(d)}</p>
+      )}
+    </div>
+  );
+
+  return (
+    <div
+      className="relative flex h-[440px] min-w-[170px] flex-1 flex-col items-center animate-slide-up"
+      style={{ animationDelay: `${Math.min(index, 10) * 70}ms` }}
+    >
+      {/* marker sitting on the central axis */}
+      <span
+        className={`absolute left-1/2 top-1/2 z-20 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full ring-4 ring-canvas ${s.dot} ${
+          imminent ? "animate-pulse" : ""
+        }`}
+      />
+      {/* TOP half — content hugs the axis at the bottom */}
+      <div className="flex h-[220px] w-full flex-col items-center">
+        {up ? (
+          <>
+            <HText ev={ev} s={s} />
+            {pin}
+            {stem}
+          </>
+        ) : (
+          <>
+            {spacer}
+            {year}
+          </>
+        )}
+      </div>
+      {/* BOTTOM half — content hugs the axis at the top */}
+      <div className="flex h-[220px] w-full flex-col items-center">
+        {up ? (
+          <>
+            {year}
+            {spacer}
+          </>
+        ) : (
+          <>
+            {stem}
+            {pin}
+            <HText ev={ev} s={s} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function HorizontalTimeline({ events }: { events: TimelineEvent[] }) {
+  const now = Date.now();
+  const firstFuture = events.findIndex((e) => e.iso && +new Date(e.iso) > now);
+
+  return (
+    <div className="scroll-zone overflow-x-auto pb-2">
+      <div
+        className="relative flex h-[440px]"
+        style={{ minWidth: `${events.length * 170}px` }}
+      >
+        {/* the timeline axis with rounded end caps */}
+        <span className="pointer-events-none absolute left-2 right-2 top-1/2 h-0.5 -translate-y-1/2 rounded-full bg-ink-subtle" />
+        <span className="pointer-events-none absolute left-1 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-ink-subtle" />
+        <span className="pointer-events-none absolute right-1 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-ink-subtle" />
+
+        {/* "Hoy" divider between the last past event and the first upcoming one */}
+        {firstFuture > 0 && (
+          <div
+            className="pointer-events-none absolute bottom-8 top-8 z-10 flex flex-col items-center"
+            style={{ left: `${(firstFuture / events.length) * 100}%` }}
+          >
+            <span className="rounded-full bg-accent px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
+              Hoy
+            </span>
+            <span className="mt-1 w-0 flex-1 border-l border-dashed border-accent" />
+          </div>
+        )}
+
+        {events.map((ev, i) => (
+          <HColumn key={ev.id} ev={ev} index={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────── Entry point ──────────────────────────── */
+
 export function Timeline() {
   const { timeline, timelineLoading, runTimeline } = useWorkspace();
 
   if (timelineLoading) {
     return (
-      <div className="mx-auto max-w-2xl px-2 py-6">
+      <div className="mx-auto max-w-2xl px-4 py-6">
         <div className="mb-5 flex items-center gap-2 text-sm text-ink-muted">
           <Sparkles size={16} className="text-accent" />
           Analizando expediente y ordenando hechos…
@@ -47,77 +397,65 @@ export function Timeline() {
     );
   }
 
-  if (!timeline) {
+  if (!timeline || timeline.length === 0) {
     return (
       <div className="flex h-full flex-col items-center justify-center px-6 text-center">
         <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-soft text-accent">
           <CalendarClock size={26} strokeWidth={1.5} />
         </span>
-        <h3 className="text-base font-semibold text-ink">Automatización de Cronología</h3>
+        <h3 className="text-base font-semibold text-ink">La cronología se construye sola</h3>
         <p className="mt-1.5 max-w-sm text-sm text-ink-muted">
-          La IA analiza los archivos del caso y genera una secuencia ordenada de los
-          hechos para detectar contradicciones de fechas y plazos de prescripción.
+          Cada documento que sueltas en el Archivero aporta sus hechos con fecha. La IA
+          los ordena, detecta plazos y marca posibles contradicciones — y la línea del
+          tiempo crece automáticamente.
         </p>
+        <div className="mt-5 flex items-center gap-2.5 rounded-xl bg-elevated px-4 py-2.5 text-[13px] text-ink-muted">
+          <Inbox size={16} className="text-accent" />
+          Arrastra un documento para empezar
+        </div>
         <button
           onClick={runTimeline}
-          className="mt-5 flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer"
+          className="mt-4 flex items-center gap-2 rounded-xl border border-hairline px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-elevated hover:text-ink cursor-pointer"
         >
-          <Sparkles size={16} />
-          Generar línea del tiempo
+          <Sparkles size={15} className="text-accent" />
+          Ver cronología de referencia
         </button>
       </div>
     );
   }
 
+  const deadlines = timeline.filter((e) => e.severity === "deadline").length;
+  const horizontal = timeline.length <= HORIZONTAL_MAX;
+
   return (
-    <div className="mx-auto max-w-2xl px-2 py-6">
-      <div className="mb-5 flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-ink">
-          <CalendarClock size={16} className="text-accent" />
-          Cronología del caso
-        </h3>
+    <div className={`mx-auto px-4 py-6 ${horizontal ? "max-w-5xl" : "max-w-2xl"}`}>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-ink">
+            <CalendarClock size={16} className="text-accent" />
+            Cronología del caso
+          </h3>
+          <p className="mt-0.5 text-[11px] text-ink-subtle">
+            {timeline.length} {timeline.length === 1 ? "hecho" : "hechos"}
+            {deadlines > 0 && ` · ${deadlines} ${deadlines === 1 ? "plazo" : "plazos"}`}
+          </p>
+        </div>
         <button
           onClick={runTimeline}
-          className="rounded-lg border border-hairline px-2.5 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-elevated hover:text-ink cursor-pointer"
+          className="flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-elevated hover:text-ink cursor-pointer"
         >
+          <RotateCw size={13} />
           Regenerar
         </button>
       </div>
 
-      <ol className="relative ml-1.5 border-l border-hairline">
-        {timeline.map((ev, i) => {
-          const s = SEVERITY[ev.severity];
-          const Icon = s.icon;
-          return (
-            <li
-              key={ev.id}
-              className="relative mb-5 pl-6 animate-slide-up"
-              style={{ animationDelay: `${i * 60}ms` }}
-            >
-              <span
-                className={`absolute -left-[7px] top-1 h-3.5 w-3.5 rounded-full ${s.dot} ring-4 ${s.ring}`}
-              />
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-ink">{ev.date}</span>
-                <span
-                  className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                    ev.severity === "deadline"
-                      ? "bg-danger-soft text-danger"
-                      : ev.severity === "warning"
-                        ? "bg-warning/10 text-warning"
-                        : "bg-accent-soft text-accent"
-                  }`}
-                >
-                  <Icon size={11} />
-                  {s.label}
-                </span>
-              </div>
-              <p className="mt-1 text-sm font-medium text-ink">{ev.title}</p>
-              <p className="mt-0.5 text-[13px] leading-relaxed text-ink-muted">{ev.detail}</p>
-            </li>
-          );
-        })}
-      </ol>
+      <NextDeadline events={timeline} />
+
+      {horizontal ? (
+        <HorizontalTimeline events={timeline} />
+      ) : (
+        <VerticalTimeline events={timeline} />
+      )}
     </div>
   );
 }

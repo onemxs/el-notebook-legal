@@ -28,6 +28,7 @@
 
   --success: #2f6b4f; /* deep green */
   --warning: #9a6b1f; /* burnt amber (NOT gold) */
+  --warning-soft: rgba(154, 107, 31, 0.1);
   --danger: #ba1a1a; /* brick red */
   --danger-soft: rgba(186, 26, 26, 0.08);
 
@@ -58,6 +59,7 @@
 
   --success: #6ee7a8;
   --warning: #edbf7f;
+  --warning-soft: rgba(237, 191, 127, 0.15);
   --danger: #ff6b6b;
   --danger-soft: rgba(255, 107, 107, 0.15);
 

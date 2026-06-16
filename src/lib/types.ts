@@ -68,15 +68,24 @@ export type TimelineSeverity = "info" | "warning" | "deadline";
 export interface TimelineEvent {
   id: string;
   date: string; // display date
-  iso: string; // sortable
+  iso: string; // sortable; "" cuando la fecha no se pudo interpretar
   title: string;
   detail: string;
   severity: TimelineSeverity;
+  source?: string; // documento del que proviene el hecho
 }
 
 export interface ExtractedField {
   label: string;
   value: string;
+}
+
+/** Un hecho fechado que extrae la IA, antes de enriquecerlo en el cliente (id/iso). */
+export interface ExtractedEvent {
+  date: string; // fecha tal como la da la IA, p. ej. "15 de mayo de 2025"
+  title: string;
+  detail: string;
+  severity: TimelineSeverity;
 }
 
 /** Result of AI intake: reads a dropped expediente and proposes a case. */
@@ -89,6 +98,7 @@ export interface ExtractedCase {
   keyDates: ExtractedField[];
   summary: string;
   suggestedLaws: string[];
+  cronologia?: ExtractedEvent[]; // hechos con fecha para la línea del tiempo
   transcripcion?: string; // texto del documento leído por la IA (opcional)
   source?: "ia" | "demo"; // procedencia del análisis
 }

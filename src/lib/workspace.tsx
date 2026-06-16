@@ -20,6 +20,7 @@ import type {
   Law,
   SystemSettings,
   TimelineEvent,
+  TimelineSeverity,
 } from "./types";
 import { BRANCHES } from "./branches";
 import { askAssistant } from "./ai";
@@ -95,29 +96,106 @@ const welcomeMessage = (branch: BranchId): ChatMessage => ({
 
 const MONTHS: Record<string, number> = {
   ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5,
-  jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11,
+  jul: 6, ago: 7, sep: 8, set: 8, oct: 9, nov: 10, dic: 11,
 };
 
+/** Normalize a word to its 3-letter, accent-free month key ("mayo" → "may"). */
+const monthKey = (w: string) =>
+  w.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().slice(0, 3);
+
+/**
+ * Parse the many date shapes the AI (or a document) may use into a timestamp:
+ * "15 de mayo de 2025", "15 mayo 2025", "15 may 2026", "15/05/2025",
+ * "2025-05-15", or "mayo de 2025". Returns NaN when nothing matches.
+ */
 function parseSpanishDate(v: string): number {
-  const m = v.toLowerCase().match(/(\d{1,2})\s+([a-z]{3})\w*\s+(\d{4})/);
-  if (m && MONTHS[m[2]] !== undefined) {
-    return new Date(+m[3], MONTHS[m[2]], +m[1]).getTime();
+  const s = v.toLowerCase().trim();
+
+  const iso = s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (iso) return new Date(+iso[1], +iso[2] - 1, +iso[3]).getTime();
+
+  const num = s.match(/(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})/);
+  if (num) {
+    const year = +num[3] < 100 ? 2000 + +num[3] : +num[3];
+    return new Date(year, +num[2] - 1, +num[1]).getTime();
+  }
+
+  const dmy = s.match(/(\d{1,2})\s*(?:de\s+)?([a-záéíóú]+)\.?\s*(?:de\s+)?(\d{4})/);
+  if (dmy) {
+    const month = MONTHS[monthKey(dmy[2])];
+    if (month !== undefined) return new Date(+dmy[3], month, +dmy[1]).getTime();
+  }
+
+  const my = s.match(/([a-záéíóú]+)\.?\s*(?:de\s+)?(\d{4})/);
+  if (my) {
+    const month = MONTHS[monthKey(my[1])];
+    if (month !== undefined) return new Date(+my[2], month, 1).getTime();
   }
   return NaN;
 }
 
+/** Display date → sortable ISO, or "" when the date can't be interpreted. */
+function toIso(raw: string): string {
+  const t = parseSpanishDate(raw);
+  return Number.isNaN(t) ? "" : new Date(t).toISOString();
+}
+
+/** Chronological order; events with no parseable date sink to the bottom. */
+function byChrono(a: TimelineEvent, b: TimelineEvent): number {
+  if (!a.iso && !b.iso) return 0;
+  if (!a.iso) return 1;
+  if (!b.iso) return -1;
+  return +new Date(a.iso) - +new Date(b.iso);
+}
+
+const DEADLINE_RE = /vence|prescrip|plazo|t[ée]rmino|recurso|caduc|vencimiento/i;
+
 /** Turn an extracted key-date into a timeline event (deadlines flagged). */
 function fieldToEvent(field: ExtractedField, fileName: string): TimelineEvent {
-  const t = parseSpanishDate(field.value);
-  const isDeadline = /vence|prescrip|plazo|t[ée]rmino|recurso/i.test(field.label);
   return {
     id: uid("de"),
     date: field.value,
-    iso: Number.isNaN(t) ? new Date(Date.now() + n * 1000).toISOString() : new Date(t).toISOString(),
+    iso: toIso(field.value),
     title: field.label,
     detail: `Dato extraído de ${fileName}.`,
-    severity: isDeadline ? "deadline" : "info",
+    severity: DEADLINE_RE.test(field.label) ? "deadline" : "info",
+    source: fileName,
   };
+}
+
+const VALID_SEV: TimelineSeverity[] = ["info", "warning", "deadline"];
+
+/**
+ * Build timeline events from an AI extraction: prefer the narrative `cronologia`,
+ * and fall back to the labelled key-dates when the model didn't return one.
+ */
+function eventsFromExtraction(res: ExtractedCase, fileName: string): TimelineEvent[] {
+  if (res.cronologia && res.cronologia.length) {
+    return res.cronologia.map((e) => ({
+      id: uid("ev"),
+      date: e.date,
+      iso: toIso(e.date),
+      title: e.title,
+      detail: e.detail,
+      severity: VALID_SEV.includes(e.severity) ? e.severity : "info",
+      source: fileName,
+    }));
+  }
+  return res.keyDates.map((d) => fieldToEvent(d, fileName));
+}
+
+/** Merge new events into existing ones, de-duping by day + title, kept sorted. */
+function mergeEvents(prev: TimelineEvent[], next: TimelineEvent[]): TimelineEvent[] {
+  const key = (e: TimelineEvent) => `${e.iso.slice(0, 10)}|${e.title.trim().toLowerCase()}`;
+  const seen = new Set(prev.map(key));
+  const merged = [...prev];
+  for (const e of next) {
+    if (!seen.has(key(e))) {
+      seen.add(key(e));
+      merged.push(e);
+    }
+  }
+  return merged.sort(byChrono);
 }
 
 function ingestMessage(fileName: string, res: ExtractedCase): ChatMessage {
@@ -267,13 +345,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         setFiles((prev) =>
           prev.map((f) => (f.id === id ? { ...f, analyzing: false, size: "expediente" } : f)),
         );
-        const events = res.keyDates.map((d) => fieldToEvent(d, fileName));
-        setIngestedEvents((prev) => [...prev, ...events]);
-        setTimeline((prev) =>
-          prev
-            ? [...prev, ...events].sort((a, b) => +new Date(a.iso) - +new Date(b.iso))
-            : prev,
-        );
+        const events = eventsFromExtraction(res, fileName);
+        setIngestedEvents((prev) => mergeEvents(prev, events));
+        // Auto-construcción: la cronología se llena sola conforme llegan documentos.
+        setTimeline((prev) => mergeEvents(prev ?? [], events));
         setMessages((prev) => [...prev, ingestMessage(fileName, res)]);
       } catch (error) {
         console.error("Error ingesting document:", error);
@@ -337,15 +412,19 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     [branch, laws, thinking, runAssistant],
   );
 
+  // Manual (re)build: show the real ingested events when there are any; otherwise
+  // synthesize a branch-specific reference chronology so the feature is previewable.
   const runTimeline = useCallback(() => {
     setTimelineLoading(true);
     setTimeout(() => {
-      const merged = [...generateTimeline(branch, filesRef.current), ...ingestedEventsRef.current];
-      merged.sort((a, b) => +new Date(a.iso) - +new Date(b.iso));
-      setTimeline(merged);
+      const real = ingestedEventsRef.current;
+      const base = real.length
+        ? real
+        : generateTimeline(branchRef.current, filesRef.current);
+      setTimeline([...base].sort(byChrono));
       setTimelineLoading(false);
-    }, 1100);
-  }, [branch]);
+    }, 900);
+  }, []);
 
   const clearTimeline = useCallback(() => setTimeline(null), []);
 

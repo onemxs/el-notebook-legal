@@ -46,11 +46,25 @@ const SCHEMA = {
     },
     summary: { type: "string" },
     suggestedLaws: { type: "array", items: { type: "string" } },
+    cronologia: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          date: { type: "string" },
+          title: { type: "string" },
+          detail: { type: "string" },
+          severity: { type: "string", enum: ["info", "warning", "deadline"] },
+        },
+        required: ["date", "title", "detail", "severity"],
+      },
+    },
     transcripcion: { type: "string" },
   },
   required: [
     "branch", "confidence", "caseName", "asunto",
-    "parties", "keyDates", "summary", "suggestedLaws", "transcripcion",
+    "parties", "keyDates", "summary", "suggestedLaws", "cronologia", "transcripcion",
   ],
 };
 
@@ -66,6 +80,12 @@ Devuelve EXCLUSIVAMENTE el objeto JSON del esquema, en español, sin texto adici
 - keyDates: fechas relevantes con etiqueta (fecha de los hechos, notificación, vencimientos, plazos de prescripción si los infieres del tipo de asunto).
 - summary: 2-3 frases con lo esencial y lo que el abogado debe vigilar.
 - suggestedLaws: abreviaturas de leyes mexicanas aplicables (ej. "LFT", "CPEUM", "Cód. Comercio", "CFF", "CNPP").
+- cronologia: la SECUENCIA ORDENADA de los hechos con fecha que narra el documento, del más antiguo al más reciente. Cada evento es un objeto:
+    · date: la fecha del hecho en formato "DD de MES de AAAA" (ej. "15 de mayo de 2025"). Si solo hay mes y año, usa "MES de AAAA". Si infieres un plazo legal, calcula y pon su fecha estimada.
+    · title: frase corta del hecho (ej. "Notificación del acto de autoridad").
+    · detail: una frase de contexto o de su relevancia procesal.
+    · severity: "deadline" para plazos, vencimientos, prescripciones o términos procesales; "warning" para contradicciones de fecha o riesgos; "info" para hechos ordinarios.
+  Incluye tanto los hechos narrados como los plazos legales que se deriven del tipo de asunto. Si el documento no tiene ninguna fecha, devuelve cronologia como arreglo vacío [].
 - transcripcion: el texto literal del documento tal como lo lees (o un resumen fiel si es muy largo).
 Si no encuentras un dato, usa un valor razonable o "No especificado". No inventes nombres propios que no estén en el documento.`;
 
