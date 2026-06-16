@@ -123,17 +123,42 @@ export async function analyzeDocument(
 ): Promise<ExtractedCase | null> {
   try {
     const payload = await buildPayload(file);
-    if (!payload) return null;
+    if (!payload) {
+      console.warn(
+        `[analyzeDocument] "${file.name}" (${file.type || "tipo desconocido"}) no es un formato legible (PDF, imagen, texto o .docx). Se usarán datos de ejemplo.`,
+      );
+      return null;
+    }
     const res = await fetch("/api/analizar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...payload, forceBranch: forceBranch ?? null }),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error(
+        `[analyzeDocument] /api/analizar respondió HTTP ${res.status}. ¿El endpoint/servidor está activo? Se usarán datos de ejemplo.`,
+      );
+      return null;
+    }
     const json = await res.json();
-    if (json?.error || !json?.branch) return null;
+    if (json?.error) {
+      console.error(
+        `[analyzeDocument] La IA devolvió un error: ${json.error}. Se usarán datos de ejemplo.`,
+      );
+      return null;
+    }
+    if (!json?.branch) {
+      console.error(
+        "[analyzeDocument] La respuesta no trae 'branch' (posible JSON truncado o vacío). Se usarán datos de ejemplo.",
+      );
+      return null;
+    }
     return json as ExtractedCase;
-  } catch {
+  } catch (e) {
+    console.error(
+      "[analyzeDocument] Falló el análisis (red o excepción no controlada):",
+      e,
+    );
     return null;
   }
 }

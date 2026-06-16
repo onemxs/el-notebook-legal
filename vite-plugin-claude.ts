@@ -86,7 +86,7 @@ Devuelve EXCLUSIVAMENTE el objeto JSON del esquema, en español, sin texto adici
     · detail: una frase de contexto o de su relevancia procesal.
     · severity: "deadline" para plazos, vencimientos, prescripciones o términos procesales; "warning" para contradicciones de fecha o riesgos; "info" para hechos ordinarios.
   Incluye tanto los hechos narrados como los plazos legales que se deriven del tipo de asunto. Si el documento no tiene ninguna fecha, devuelve cronologia como arreglo vacío [].
-- transcripcion: el texto literal del documento tal como lo lees (o un resumen fiel si es muy largo).
+- transcripcion: un RESUMEN breve y fiel del documento (máximo 4-5 frases). NO copies el texto completo del documento, solo resúmelo.
 Si no encuentras un dato, usa un valor razonable o "No especificado". No inventes nombres propios que no estén en el documento.`;
 
 interface ReqBody {
@@ -264,15 +264,21 @@ export function claudeProxy(): Plugin {
 
             const message = await client.messages.create({
               model,
-              max_tokens: 4000,
+              max_tokens: 8000,
               system: SYSTEM,
               messages: [{ role: "user", content: content as never }],
               output_config: { format: { type: "json_schema", schema: SCHEMA } } as never,
             });
 
+            if (message.stop_reason === "max_tokens") {
+              console.error("[/api/analizar] respuesta truncada por max_tokens");
+              return send(200, { error: "respuesta_truncada_por_longitud" });
+            }
+
             const textBlock = message.content.find((b) => b.type === "text");
             const jsonText = textBlock && "text" in textBlock ? textBlock.text : "{}";
             const parsed = JSON.parse(jsonText);
+            console.log(`[/api/analizar] OK (${model}) → ${parsed.branch ?? "?"} · ${parsed.caseName ?? "?"}`);
             send(200, { ...parsed, source: "ia" });
           } catch (e) {
             const msg = e instanceof Error ? e.message : String(e);
