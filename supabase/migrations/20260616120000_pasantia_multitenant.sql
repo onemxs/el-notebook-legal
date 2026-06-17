@@ -292,13 +292,17 @@ create policy chat_all on public.chat_mensajes for all
 
 grant usage on schema public to anon, authenticated;
 grant select, insert, update, delete on
-  public.organizaciones, public.perfiles, public.invitaciones,
+  public.organizaciones, public.invitaciones,
   public.casos, public.documentos, public.timeline_eventos, public.chat_mensajes
   to authenticated;
 
--- Anti-escalada: el usuario edita su perfil pero NO cambia rol/plan/org directo.
-revoke update (rol_sistema, tipo_plan, organizacion_id, rol_organizacion)
-  on public.perfiles from authenticated;
+-- Anti-escalada en perfiles: NO se otorga UPDATE a nivel tabla (un GRANT de tabla
+-- no se puede acotar con REVOKE(col) — privilegios de tabla y columna son
+-- independientes en PostgreSQL). En su lugar, UPDATE solo en columnas seguras;
+-- rol_sistema/tipo_plan/organizacion_id/rol_organizacion cambian solo vía RPC.
+grant select, insert on public.perfiles to authenticated;
+grant update (nombre_completo, cedula, especialidad, logotipo_url, tema, onboarding_completo)
+  on public.perfiles to authenticated;
 
 grant execute on function public.migrar_a_despacho(text, text) to authenticated;
 grant execute on function public.aceptar_invitacion(uuid)      to authenticated;

@@ -124,6 +124,16 @@ function RequireSuperadmin({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+/** Sends authenticated users through onboarding until they complete it. */
+function OnboardingGate({ children }: { children: ReactNode }) {
+  const { session, perfil, demo } = useAuth();
+  if (demo) return <>{children}</>; // el modo demo nunca hace onboarding
+  if (session && !perfil) return <Splash />; // perfil cargando
+  if (session && perfil && !perfil.onboarding_completo)
+    return <Navigate to="/onboarding" replace />;
+  return <>{children}</>;
+}
+
 /** Logged-in / demo users skip the landing and go straight to the app. */
 function LandingRoute() {
   const { session, demo, loading } = useAuth();
@@ -143,9 +153,11 @@ export default function App() {
               path="/app"
               element={
                 <RequireAccess>
-                  <WorkspaceProvider>
-                    <AppShell />
-                  </WorkspaceProvider>
+                  <OnboardingGate>
+                    <WorkspaceProvider>
+                      <AppShell />
+                    </WorkspaceProvider>
+                  </OnboardingGate>
                 </RequireAccess>
               }
             />
