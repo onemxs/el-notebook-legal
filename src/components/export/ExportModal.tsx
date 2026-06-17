@@ -19,7 +19,7 @@ export function ExportModal({ open, onClose }: { open: boolean; onClose: () => v
     bodyHtml: editorHtml,
     signatureDataUrl: signature,
     signerName: signer.trim() || undefined,
-    footer: `${caseName} · Materia ${BRANCHES[branch].name} · El Notebook Legal`,
+    footer: `${caseName} · Materia ${BRANCHES[branch].name} · PasantIA`,
   });
 
   return (

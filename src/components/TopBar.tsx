@@ -31,7 +31,7 @@ export function TopBar() {
         </span>
         <span className="hidden text-left sm:block">
           <span className="block font-serif text-[19px] font-semibold leading-none tracking-tight text-ink">
-            El Notebook Legal
+            PasantIA
           </span>
           <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-subtle">
             Inteligencia jurídica · México

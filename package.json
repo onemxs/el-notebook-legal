@@ -1,9 +1,9 @@
 {
-  "name": "el-notebook-legal",
+  "name": "pasantia",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "El Notebook Legal — Asistente jurídico inteligente para abogados de México",
+  "description": "PasantIA — Asistente jurídico inteligente para abogados de México",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
