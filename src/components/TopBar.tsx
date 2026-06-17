@@ -11,6 +11,7 @@ import {
   LogOut,
   ShieldCheck,
   Users,
+  Building2,
 } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
@@ -18,6 +19,7 @@ import { useWorkspace } from "@/lib/workspace";
 import { BRANCHES } from "@/lib/branches";
 import { BranchIcon } from "@/components/branchIcons";
 import { SettingsModal } from "@/components/settings/SettingsModal";
+import { CrearDespachoModal } from "@/components/equipo/CrearDespachoModal";
 
 export function TopBar() {
   const { theme, toggle } = useTheme();
@@ -27,6 +29,7 @@ export function TopBar() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [acctOpen, setAcctOpen] = useState(false);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const displayName = perfil?.nombre_completo || session?.user.email || "";
   const initial = (displayName.trim()[0] || "U").toUpperCase();
   const b = BRANCHES[branch];
@@ -155,6 +158,18 @@ export function TopBar() {
                     )}
                     <p className="truncate text-[12px] text-ink-subtle">{session.user.email}</p>
                   </div>
+                  {perfil && !perfil.organizacion_id && (
+                    <button
+                      onClick={() => {
+                        setAcctOpen(false);
+                        setUpgradeOpen(true);
+                      }}
+                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-accent-soft cursor-pointer"
+                    >
+                      <Building2 size={15} className="text-accent" />
+                      Crear despacho
+                    </button>
+                  )}
                   {perfil?.rol_organizacion === "dueno" && (
                     <button
                       onClick={() => {
@@ -198,6 +213,7 @@ export function TopBar() {
       </div>
 
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <CrearDespachoModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
     </header>
   );
 }
