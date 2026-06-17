@@ -42,10 +42,13 @@ interface AuthState {
   enterDemo: () => void;
   exitDemo: () => void;
   refreshPerfil: () => Promise<void>;
+  /** Accept a pending org invitation stored before auth (token in sessionStorage). */
+  processPendingInvite: () => Promise<{ error?: string }>;
 }
 
 const Ctx = createContext<AuthState | null>(null);
 const DEMO_KEY = "pasantia-demo";
+const INVITE_KEY = "pasantia-invite";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -156,6 +159,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (session) await loadPerfil(session.user.id);
   }, [session, loadPerfil]);
 
+  const processPendingInvite = useCallback(async () => {
+    let token: string | null = null;
+    try {
+      token = sessionStorage.getItem(INVITE_KEY);
+    } catch {
+      /* noop */
+    }
+    if (!token || !session) return {};
+    try {
+      sessionStorage.removeItem(INVITE_KEY); // claim it (avoids double-accept)
+    } catch {
+      /* noop */
+    }
+    const sb = getSupabase();
+    if (!sb) return { error: "Sin conexión a Supabase." };
+    const { error } = await sb.rpc("aceptar_invitacion", { p_token: token });
+    if (error) return { error: error.message };
+    await loadPerfil(session.user.id);
+    return {};
+  }, [session, loadPerfil]);
+
+  // Auto-accept a pending invitation once authenticated (covers the OAuth
+  // redirect, which lands on /app rather than the invitation page).
+  useEffect(() => {
+    if (session) void processPendingInvite();
+  }, [session, processPendingInvite]);
+
   const value: AuthState = {
     session,
     perfil,
@@ -170,6 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     enterDemo,
     exitDemo,
     refreshPerfil,
+    processPendingInvite,
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

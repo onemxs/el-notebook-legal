@@ -10,6 +10,7 @@ import {
   Search,
   LogOut,
   ShieldCheck,
+  Users,
 } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
@@ -154,6 +155,18 @@ export function TopBar() {
                     )}
                     <p className="truncate text-[12px] text-ink-subtle">{session.user.email}</p>
                   </div>
+                  {perfil?.rol_organizacion === "dueno" && (
+                    <button
+                      onClick={() => {
+                        setAcctOpen(false);
+                        navigate("/equipo");
+                      }}
+                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-accent-soft cursor-pointer"
+                    >
+                      <Users size={15} className="text-accent" />
+                      Mi despacho
+                    </button>
+                  )}
                   {isSuperadmin && (
                     <button
                       onClick={() => {

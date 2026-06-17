@@ -14,6 +14,8 @@ import { AssistantPanel } from "@/components/panels/AssistantPanel";
 import { Landing } from "@/components/landing/Landing";
 import { Onboarding } from "@/components/onboarding/Onboarding";
 import { AdminPanel } from "@/components/admin/AdminPanel";
+import { MembersPanel } from "@/components/equipo/MembersPanel";
+import { AcceptInvite } from "@/components/auth/AcceptInvite";
 
 type MobilePanel = "archivero" | "editor" | "asistente";
 
@@ -177,6 +179,15 @@ export default function App() {
                 </RequireSuperadmin>
               }
             />
+            <Route
+              path="/equipo"
+              element={
+                <RequireAuth>
+                  <MembersPanel />
+                </RequireAuth>
+              }
+            />
+            <Route path="/invitacion/:token" element={<AcceptInvite />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
