@@ -105,6 +105,7 @@ interface WorkspaceCtx extends WorkspaceState {
   startCase: (branch: BranchId, name: string, extraction?: ExtractedCase) => Promise<string>;
   toggleLaw: (lawId: string) => void;
   addFiles: (files: CaseFile[]) => void;
+  addTranscript: (fileName: string, text: string) => void;
   ingestDocument: (file: File) => void;
   seedFromExtraction: (fileName: string, res: ExtractedCase) => void;
   removeFile: (id: string) => void;
@@ -551,6 +552,22 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Finished local transcription: add it to the archivero, feed it to the
+  // assistant context, and (cloud) persist only the TEXT to the case's documentos.
+  const addTranscript = useCallback((fileName: string, text: string) => {
+    const file: CaseFile = {
+      id: uid("f"),
+      name: fileName,
+      kind: "text",
+      size: `${(text.length / 1024).toFixed(1)} KB`,
+      addedAt: Date.now(),
+    };
+    setFiles((prev) => [file, ...prev]);
+    setCaseDocContent((prev) => [...prev, text]);
+    const caso = currentCaseIdRef.current;
+    if (caso) void guardarDocumento({ caso_id: caso, nombre: fileName, tipo: "transcription", contenido: text });
+  }, []);
+
   const removeFile = useCallback((id: string) => {
     setFiles((prev) => prev.filter((f) => f.id !== id));
   }, []);
@@ -832,6 +849,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       startCase,
       toggleLaw,
       addFiles,
+      addTranscript,
       ingestDocument,
       seedFromExtraction,
       removeFile,
@@ -876,6 +894,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       startCase,
       toggleLaw,
       addFiles,
+      addTranscript,
       ingestDocument,
       seedFromExtraction,
       removeFile,

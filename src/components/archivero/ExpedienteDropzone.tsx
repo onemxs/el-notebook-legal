@@ -27,13 +27,14 @@ const KIND_ICON: Record<CaseFileKind, typeof FileText> = {
 };
 
 export function ExpedienteDropzone() {
-  const { files, addFiles, ingestDocument, removeFile, caseName } = useWorkspace();
+  const { files, addFiles, addTranscript, ingestDocument, removeFile, caseName } = useWorkspace();
   const [dragging, setDragging] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [transcriptionProgress, setTranscriptionProgress] = useState<{
     fileId: string;
     status: string;
     progress: number;
+    partialText?: string;
   } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -61,26 +62,18 @@ export function ExpedienteDropzone() {
     addFiles([fileEntry]);
 
     try {
-      const result = await transcribeVideo(videoFile, caseName, (progress) => {
+      const result = await transcribeVideo(videoFile, caseName, (p) =>
         setTranscriptionProgress({
           fileId,
-          status: progress.message,
-          progress: progress.progress,
-        });
-
-        if (progress.status === "complete" && result) {
-          const transcriptFile: CaseFile = {
-            id: `${fileId}-transcript`,
-            name: `Transcripción: ${videoFile.name}`,
-            kind: "text",
-            size: `${(result.transcription.length / 1024).toFixed(1)} KB`,
-            addedAt: Date.now(),
-          };
-          addFiles([transcriptFile]);
-          setTranscriptionProgress(null);
-          removeFile(fileId);
-        }
-      });
+          status: p.message,
+          progress: p.progress,
+          partialText: p.partialText,
+        }),
+      );
+      // Discard the video entry — the media is processed locally and never uploaded.
+      removeFile(fileId);
+      setTranscriptionProgress(null);
+      if (result) addTranscript(`Transcripción: ${videoFile.name}`, result.transcription);
     } catch (error) {
       console.error("Error transcribing video:", error);
       setTranscriptionProgress(null);
@@ -183,8 +176,13 @@ export function ExpedienteDropzone() {
             />
           </div>
           <p className="mt-1 text-[10px] text-ink-subtle">
-            {transcriptionProgress.progress}% — Puede tomar varios minutos para videos largos
+            🔒 100% local — el video se procesa en tu equipo y nunca se sube
           </p>
+          {transcriptionProgress.partialText && (
+            <div className="mt-2 max-h-32 overflow-y-auto whitespace-pre-wrap rounded-md border border-hairline bg-panel-solid p-2 text-[11px] leading-relaxed text-ink-muted">
+              {transcriptionProgress.partialText}
+            </div>
+          )}
         </div>
       )}
 

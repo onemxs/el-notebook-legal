@@ -1,9 +1,12 @@
-import { createClient } from "@supabase/supabase-js";
+// 100% client-side video/audio → text. The media never leaves the browser:
+// we decode its audio with the native Web Audio API, then transcribe it locally
+// with Whisper (WASM) in a Web Worker. Only the resulting text is persisted.
 
 export interface TranscriptionProgress {
-  status: "uploading" | "processing" | "transcribing" | "formatting" | "complete" | "error";
-  progress: number;
+  status: "extracting" | "downloading" | "transcribing" | "complete" | "error";
+  progress: number; // 0–100
   message: string;
+  partialText?: string; // transcript streamed so far
   error?: string;
 }
 
@@ -17,143 +20,126 @@ export interface VideoTranscription {
 }
 
 const SUPPORTED_FORMATS = ["video/mp4", "video/quicktime", "video/x-matroska", "video/webm"];
-const MAX_VIDEO_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
+const MAX_VIDEO_SIZE = 2 * 1024 * 1024 * 1024; // 2GB (ponytail: client-side decode may hit
+// browser memory limits well before this on multi-hour files — no streaming demux here)
+const SAMPLE_RATE = 16000; // Whisper expects 16kHz mono PCM
+const CHUNK_SECONDS = 30; // Whisper's native window
 
 export function isVideoFile(file: File): boolean {
-  return SUPPORTED_FORMATS.includes(file.type) || /\.(mp4|mov|mkv|webm)$/i.test(file.name);
+  return SUPPORTED_FORMATS.includes(file.type) || /\.(mp4|mov|mkv|webm|m4a|mp3|wav|ogg)$/i.test(file.name);
 }
 
 export function getVideoExtension(file: File): string {
   return file.name.split(".").pop()?.toLowerCase() || "mp4";
 }
 
+/** Decode any browser-supported media file to 16kHz mono PCM via the native decoder. */
+async function decodePcm16k(file: File): Promise<Float32Array> {
+  const buf = await file.arrayBuffer();
+  const Ctx: typeof AudioContext =
+    window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+  const ctx = new Ctx({ sampleRate: SAMPLE_RATE });
+  try {
+    const audio = await ctx.decodeAudioData(buf);
+    if (audio.numberOfChannels === 1) return audio.getChannelData(0).slice();
+    // Mix down to mono.
+    const a = audio.getChannelData(0);
+    const b = audio.getChannelData(1);
+    const mono = new Float32Array(a.length);
+    for (let i = 0; i < a.length; i++) mono[i] = (a[i] + b[i]) / 2;
+    return mono;
+  } finally {
+    void ctx.close();
+  }
+}
+
+const mmss = (sec: number) =>
+  `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
+
 export async function transcribeVideo(
   file: File,
-  casoId: string,
+  _casoId: string,
   onProgress: (progress: TranscriptionProgress) => void,
 ): Promise<VideoTranscription | null> {
   try {
     if (!isVideoFile(file)) {
-      onProgress({
-        status: "error",
-        progress: 0,
-        message: "Formato de video no soportado",
-        error: "Solo se permiten .mp4, .mov, .mkv, .webm",
-      });
+      onProgress({ status: "error", progress: 0, message: "Formato no soportado", error: "Usa MP4, MOV, MKV, WEBM o audio (m4a/mp3/wav)." });
       return null;
     }
-
     if (file.size > MAX_VIDEO_SIZE) {
+      onProgress({ status: "error", progress: 0, message: "Archivo demasiado grande", error: "El máximo es 2 GB." });
+      return null;
+    }
+
+    onProgress({ status: "extracting", progress: 0, message: "Extrayendo audio del video (local)…" });
+    let pcm: Float32Array;
+    try {
+      pcm = await decodePcm16k(file);
+    } catch {
       onProgress({
         status: "error",
         progress: 0,
-        message: "Video demasiado grande",
-        error: "El máximo es 2 GB",
+        message: "No pude extraer el audio en el navegador",
+        error: "El decodificador nativo no soporta este contenedor. Prueba MP4, MOV o WEBM.",
       });
       return null;
     }
 
-    const url = import.meta.env.VITE_SUPABASE_URL;
-    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const worker = new Worker(new URL("./transcribe.worker.ts", import.meta.url), { type: "module" });
+    const chunkSamples = SAMPLE_RATE * CHUNK_SECONDS;
+    const total = Math.max(1, Math.ceil(pcm.length / chunkSamples));
+    const parts: string[] = [];
 
-    if (!url || !anonKey) {
-      onProgress({
-        status: "error",
-        progress: 0,
-        message: "Supabase no configurado",
-        error: "Verifica VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY",
-      });
-      return null;
-    }
-
-    const supabase = createClient(url, anonKey);
-
-    onProgress({
-      status: "uploading",
-      progress: 20,
-      message: "Subiendo video a almacenamiento...",
+    const transcript = await new Promise<string>((resolve, reject) => {
+      let i = 0;
+      const sendNext = () => {
+        if (i >= total) return resolve(parts.join("\n").trim());
+        const slice = pcm.slice(i * chunkSamples, (i + 1) * chunkSamples);
+        worker.postMessage({ audio: slice, index: i }, [slice.buffer]);
+      };
+      worker.onmessage = (e: MessageEvent) => {
+        const m = e.data;
+        if (m.type === "model") {
+          onProgress({
+            status: "downloading",
+            progress: m.progress,
+            message: "Descargando motor de transcripción local (solo la primera vez)…",
+          });
+        } else if (m.type === "chunk") {
+          if (m.text) parts.push(`[${mmss(m.index * CHUNK_SECONDS)}] ${m.text}`);
+          i++;
+          const pct = Math.round((i / total) * 100);
+          onProgress({
+            status: "transcribing",
+            progress: pct,
+            message: `Procesando audio localmente: ${pct}% completado…`,
+            partialText: parts.join("\n"),
+          });
+          sendNext();
+        } else if (m.type === "error") {
+          reject(new Error(m.error));
+        }
+      };
+      worker.onerror = (err) => reject(err.error ?? new Error("Error en el worker de transcripción"));
+      sendNext();
     });
 
-    // Upload to Supabase Storage
-    const fileName = `${casoId}/${Date.now()}-${file.name}`;
-    const { error: uploadError, data: uploadData } = await supabase.storage
-      .from("videos")
-      .upload(fileName, file, { upsert: false });
-
-    if (uploadError || !uploadData) {
-      console.error("Upload error:", uploadError);
-      onProgress({
-        status: "error",
-        progress: 0,
-        message: "Error al subir video",
-        error: uploadError?.message || "Error desconocido",
-      });
-      return null;
-    }
-
-    onProgress({
-      status: "processing",
-      progress: 40,
-      message: "Iniciando transcripción con Whisper...",
-    });
-
-    // Call Supabase Edge Function
-    const { data: funcData, error: funcError } = await supabase.functions.invoke(
-      "transcribe-video",
-      {
-        body: { videoPath: fileName, casoId },
-      },
-    );
-
-    if (funcError) {
-      console.error("Edge Function error:", funcError);
-      onProgress({
-        status: "error",
-        progress: 0,
-        message: "Error al transcribir",
-        error: funcError?.message || "Error en Edge Function",
-      });
-      return null;
-    }
-
-    if (!funcData) {
-      onProgress({
-        status: "error",
-        progress: 0,
-        message: "Sin respuesta de Edge Function",
-        error: "La función no retornó datos",
-      });
-      return null;
-    }
-
-    onProgress({
-      status: "formatting",
-      progress: 90,
-      message: "Formateando transcripción con timestamps...",
-    });
-
-    onProgress({
-      status: "complete",
-      progress: 100,
-      message: "¡Transcripción completada!",
-    });
-
+    worker.terminate();
+    onProgress({ status: "complete", progress: 100, message: "¡Transcripción local completada!", partialText: transcript });
     return {
-      id: funcData.documentId || `transcription-${Date.now()}`,
+      id: `transcription-${Date.now()}`,
       fileName: file.name,
-      duration: 0,
-      transcription: funcData.transcription,
+      duration: Math.round(pcm.length / SAMPLE_RATE),
+      transcription: transcript,
       language: "es-MX",
       createdAt: Date.now(),
     };
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    console.error("Transcribe error:", msg);
     onProgress({
       status: "error",
       progress: 0,
       message: "Error durante la transcripción",
-      error: msg,
+      error: error instanceof Error ? error.message : String(error),
     });
     return null;
   }
