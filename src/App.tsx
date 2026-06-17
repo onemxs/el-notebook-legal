@@ -122,7 +122,8 @@ function RequireSuperadmin({ children }: { children: ReactNode }) {
   const { session, perfil, loading } = useAuth();
   if (loading) return <Splash />;
   if (!session) return <Navigate to="/" replace />;
-  if (perfil?.rol_sistema !== "superadmin") return <Navigate to="/app" replace />;
+  if (!perfil) return <Splash />; // perfil cargando — no decidir aún
+  if (perfil.rol_sistema !== "superadmin") return <Navigate to="/app" replace />;
   return <>{children}</>;
 }
 
