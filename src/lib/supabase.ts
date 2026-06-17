@@ -180,6 +180,60 @@ export async function obtenerDocumentosCaso(caso_id: string): Promise<DocumentoR
   return error ? [] : (data as DocumentoRow[]);
 }
 
+export interface TimelineRow {
+  fecha: string;
+  iso: string;
+  titulo: string;
+  detalle: string | null;
+  severidad: string;
+}
+
+export async function guardarTimelineEventos(
+  caso_id: string,
+  eventos: { fecha: string; iso: string; titulo: string; detalle?: string; severidad?: string }[],
+): Promise<void> {
+  const c = db();
+  if (!c || !eventos.length) return;
+  await c.from("timeline_eventos").insert(
+    eventos.map((e) => ({
+      caso_id,
+      fecha: e.fecha,
+      iso: e.iso,
+      titulo: e.titulo,
+      detalle: e.detalle ?? null,
+      severidad: e.severidad ?? "info",
+    })),
+  );
+}
+
+export async function obtenerTimelineCaso(caso_id: string): Promise<TimelineRow[]> {
+  const c = db();
+  if (!c) return [];
+  const { data, error } = await c
+    .from("timeline_eventos")
+    .select("fecha, iso, titulo, detalle, severidad")
+    .eq("caso_id", caso_id)
+    .order("iso", { ascending: true });
+  return error ? [] : (data as TimelineRow[]);
+}
+
+export interface MensajeRow {
+  rol: "user" | "assistant";
+  contenido: string;
+  citas: { id?: string; code?: string; article?: string; label?: string }[];
+}
+
+export async function obtenerMensajesCaso(caso_id: string): Promise<MensajeRow[]> {
+  const c = db();
+  if (!c) return [];
+  const { data, error } = await c
+    .from("chat_mensajes")
+    .select("rol, contenido, citas")
+    .eq("caso_id", caso_id)
+    .order("creado_en", { ascending: true });
+  return error ? [] : (data as MensajeRow[]);
+}
+
 export async function guardarMensajeChat(datos: {
   caso_id: string;
   rol: "user" | "assistant";

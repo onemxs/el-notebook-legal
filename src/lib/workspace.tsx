@@ -28,9 +28,46 @@ import { analyzeExpediente } from "./intake";
 import { analyzeDocument, generateDocumentAI } from "./claude";
 import { kindFromName } from "./files";
 import { generateTimeline, generateDocument, getDocKindsForBranch, type DocKind } from "./generators";
+import { useAuth } from "./auth";
+import {
+  crearCaso,
+  obtenerCasos,
+  obtenerDocumentosCaso,
+  obtenerTimelineCaso,
+  obtenerMensajesCaso,
+  guardarDocumento,
+  guardarTimelineEventos,
+  guardarMensajeChat,
+  type CasoRow,
+} from "./supabase";
 
 let n = 0;
 const uid = (p: string) => `${p}-${Date.now().toString(36)}-${(n++).toString(36)}`;
+
+// CaseFile kind → documentos.tipo
+const KIND_TO_TIPO: Record<string, "pdf" | "video" | "transcription" | "text" | "image"> = {
+  pdf: "pdf",
+  image: "image",
+  video: "video",
+  text: "text",
+  doc: "text",
+};
+
+/** Relative "updated" label from an ISO timestamp, for cloud case cards. */
+function relativo(iso?: string): string {
+  if (!iso) return "ahora";
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return "ahora";
+  const min = Math.floor((Date.now() - t) / 60000);
+  if (min < 1) return "ahora";
+  if (min < 60) return `hace ${min} min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `hace ${h} h`;
+  const d = Math.floor(h / 24);
+  if (d === 1) return "ayer";
+  if (d < 7) return `hace ${d} días`;
+  return `hace ${Math.floor(d / 7)} sem`;
+}
 
 const cloneLaws = (id: BranchId): Law[] => BRANCHES[id].laws.map((l) => ({ ...l }));
 
@@ -65,7 +102,7 @@ interface WorkspaceCtx extends WorkspaceState {
   closeCaseModal: () => void;
   startIntake: (file: File) => void;
   clearIntake: () => void;
-  startCase: (branch: BranchId, name: string) => void;
+  startCase: (branch: BranchId, name: string, extraction?: ExtractedCase) => Promise<string>;
   toggleLaw: (lawId: string) => void;
   addFiles: (files: CaseFile[]) => void;
   ingestDocument: (file: File) => void;
@@ -295,6 +332,15 @@ const demoNote = (): ChatMessage => ({
 });
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
+  const { session, demo } = useAuth();
+  // Cloud-backed when authenticated (not the "explorar sin cuenta" demo mode).
+  const cloud = !!session && !demo;
+  const cloudRef = useRef(cloud);
+  cloudRef.current = cloud;
+  // Supabase id of the open case (null in demo/local). Set synchronously via the
+  // ref so persistence side-effects fire against the right case immediately.
+  const currentCaseIdRef = useRef<string | null>(null);
+
   const [view, setView] = useState<AppView>("dashboard");
   const [cases, setCases] = useState<CaseSummary[]>(SEED_CASES);
   const [caseModalOpen, setCaseModalOpen] = useState(false);
@@ -327,6 +373,30 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const branchRef = useRef(branch);
   branchRef.current = branch;
 
+  // Case list: from Supabase when authenticated (RLS → own + despacho); the
+  // "explorar sin cuenta" demo keeps the illustrative SEED_CASES.
+  useEffect(() => {
+    let active = true;
+    if (cloud) {
+      void obtenerCasos().then((rows) => {
+        if (!active) return;
+        setCases(
+          rows.map((r: CasoRow) => ({
+            id: r.id,
+            name: r.nombre,
+            branch: r.rama as BranchId,
+            updated: relativo(r.creado_en),
+          })),
+        );
+      });
+    } else if (demo) {
+      setCases(SEED_CASES);
+    }
+    return () => {
+      active = false;
+    };
+  }, [cloud, demo]);
+
   const loadCase = useCallback((next: BranchId, name: string, demo = false) => {
     setBranch(next);
     setCaseName(name.trim() || `Caso ${BRANCHES[next].name}`);
@@ -356,9 +426,23 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const startCase = useCallback(
-    (next: BranchId, name: string) => {
+    async (next: BranchId, name: string, extraction?: ExtractedCase) => {
       const finalName = name.trim() || `Caso ${BRANCHES[next].name}`;
-      const id = uid("c");
+      let id = uid("c");
+      if (cloudRef.current) {
+        const row = await crearCaso({
+          nombre: finalName,
+          rama: next,
+          asunto: extraction?.asunto,
+          resumen: extraction?.summary,
+          partes: extraction?.parties,
+          fechas_clave: extraction?.keyDates,
+          leyes_sugeridas: extraction?.suggestedLaws,
+          confianza: extraction?.confidence,
+        });
+        if (row) id = row.id;
+      }
+      currentCaseIdRef.current = cloudRef.current ? id : null;
       setCases((prev) => [
         { id, name: finalName, branch: next, updated: "ahora" },
         ...prev.filter((c) => c.name !== finalName),
@@ -366,6 +450,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       loadCase(next, finalName);
       setCaseModalOpen(false);
       setCaseModalPreset(null);
+      return id;
     },
     [loadCase],
   );
@@ -373,7 +458,60 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const openCase = useCallback(
     (id: string) => {
       const found = cases.find((c) => c.id === id);
-      if (found) loadCase(found.branch, found.name, found.demo);
+      if (!found) return;
+      // Demo or local: hydrate from the in-app examples (no cloud).
+      if (found.demo || !cloudRef.current) {
+        currentCaseIdRef.current = null;
+        loadCase(found.branch, found.name, found.demo);
+        return;
+      }
+      // Cloud case: open the shell, then hydrate documents, timeline and chat.
+      currentCaseIdRef.current = id;
+      loadCase(found.branch, found.name, false);
+      void (async () => {
+        const [docs, tl, msgs] = await Promise.all([
+          obtenerDocumentosCaso(id),
+          obtenerTimelineCaso(id),
+          obtenerMensajesCaso(id),
+        ]);
+        if (currentCaseIdRef.current !== id) return; // user switched cases meanwhile
+        if (docs.length) {
+          setFiles(
+            docs.map((d) => ({
+              id: d.id,
+              name: d.nombre,
+              kind: kindFromName(d.nombre),
+              size: "expediente",
+              addedAt: Date.parse(d.creado_en) || Date.now(),
+            })),
+          );
+        }
+        if (tl.length) {
+          const events: TimelineEvent[] = tl
+            .map((e) => ({
+              id: uid("ev"),
+              date: e.fecha,
+              iso: e.iso,
+              title: e.titulo,
+              detail: e.detalle ?? "",
+              severity: e.severidad as TimelineSeverity,
+            }))
+            .sort(byChrono);
+          setTimeline(events);
+          setIngestedEvents(events);
+        }
+        if (msgs.length) {
+          setMessages([
+            welcomeMessage(found.branch),
+            ...msgs.map((m) => ({
+              id: uid("m"),
+              role: m.rol,
+              content: m.contenido,
+              timestamp: Date.now(),
+            })),
+          ]);
+        }
+      })();
     },
     [cases, loadCase],
   );
@@ -405,6 +543,12 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   const addFiles = useCallback((next: CaseFile[]) => {
     setFiles((prev) => [...next, ...prev]);
+    const caso = currentCaseIdRef.current;
+    if (caso) {
+      next.forEach((f) =>
+        void guardarDocumento({ caso_id: caso, nombre: f.name, tipo: KIND_TO_TIPO[f.kind] ?? "text" }),
+      );
+    }
   }, []);
 
   const removeFile = useCallback((id: string) => {
@@ -451,6 +595,27 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         }
         const docText = res.transcripcion || res.summary;
         if (docText) setCaseDocContent((prev) => [...prev, docText]);
+        // Persist to the cloud case (best-effort) so it survives a reload.
+        const caso = currentCaseIdRef.current;
+        if (caso) {
+          void guardarDocumento({
+            caso_id: caso,
+            nombre: fileName,
+            tipo: KIND_TO_TIPO[kindFromName(fileName)] ?? "text",
+            contenido: docText,
+          });
+          if (events.length)
+            void guardarTimelineEventos(
+              caso,
+              events.map((e) => ({
+                fecha: e.date,
+                iso: e.iso,
+                titulo: e.title,
+                detalle: e.detail,
+                severidad: e.severity,
+              })),
+            );
+        }
       } catch (error) {
         console.error("Error ingesting document:", error);
         setFiles((prev) =>
@@ -467,6 +632,18 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     if (events.length) {
       setIngestedEvents((prev) => mergeEvents(prev, events));
       setTimeline((prev) => mergeEvents(prev ?? [], events));
+      const caso = currentCaseIdRef.current;
+      if (caso)
+        void guardarTimelineEventos(
+          caso,
+          events.map((e) => ({
+            fecha: e.date,
+            iso: e.iso,
+            titulo: e.title,
+            detalle: e.detail,
+            severidad: e.severity,
+          })),
+        );
     }
     if (res.parties?.length) {
       setCaseParties((prev) => {
@@ -512,6 +689,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
               : m,
           ),
         );
+        const caso = currentCaseIdRef.current;
+        if (caso) void guardarMensajeChat({ caso_id: caso, rol: "assistant", contenido: reply.content });
       } finally {
         setThinking(false);
       }
@@ -527,6 +706,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         ...prev,
         { id: uid("m"), role: "user", content: clean, timestamp: Date.now() },
       ]);
+      const caso = currentCaseIdRef.current;
+      if (caso) void guardarMensajeChat({ caso_id: caso, rol: "user", contenido: clean });
       void runAssistant(clean, branch, laws);
     },
     [branch, laws, thinking, runAssistant],

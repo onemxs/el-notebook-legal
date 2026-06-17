@@ -253,9 +253,11 @@ export function IntakeModal() {
     };
   }, [intakeFile]);
 
-  const confirm = () => {
+  const confirm = async () => {
     if (!intakeFile || !data) return;
-    startCase(selected, caseName);
+    // Await case creation so the cloud case id is set before we persist its
+    // document and timeline (no-op id in demo/local mode).
+    await startCase(selected, caseName, data);
     const file: CaseFile = {
       id: `f-intake-${(fid++).toString(36)}`,
       name: intakeFile.name,
