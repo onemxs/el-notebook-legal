@@ -10,8 +10,18 @@ export const SUPA_CONFIGURED = Boolean(url && anon);
 let client: SupabaseClient | null = null;
 function db(): SupabaseClient | null {
   if (!SUPA_CONFIGURED) return null;
-  if (!client) client = createClient(url!, anon!, { auth: { persistSession: false } });
+  if (!client)
+    client = createClient(url!, anon!, {
+      // Auth must persist + auto-refresh, and detect the OAuth tokens that Google
+      // returns in the URL hash after redirect.
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+    });
   return client;
+}
+
+/** The shared Supabase client (or null when not configured) — used by auth. */
+export function getSupabase(): SupabaseClient | null {
+  return db();
 }
 
 /** Exact-article lookup for the article viewer (no embedding needed). */

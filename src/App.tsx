@@ -1,6 +1,8 @@
-import { useState } from "react";
-import { FolderOpen, PenLine, Sparkles } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { FolderOpen, PenLine, Sparkles, Loader2 } from "lucide-react";
 import { ThemeProvider } from "@/lib/theme";
+import { AuthProvider, useAuth } from "@/lib/auth";
 import { WorkspaceProvider, useWorkspace } from "@/lib/workspace";
 import { TopBar } from "@/components/TopBar";
 import { DashboardView } from "@/components/DashboardView";
@@ -9,6 +11,9 @@ import { IntakeModal } from "@/components/intake/IntakeModal";
 import { ArchiveroPanel } from "@/components/panels/ArchiveroPanel";
 import { EditorPanel } from "@/components/panels/EditorPanel";
 import { AssistantPanel } from "@/components/panels/AssistantPanel";
+import { Landing } from "@/components/landing/Landing";
+import { Onboarding } from "@/components/onboarding/Onboarding";
+import { AdminPanel } from "@/components/admin/AdminPanel";
 
 type MobilePanel = "archivero" | "editor" | "asistente";
 
@@ -86,12 +91,84 @@ function AppShell() {
   );
 }
 
+function Splash() {
+  return (
+    <div className="flex h-dvh items-center justify-center bg-canvas text-accent">
+      <Loader2 size={28} className="animate-spin" />
+    </div>
+  );
+}
+
+/** Allows access when authenticated OR in "Explorar sin cuenta" demo mode. */
+function RequireAccess({ children }: { children: ReactNode }) {
+  const { session, demo, loading } = useAuth();
+  if (loading) return <Splash />;
+  if (!session && !demo) return <Navigate to="/" replace />;
+  return <>{children}</>;
+}
+
+/** Authenticated users only (no demo). */
+function RequireAuth({ children }: { children: ReactNode }) {
+  const { session, loading } = useAuth();
+  if (loading) return <Splash />;
+  if (!session) return <Navigate to="/" replace />;
+  return <>{children}</>;
+}
+
+/** Superadmin-only — protects /admin. */
+function RequireSuperadmin({ children }: { children: ReactNode }) {
+  const { session, perfil, loading } = useAuth();
+  if (loading) return <Splash />;
+  if (!session) return <Navigate to="/" replace />;
+  if (perfil?.rol_sistema !== "superadmin") return <Navigate to="/app" replace />;
+  return <>{children}</>;
+}
+
+/** Logged-in / demo users skip the landing and go straight to the app. */
+function LandingRoute() {
+  const { session, demo, loading } = useAuth();
+  if (loading) return <Splash />;
+  if (session || demo) return <Navigate to="/app" replace />;
+  return <Landing />;
+}
+
 export default function App() {
   return (
     <ThemeProvider>
-      <WorkspaceProvider>
-        <AppShell />
-      </WorkspaceProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LandingRoute />} />
+            <Route
+              path="/app"
+              element={
+                <RequireAccess>
+                  <WorkspaceProvider>
+                    <AppShell />
+                  </WorkspaceProvider>
+                </RequireAccess>
+              }
+            />
+            <Route
+              path="/onboarding"
+              element={
+                <RequireAuth>
+                  <Onboarding />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <RequireSuperadmin>
+                  <AdminPanel />
+                </RequireSuperadmin>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

@@ -1,6 +1,18 @@
 import { useState } from "react";
-import { Scale, Sun, Moon, Settings, FolderPlus, ChevronDown, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import {
+  Scale,
+  Sun,
+  Moon,
+  Settings,
+  FolderPlus,
+  ChevronDown,
+  Search,
+  LogOut,
+  ShieldCheck,
+} from "lucide-react";
 import { useTheme } from "@/lib/theme";
+import { useAuth } from "@/lib/auth";
 import { useWorkspace } from "@/lib/workspace";
 import { BRANCHES } from "@/lib/branches";
 import { BranchIcon } from "@/components/branchIcons";
@@ -8,9 +20,14 @@ import { SettingsModal } from "@/components/settings/SettingsModal";
 
 export function TopBar() {
   const { theme, toggle } = useTheme();
+  const { session, perfil, demo, isSuperadmin, signOut, exitDemo } = useAuth();
+  const navigate = useNavigate();
   const { view, branch, caseName, goHome, openCaseModal } = useWorkspace();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [acctOpen, setAcctOpen] = useState(false);
+  const displayName = perfil?.nombre_completo || session?.user.email || "";
+  const initial = (displayName.trim()[0] || "U").toUpperCase();
   const b = BRANCHES[branch];
   const inWorkspace = view === "workspace";
   const isDashboard = view === "dashboard";
@@ -102,6 +119,69 @@ export function TopBar() {
         >
           <Settings size={18} />
         </button>
+
+        {/* Account / demo control */}
+        {demo ? (
+          <button
+            onClick={() => {
+              exitDemo();
+              navigate("/");
+            }}
+            className="ml-1 rounded-full border border-accent/40 bg-accent-soft px-3 py-1.5 text-[12px] font-semibold text-accent transition-colors hover:bg-accent hover:text-white cursor-pointer"
+            title="Estás en modo demo — crea una cuenta para guardar tu trabajo"
+          >
+            Modo demo · Crear cuenta
+          </button>
+        ) : session ? (
+          <div className="relative ml-1">
+            <button
+              onClick={() => setAcctOpen((v) => !v)}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-[13px] font-semibold text-white transition-transform hover:scale-105 cursor-pointer"
+              aria-label="Cuenta"
+              title={displayName}
+            >
+              {initial}
+            </button>
+            {acctOpen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setAcctOpen(false)} />
+                <div className="absolute right-0 z-20 mt-1.5 w-60 overflow-hidden rounded-xl border border-hairline bg-panel-solid shadow-float animate-scale-in">
+                  <div className="border-b border-hairline px-3.5 py-2.5">
+                    {perfil?.nombre_completo && (
+                      <p className="truncate text-[13px] font-semibold text-ink">
+                        {perfil.nombre_completo}
+                      </p>
+                    )}
+                    <p className="truncate text-[12px] text-ink-subtle">{session.user.email}</p>
+                  </div>
+                  {isSuperadmin && (
+                    <button
+                      onClick={() => {
+                        setAcctOpen(false);
+                        navigate("/admin");
+                      }}
+                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-accent-soft cursor-pointer"
+                    >
+                      <ShieldCheck size={15} className="text-accent" />
+                      Panel de admin
+                    </button>
+                  )}
+                  <button
+                    onClick={async () => {
+                      setAcctOpen(false);
+                      await signOut();
+                      navigate("/");
+                    }}
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-danger-soft hover:text-danger cursor-pointer"
+                  >
+                    <LogOut size={15} />
+                    Cerrar sesión
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        ) : null}
       </div>
 
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
