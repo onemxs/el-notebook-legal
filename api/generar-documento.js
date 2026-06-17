@@ -41,8 +41,10 @@ REGLAS ESTRICTAS:
 - Si se proporcionan artículos de ley, cítalos textualmente dentro de la sección de Derecho
 - Si NO hay información suficiente para un campo, redacta una nota breve indicando qué falta
 - Sigue el formato procesal mexicano formal: Rubro, Proemio, Hechos, Derecho, Puntos Petitorios
-- Devuelve SOLO el HTML del documento, sin explicaciones ni comentarios fuera del escrito
-- Usa etiquetas HTML semánticas: <p>, <h2>, <strong>
+- Devuelve SOLO un FRAGMENTO HTML del contenido del escrito, sin explicaciones ni comentarios
+- PROHIBIDO ABSOLUTAMENTE incluir <!DOCTYPE>, <html>, <head>, <body>, <title>, <meta>, <style> o atributos style="..."
+- NO uses clases CSS (class="..."). El estilo lo aplica la aplicación; tú solo entregas el contenido estructurado
+- Usa SOLO etiquetas semánticas de contenido: <h1>, <h2>, <h3>, <p>, <strong>, <em>, <ul>, <ol>, <li>, <blockquote>
 - El documento debe estar listo para imprimir y firmar`;
 
     const prompt = `Genera un escrito legal completo de tipo **${kindLabel}** para el siguiente expediente:
@@ -74,17 +76,33 @@ Genera el escrito HTML completo con la estructura procesal mexicana formal.`;
     });
 
     const textBlock = message.content.find((b) => b.type === "text");
-    const html = textBlock && "text" in textBlock ? textBlock.text : "";
+    const raw = textBlock && "text" in textBlock ? textBlock.text : "";
 
-    const cleaned = html
-      .replace(/^```html\s*/i, "")
-      .replace(/```\s*$/, "")
-      .trim();
-
-    return res.status(200).json({ html: cleaned });
+    return res.status(200).json({ html: toFragment(raw) });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("[/api/generar-documento]", msg);
     return res.status(500).json({ error: msg });
   }
+}
+
+// Reduce model output to a safe body fragment. Models sometimes return a full
+// HTML document (<!DOCTYPE><html><head><style>…</style>…</body></html>); inserting
+// that via innerHTML leaks its <style> — a body{...} rule there restyles the WHOLE
+// app. Strip code fences, keep only the <body> inner content if a document was
+// returned, and remove document-level + <style>/<script> tags.
+function toFragment(raw) {
+  let s = (raw || "")
+    .trim()
+    .replace(/^```(?:html)?\s*/i, "")
+    .replace(/```\s*$/i, "")
+    .trim();
+  const body = s.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  if (body) s = body[1];
+  return s
+    .replace(/<!DOCTYPE[^>]*>/gi, "")
+    .replace(/<\/?(?:html|head|body|meta|title|link|base)\b[^>]*>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .trim();
 }

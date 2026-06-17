@@ -111,10 +111,26 @@ export async function generateDocumentAI(ctx: DocGenContext): Promise<string | n
     });
     if (!res.ok) return null;
     const json = await res.json();
-    return json?.html ?? null;
+    return json?.html ? stripDocumentChrome(json.html) : null;
   } catch {
     return null;
   }
+}
+
+/**
+ * Defense-in-depth before the generated HTML is inserted via innerHTML: ensure it
+ * is a body fragment, never a full document. A returned `<style>` with a `body{}`
+ * rule would otherwise leak and restyle the whole app. Mirrors the server cleanup.
+ */
+function stripDocumentChrome(html: string): string {
+  const body = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  const s = body ? body[1] : html;
+  return s
+    .replace(/<!DOCTYPE[^>]*>/gi, "")
+    .replace(/<\/?(?:html|head|body|meta|title|link|base)\b[^>]*>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .trim();
 }
 
 export async function analyzeDocument(

@@ -1,0 +1,19 @@
+# Supabase configuration.
+#
+# Edge Functions invoked from the browser must NOT verify the JWT: the CORS
+# preflight (OPTIONS) is sent by the browser without an Authorization header, so
+# with verify_jwt = true the platform rejects it before the function's own CORS
+# handler runs — which is exactly the "preflight ... does not have HTTP ok status"
+# error. These functions guard themselves (the service-role key lives in the
+# function env, never in the client), so skipping JWT verification is safe here.
+#
+# Apply by redeploying:
+#   supabase functions deploy consultar --no-verify-jwt
+#   supabase functions deploy transcribe-video --no-verify-jwt
+project_id = "el-notebook-legal"
+
+[functions.consultar]
+verify_jwt = false
+
+[functions.transcribe-video]
+verify_jwt = false
