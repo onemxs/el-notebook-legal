@@ -1,6 +1,5 @@
 import type { BranchId, ExtractedCase, ExtractedField } from "./types";
 import { BRANCHES } from "./branches";
-import { SUPA_CONFIGURED, consultarSemantica, type MatchedArticulo } from "./supabase";
 import { DOC_LABELS, type DocKind } from "./generators";
 
 /**
@@ -82,14 +81,8 @@ export interface DocGenContext {
 export async function generateDocumentAI(ctx: DocGenContext): Promise<string | null> {
   try {
     const b = BRANCHES[ctx.branch];
-    let articles: MatchedArticulo[] = [];
-    if (SUPA_CONFIGURED) {
-      try {
-        const query = `${DOC_LABELS[ctx.kind]} ${b.name} ${ctx.caseName}`;
-        articles = await consultarSemantica(query, { rama: ctx.branch, matchCount: 6 });
-      } catch { /* semantic search unavailable — proceed without articles */ }
-    }
-
+    // El RAG (consulta vectorial al corpus legal) lo hace el backend en
+    // /api/generar-documento con los términos del expediente — server-side, sin CORS.
     const res = await fetch("/api/generar-documento", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -101,11 +94,6 @@ export async function generateDocumentAI(ctx: DocGenContext): Promise<string | n
         caseName: ctx.caseName,
         parties: ctx.parties,
         facts: ctx.facts,
-        articles: articles.map((a) => ({
-          codigo: a.codigo,
-          articulo: a.articulo,
-          texto: a.texto,
-        })),
         lawName: b.laws[0]?.name ?? "",
       }),
     });

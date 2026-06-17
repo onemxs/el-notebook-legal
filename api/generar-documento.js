@@ -4,7 +4,8 @@ export default async function handler(req, res) {
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
+  // ponytail: Opus por defecto para docs (redacción extensa/meticulosa). Override con ANTHROPIC_MODEL_DOCS.
+  const model = process.env.ANTHROPIC_MODEL_DOCS || "claude-opus-4-8";
   const baseURL = process.env.ANTHROPIC_BASE_URL;
 
   if (!apiKey) {
@@ -12,8 +13,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { kind, kindLabel, branch, branchName, caseName, parties, facts, articles, lawName } =
-      req.body;
+    const { kind, kindLabel, branch, branchName, caseName, parties, facts, lawName } = req.body;
 
     const partiesBlock = parties?.length
       ? parties.map((p) => `• ${p.label}: ${p.value}`).join("\n")
@@ -23,47 +23,65 @@ export default async function handler(req, res) {
       ? facts.join("\n\n---\n\n")
       : "Sin documentos analizados en el expediente.";
 
-    const articlesBlock = articles?.length
+    // RAG obligatorio (backend): consulta vectorial al corpus legal con los términos
+    // clave del expediente. Best-effort: si el corpus no está ingerido, devuelve [].
+    const ragQuery = [kindLabel, branchName, caseName, partiesBlock, factsBlock]
+      .filter(Boolean)
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .slice(0, 1500);
+    const articles = await buscarArticulos(ragQuery, branch);
+    const articlesBlock = articles.length
       ? articles
-          .map(
-            (a) =>
-              `**${a.codigo} — Art. ${a.articulo}:**\n${a.texto.slice(0, 500)}`,
-          )
+          .map((a) => `**${a.codigo} — Art. ${a.articulo} (vigente):**\n${(a.texto || "").slice(0, 800)}`)
           .join("\n\n")
       : "";
 
-    const SYSTEM = `Eres un redactor jurídico experto en derecho procesal mexicano. Generas escritos legales formales, completos y listos para firma, en formato HTML.
+    const esApelacion = /apel/i.test(kind || "") || /apel/i.test(kindLabel || "");
 
-REGLAS ESTRICTAS:
-- NUNCA uses corchetes, placeholders ni texto genérico como "[Inserte aquí…]" o "[Describa…]"
-- Usa EXCLUSIVAMENTE los datos reales del expediente proporcionados
-- Redacta los hechos como narrativa cronológica fluida basada en la información del caso
-- Si se proporcionan artículos de ley, cítalos textualmente dentro de la sección de Derecho
-- Si NO hay información suficiente para un campo, redacta una nota breve indicando qué falta
-- Sigue el formato procesal mexicano formal: Rubro, Proemio, Hechos, Derecho, Puntos Petitorios
-- Devuelve SOLO un FRAGMENTO HTML del contenido del escrito, sin explicaciones ni comentarios
-- PROHIBIDO ABSOLUTAMENTE incluir <!DOCTYPE>, <html>, <head>, <body>, <title>, <meta>, <style> o atributos style="..."
-- NO uses clases CSS (class="..."). El estilo lo aplica la aplicación; tú solo entregas el contenido estructurado
-- Usa SOLO etiquetas semánticas de contenido: <h1>, <h2>, <h3>, <p>, <strong>, <em>, <ul>, <ol>, <li>, <blockquote>
-- El documento debe estar listo para imprimir y firmar`;
+    const estructura = esApelacion
+      ? `ESTRUCTURA OBLIGATORIA — RECURSO DE APELACIÓN (no escribas un capítulo de "Hechos"):
+1. RUBRO: tribunal de alzada, número de toca/expediente (o ______ si no consta), y las partes con su rol correcto.
+2. PROEMIO: quién promueve y con qué personalidad, contra qué resolución y de qué juzgado (o ______), y la vía.
+3. AGRAVIOS: analiza el expediente, detecta las violaciones al debido proceso o inconsistencias narradas por el abogado, y redacta CADA agravio de forma estructurada y silogística:
+   • Premisa Mayor — la norma o principio jurídico violado (cítalo).
+   • Premisa Menor — el acto u omisión concreto del juez de origen que la transgrede.
+   • Conclusión — el perjuicio causado al recurrente y por qué procede revocar o modificar la resolución.
+4. DERECHO: integra TEXTUALMENTE los artículos vigentes provistos.
+5. PUNTOS PETITORIOS.`
+      : `ESTRUCTURA OBLIGATORIA: Rubro · Proemio · Hechos (narrativa cronológica fluida extraída del expediente) · Derecho (integra TEXTUALMENTE los artículos provistos) · Puntos Petitorios.`;
 
-    const prompt = `Genera un escrito legal completo de tipo **${kindLabel}** para el siguiente expediente:
+    const SYSTEM = `Eres un abogado postulante experto en derecho mexicano. Tienes prohibido delegar la escritura al usuario mediante marcadores de posición o corchetes. Debes redactar cada sección de forma fluida, extensa, meticulosa y con terminología jurídica formal y elegante. Si faltan datos específicos (como el número de juzgado), deja una línea limpia en blanco ______ en lugar de inventar una ciudad o institución.
 
-**TIPO DE DOCUMENTO:** ${kindLabel}
-**RAMA DEL DERECHO:** ${branchName}
+REGLAS DE PRECISIÓN JURÍDICA:
+- PROHIBIDO: corchetes, "[Describa…]", "[Inserte aquí…]", texto genérico de relleno, plantillas vacías, y ciudades o instituciones inventadas por defecto. Donde falte un dato, escribe ______.
+- UBICACIÓN: extrae el Estado y Municipio reales del expediente (de los hechos, pruebas o datos generales) y úsalos en el cierre y el proemio. Si el caso ocurre en Veracruz, jamás cierres con "Ciudad de México": usa la ubicación real. Si no consta, ______.
+- PARTES: identifica con precisión el rol de cada parte según el contexto (víctima/ofendido vs. imputado; actor vs. demandado; quejoso vs. autoridad responsable) y colócalas correctamente en el RUBRO y el PROEMIO.
+- DERECHO: integra TEXTUALMENTE los artículos vigentes que se te proporcionen. NO inventes números de artículo: si no se te proporciona uno, cita el código por su nombre y deja el número como ______ antes que fabricarlo.
+- FORMATO: devuelve SOLO un FRAGMENTO HTML (sin <!DOCTYPE>, <html>, <head>, <body>, <title>, <meta>, <style> ni atributos style="..." ni class="..."). Usa solo <h1>, <h2>, <h3>, <p>, <strong>, <em>, <ul>, <ol>, <li>, <blockquote>.
+- El escrito debe quedar completo y listo para revisión formal y firma.`;
+
+    const prompt = `Redacta un **${kindLabel}** completo para el siguiente expediente de materia **${branchName}**.
+
 **EXPEDIENTE:** ${caseName}
 
-## PARTES DEL CASO:
+## PARTES (asígnales su rol procesal correcto en rubro y proemio):
 ${partiesBlock}
 
-## HECHOS Y CONTENIDO DE LOS DOCUMENTOS DEL EXPEDIENTE:
+## EXPEDIENTE DEL CLIENTE (hechos, pruebas y datos generales — de AQUÍ extrae la ubicación real, los roles de las partes y los agravios):
 ${factsBlock}
 
-## LEGISLACIÓN PRINCIPAL: ${lawName || "No especificada"}
+## LEGISLACIÓN PRINCIPAL DE LA RAMA: ${lawName || "la aplicable a la materia"}
 
-${articlesBlock ? `## ARTÍCULOS APLICABLES (extraídos de la base de datos legal):\n${articlesBlock}` : "No se encontraron artículos específicos en la base de datos. Usa los fundamentos generales de la rama."}
+${
+      articlesBlock
+        ? `## ARTÍCULOS VIGENTES DEL CORPUS (intégralos TEXTUALMENTE en la sección de Derecho):\n${articlesBlock}`
+        : "## ARTÍCULOS: el corpus legal no devolvió artículos para este caso. NO inventes números de artículo; cita los códigos aplicables por su nombre y deja el número como ______ donde no lo tengas verificado."
+    }
 
-Genera el escrito HTML completo con la estructura procesal mexicana formal.`;
+${estructura}
+
+Redacta el HTML del escrito — extenso, meticuloso y elegante — sin un solo corchete ni placeholder.`;
 
     const { Anthropic } = await import("@anthropic-ai/sdk");
     const client = new Anthropic(baseURL ? { apiKey, baseURL } : { apiKey });
@@ -83,6 +101,27 @@ Genera el escrito HTML completo con la estructura procesal mexicana formal.`;
     const msg = error instanceof Error ? error.message : String(error);
     console.error("[/api/generar-documento]", msg);
     return res.status(500).json({ error: msg });
+  }
+}
+
+// RAG: consulta vectorial al corpus legal vía la Edge Function `consultar` (server-side,
+// con el service role → sin CORS). Devuelve [] si el corpus aún no está ingerido.
+// ponytail: best-effort; cuando exista leyes_articulos + match_articulos, se activa solo.
+async function buscarArticulos(query, rama) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key || !query) return [];
+  try {
+    const r = await fetch(`${url}/functions/v1/consultar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: key, Authorization: `Bearer ${key}` },
+      body: JSON.stringify({ query, rama: rama ?? null, matchCount: 6 }),
+    });
+    if (!r.ok) return [];
+    const j = await r.json();
+    return Array.isArray(j?.articulos) ? j.articulos : [];
+  } catch {
+    return [];
   }
 }
 
