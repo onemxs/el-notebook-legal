@@ -93,7 +93,7 @@ export function AcceptInvite() {
           </>
         )}
       </div>
-      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} initialMode="signup" />
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </div>
   );
 }

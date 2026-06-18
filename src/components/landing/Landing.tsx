@@ -14,8 +14,6 @@ import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
 import { AuthModal } from "@/components/auth/AuthModal";
 
-type AuthMode = "login" | "signup";
-
 function Feature({
   icon,
   title,
@@ -41,12 +39,8 @@ export function Landing() {
   const { theme, toggle } = useTheme();
   const navigate = useNavigate();
   const [authOpen, setAuthOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<AuthMode>("login");
 
-  const openAuth = (mode: AuthMode) => {
-    setAuthMode(mode);
-    setAuthOpen(true);
-  };
+  const openAuth = () => setAuthOpen(true);
 
   const explore = () => {
     enterDemo();
@@ -84,7 +78,7 @@ export function Landing() {
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <button
-            onClick={() => openAuth("login")}
+            onClick={openAuth}
             className="rounded-full px-4 py-2 text-[13px] font-semibold text-ink transition-colors hover:bg-elevated cursor-pointer"
           >
             Iniciar sesión
@@ -112,7 +106,7 @@ export function Landing() {
 
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <button
-            onClick={() => openAuth("signup")}
+            onClick={openAuth}
             className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-tactile transition-all hover:bg-accent-hover active:translate-y-px cursor-pointer sm:w-auto"
           >
             Comenzar gratis
@@ -150,7 +144,7 @@ export function Landing() {
         </div>
       </footer>
 
-      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} initialMode={authMode} />
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </div>
   );
 }
