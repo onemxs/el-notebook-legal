@@ -83,6 +83,7 @@ export async function generateDocumentAI(ctx: DocGenContext): Promise<string | n
     const b = BRANCHES[ctx.branch];
     // El RAG (consulta vectorial al corpus legal) lo hace el backend en
     // /api/generar-documento con los términos del expediente — server-side, sin CORS.
+    console.log("[Generación AI Contexto]", { kind: ctx.kind, parties: ctx.parties, factsCount: ctx.facts?.length });
     const res = await fetch("/api/generar-documento", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
