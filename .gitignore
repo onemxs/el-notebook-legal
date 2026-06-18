@@ -11,3 +11,4 @@ dist-ssr
 # `npm run corpus:build`). No conviene versionar megas de leyes.
 data/leyes_fuente/
 data/leyes_articulos.json
+supabase/.temp/
