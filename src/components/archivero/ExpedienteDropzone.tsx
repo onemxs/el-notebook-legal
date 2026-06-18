@@ -218,7 +218,10 @@ export function ExpedienteDropzone() {
                 </div>
                 {!f.analyzing && (
                   <button
-                    onClick={() => removeFile(f.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeFile(f.id);
+                    }}
                     aria-label={`Eliminar ${f.name}`}
                     className="rounded-md p-1.5 text-ink-subtle opacity-0 transition-all hover:bg-danger-soft hover:text-danger group-hover:opacity-100 cursor-pointer"
                   >

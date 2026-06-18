@@ -4,7 +4,7 @@ import { BRANCHES } from "@/lib/branches";
 import { BranchIcon } from "@/components/branchIcons";
 
 export function QuickGuides({ onAsk }: { onAsk: (q: string) => void }) {
-  const { branch } = useWorkspace();
+  const { branch, thinking } = useWorkspace();
   const b = BRANCHES[branch];
 
   return (
@@ -31,10 +31,11 @@ export function QuickGuides({ onAsk }: { onAsk: (q: string) => void }) {
 
       <ul className="space-y-2">
         {b.guideQuestions.map((q, i) => (
-          <li key={i}>
+          <li key={`${branch}-${i}`}>
             <button
               onClick={() => onAsk(q)}
-              className="group flex w-full items-start gap-2.5 rounded-xl border border-hairline bg-panel-solid p-3 text-left transition-all hover:border-accent/40 hover:bg-accent-soft/40 hover:shadow-sm active:scale-[0.99] cursor-pointer animate-slide-up"
+              disabled={thinking}
+              className="group flex w-full items-start gap-2.5 rounded-xl border border-hairline bg-panel-solid p-3 text-left transition-all hover:border-accent/40 hover:bg-accent-soft/40 hover:shadow-sm active:scale-[0.99] cursor-pointer animate-slide-up disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ animationDelay: `${i * 50}ms` }}
             >
               <HelpCircle
