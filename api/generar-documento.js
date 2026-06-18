@@ -6,9 +6,9 @@ export default async function handler(req, res) {
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  
-  // Usamos el ID estático y universal claude-3-5-sonnet-20241022 por defecto para evitar el error 404 de Anthropic.
-  const model = process.env.ANTHROPIC_MODEL_DOCS || "claude-3-5-sonnet-20241022";
+
+  // Usamos el modelo estable y activo de la generación actual de Anthropic para evitar el error 404.
+  const model = process.env.ANTHROPIC_MODEL_DOCS || "claude-sonnet-4-6";
   const baseURL = process.env.ANTHROPIC_BASE_URL;
 
   if (!apiKey) {
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
       .join(" ")
       .replace(/\s+/g, " ")
       .slice(0, 1500);
-    
+
     const articles = await buscarArticulos(ragQuery, branch);
     const articlesBlock = articles.length
       ? articles
@@ -59,10 +59,13 @@ export default async function handler(req, res) {
     const SYSTEM = `Eres un Magistrado y Abogado Postulante experto en derecho procesal mexicano, con un rigor técnico impecable y redacción jurídica formal de alta escuela. Tu objetivo es redactar de manera completa y terminada el documento legal solicitado (${kindLabel || "Escrito"}), usando única y exclusivamente la información fáctica y verídica suministrada en el expediente.
 
 REGLAS DE OBLIGATORIO CUMPLIMIENTO:
-1. PROHIBIDO EL USO DE CORCHETES O MARCADORES: Está strictly prohibido generar textos como "[Describa aquí...]", "[Inserte fecha]", o marcadores de posición vacíos. Si falta un dato no crítico, redáctalo de manera fluida y profesional conforme a la práctica judicial mexicana o usa la información general del caso.
-2. INYECCIÓN REAL DE HECHOS: Toma el arreglo de antecedentes y hechos extraídos del expediente y redáctalos de forma cronológica, hilada y natural dentro del apartado de "HECHOS". No los listes como notas resumidas; dales estructura de demanda o recurso formal.
-3. FUNDAMENTACIÓN ACTIVA: Utiliza el nombre de la ley de la materia (${lawName || "leyes aplicables"}) y las menciones en el expediente para estructurar los capítulos de DERECHO y los PUNTOS PETITORIOS de forma contundente y explícita, citando los artículos aplicables de manera literal si aparecen en el contexto.
-4. MANTÉN EL DISEÑO DE MARGEN: Genera el contenido estructurado únicamente en HTML limpio (usando etiquetas <h2>, <h3>, <p>, <strong>), respetando el tono solemne del foro judicial mexicano y cerrando obligatoriamente con la frase de estilo "PROTESTO LO NECESARIO".
+PROHIBIDO EL USO DE CORCHETES O MARCADORES: Está estrictamente prohibido generar textos como "[Describa aquí...]", "[Inserte fecha]", o marcadores de posición vacíos. Si falta un dato no crítico, redáctalo de manera fluida y profesional conforme a la práctica judicial mexicana o usa la información general del caso.
+
+INYECCIÓN REAL DE HECHOS: Toma el arreglo de antecedentes y hechos extraídos del expediente y redáctalos de forma cronológica, hilada y natural dentro del apartado de "HECHOS". No los listes como notas resumidas; dales estructura de demanda o recurso formal.
+
+FUNDAMENTACIÓN ACTIVA: Utiliza el nombre de la ley de la materia (${lawName || "leyes aplicables"}) y las menciones en el expediente para estructurar los capítulos de DERECHO y los PUNTOS PETITORIOS de forma contundente y explícita, citando los artículos aplicables de manera literal si aparecen en el contexto.
+
+MANTÉN EL DISEÑO DE MARGEN: Genera el contenido estructurado únicamente en HTML limpio (usando etiquetas <h2>, <h3>, <p>, <strong>), respetando el tono solemne del foro judicial mexicano y cerrando obligatoriamente con la frase de estilo "PROTESTO LO NECESARIO".
 
 - FORMATO: devuelve SOLO un FRAGMENTO HTML (sin <!DOCTYPE>, <html>, <head>, <body>, <title>, <meta>, <style> ni atributos style="..." ni class="..."). Do not wrap in markdown code fences.`;
 
