@@ -11,7 +11,7 @@ import { IntakeModal } from "@/components/intake/IntakeModal";
 import { ArchiveroPanel } from "@/components/panels/ArchiveroPanel";
 import { EditorPanel } from "@/components/panels/EditorPanel";
 import { AssistantPanel } from "@/components/panels/AssistantPanel";
-import { Landing } from "@/components/landing/Landing";
+import { LandingPage } from "@/components/landing/LandingPage";
 import { Onboarding } from "@/components/onboarding/Onboarding";
 import { AdminPanel } from "@/components/admin/AdminPanel";
 import { MembersPanel } from "@/components/equipo/MembersPanel";
@@ -76,7 +76,18 @@ function Workspace() {
 }
 
 function AppShell() {
-  const { view } = useWorkspace();
+  const { view, setView } = useWorkspace();
+  const { session, signInWithGoogle } = useAuth();
+  if (view === "landing" || !session) {
+    return (
+      <LandingPage
+        onLogin={() => {
+          setView("dashboard");
+          signInWithGoogle();
+        }}
+      />
+    );
+  }
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-canvas text-ink">
       <TopBar />
@@ -139,10 +150,10 @@ function OnboardingGate({ children }: { children: ReactNode }) {
 
 /** Logged-in / demo users skip the landing and go straight to the app. */
 function LandingRoute() {
-  const { session, demo, loading } = useAuth();
+  const { session, demo, loading, signInWithGoogle } = useAuth();
   if (loading) return <Splash />;
   if (session || demo) return <Navigate to="/app" replace />;
-  return <Landing />;
+  return <LandingPage onLogin={() => signInWithGoogle()} />;
 }
 
 export default function App() {
