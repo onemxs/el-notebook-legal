@@ -65,8 +65,8 @@ export function ExportModal({ open, onClose }: { open: boolean; onClose: () => v
             Previsualización de impresión
           </div>
           <div className="scroll-zone max-h-[52vh] overflow-y-auto rounded-xl bg-canvas/60 p-4">
-            <div className="mx-auto aspect-[8.5/11] w-full max-w-[460px] bg-white shadow-float">
-              <div className="h-full overflow-hidden py-10 pl-16 pr-9">
+            <div className="mx-auto min-h-[595px] w-full max-w-[460px] bg-white shadow-float">
+              <div className="h-full py-10 pl-16 pr-9">
                 {hasContent ? (
                   <>
                     <div

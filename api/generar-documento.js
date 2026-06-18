@@ -4,8 +4,8 @@ export default async function handler(req, res) {
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  // ponytail: Opus por defecto para docs (redacción extensa/meticulosa). Override con ANTHROPIC_MODEL_DOCS.
-  const model = process.env.ANTHROPIC_MODEL_DOCS || "claude-opus-4-8";
+  // ponytail: Sonnet por defecto (rápido, compatible con timeout 10s Vercel Hobby). Override con ANTHROPIC_MODEL_DOCS.
+  const model = process.env.ANTHROPIC_MODEL_DOCS || "claude-3-5-sonnet-latest";
   const baseURL = process.env.ANTHROPIC_BASE_URL;
 
   if (!apiKey) {
@@ -58,7 +58,7 @@ REGLAS DE PRECISIÓN JURÍDICA:
 - UBICACIÓN: extrae el Estado y Municipio reales del expediente (de los hechos, pruebas o datos generales) y úsalos en el cierre y el proemio. Si el caso ocurre en Veracruz, jamás cierres con "Ciudad de México": usa la ubicación real. Si no consta, ______.
 - PARTES: identifica con precisión el rol de cada parte según el contexto (víctima/ofendido vs. imputado; actor vs. demandado; quejoso vs. autoridad responsable) y colócalas correctamente en el RUBRO y el PROEMIO.
 - DERECHO: integra TEXTUALMENTE los artículos vigentes que se te proporcionen. NO inventes números de artículo: si no se te proporciona uno, cita el código por su nombre y deja el número como ______ antes que fabricarlo.
-- FORMATO: devuelve SOLO un FRAGMENTO HTML (sin <!DOCTYPE>, <html>, <head>, <body>, <title>, <meta>, <style> ni atributos style="..." ni class="..."). Usa solo <h1>, <h2>, <h3>, <p>, <strong>, <em>, <ul>, <ol>, <li>, <blockquote>.
+- FORMATO: devuelve SOLO un FRAGMENTO HTML (sin <!DOCTYPE>, <html>, <head>, <body>, <title>, <meta>, <style> ni atributos style="..." ni class="..."). Usa solo <h2>, <h3>, <p>, <strong>, <em>, <ul>, <ol>, <li>, <blockquote>. PROHIBIDO usar la etiqueta <h1>. Para los apartados principales (Rubro, Proemio, Hechos, Derecho, Petitorios) utiliza exclusivamente <h2> y para subsecciones o agravios utiliza <h3>.
 - El escrito debe quedar completo y listo para revisión formal y firma.`;
 
     const prompt = `Redacta un **${kindLabel}** completo para el siguiente expediente de materia **${branchName}**.
@@ -88,7 +88,7 @@ Redacta el HTML del escrito — extenso, meticuloso y elegante — sin un solo c
 
     const message = await client.messages.create({
       model,
-      max_tokens: 8000,
+      max_tokens: 4000,
       system: SYSTEM,
       messages: [{ role: "user", content: prompt }],
     });

@@ -8,18 +8,33 @@ import type { ChatMessage } from "@/lib/types";
 function renderContent(text: string): ReactNode {
   return text.split("\n").map((line, i) => {
     if (line === "") return <span key={i} className="block h-2" />;
-    const parts = line.split(/(\*\*[^*]+\*\*)/g);
+
+    // Detectar si la línea es una viñeta (*, -, •)
+    const isBullet = line.trim().startsWith("* ") || line.trim().startsWith("- ") || line.trim().startsWith("• ");
+    const cleanLine = isBullet ? line.trim().replace(/^[\*\-•]\s+/, "") : line;
+
+    const parts = cleanLine.split(/(\*\*[^*]+\*\*)/g);
+    const content = parts.map((p, j) =>
+      p.startsWith("**") && p.endsWith("**") ? (
+        <strong key={j} className="font-semibold">
+          {p.slice(2, -2)}
+        </strong>
+      ) : (
+        <span key={j}>{p}</span>
+      ),
+    );
+
+    if (isBullet) {
+      return (
+        <ul key={i} className="list-disc pl-4 mb-1">
+          <li className="text-[13px]">{content}</li>
+        </ul>
+      );
+    }
+
     return (
       <p key={i} className="mb-1.5 last:mb-0">
-        {parts.map((p, j) =>
-          p.startsWith("**") && p.endsWith("**") ? (
-            <strong key={j} className="font-semibold">
-              {p.slice(2, -2)}
-            </strong>
-          ) : (
-            <span key={j}>{p}</span>
-          ),
-        )}
+        {content}
       </p>
     );
   });

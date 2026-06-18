@@ -189,7 +189,7 @@ export function EditorPanel() {
                 suppressContentEditableWarning
                 onInput={() => setEditorHtml(ref.current?.innerHTML ?? "")}
                 data-placeholder="Empieza a redactar el caso, o usa «Generar» para crear un escrito legal contextual basado en tu expediente…"
-                className="prose-legal min-h-[50vh] max-w-none outline-none"
+                className="prose-legal min-h-[50vh] max-w-none outline-none relative before:content-[attr(data-placeholder)] before:absolute before:text-ink-subtle/50 before:pointer-events-none empty:before:block before:hidden"
                 aria-label="Editor de documento legal"
                 role="textbox"
                 aria-multiline="true"

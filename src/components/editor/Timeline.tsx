@@ -384,6 +384,9 @@ function HorizontalTimeline({ events }: { events: TimelineEvent[] }) {
 
 export function Timeline() {
   const { timeline, timelineLoading, runTimeline } = useWorkspace();
+  const sortedTimeline = [...(timeline || [])].sort(
+    (a, b) => +new Date(a.iso || 0) - +new Date(b.iso || 0)
+  );
 
   if (timelineLoading) {
     return (
@@ -397,7 +400,7 @@ export function Timeline() {
     );
   }
 
-  if (!timeline || timeline.length === 0) {
+  if (!sortedTimeline || sortedTimeline.length === 0) {
     return (
       <div className="flex h-full flex-col items-center justify-center px-6 text-center">
         <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-soft text-accent">
@@ -424,8 +427,8 @@ export function Timeline() {
     );
   }
 
-  const deadlines = timeline.filter((e) => e.severity === "deadline").length;
-  const horizontal = timeline.length <= HORIZONTAL_MAX;
+  const deadlines = sortedTimeline.filter((e) => e.severity === "deadline").length;
+  const horizontal = sortedTimeline.length <= HORIZONTAL_MAX;
 
   return (
     <div className={`mx-auto px-4 py-6 ${horizontal ? "max-w-5xl" : "max-w-2xl"}`}>
@@ -436,7 +439,7 @@ export function Timeline() {
             Cronología del caso
           </h3>
           <p className="mt-0.5 text-[11px] text-ink-subtle">
-            {timeline.length} {timeline.length === 1 ? "hecho" : "hechos"}
+            {sortedTimeline.length} {sortedTimeline.length === 1 ? "hecho" : "hechos"}
             {deadlines > 0 && ` · ${deadlines} ${deadlines === 1 ? "plazo" : "plazos"}`}
           </p>
         </div>
@@ -449,12 +452,12 @@ export function Timeline() {
         </button>
       </div>
 
-      <NextDeadline events={timeline} />
+      <NextDeadline events={sortedTimeline} />
 
       {horizontal ? (
-        <HorizontalTimeline events={timeline} />
+        <HorizontalTimeline events={sortedTimeline} />
       ) : (
-        <VerticalTimeline events={timeline} />
+        <VerticalTimeline events={sortedTimeline} />
       )}
     </div>
   );
