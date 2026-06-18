@@ -6,7 +6,9 @@ export default async function handler(req, res) {
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  const model = process.env.ANTHROPIC_MODEL_DOCS || "claude-3-5-sonnet-latest";
+  
+  // Usamos el ID estático y universal claude-3-5-sonnet-20241022 por defecto para evitar el error 404 de Anthropic.
+  const model = process.env.ANTHROPIC_MODEL_DOCS || "claude-3-5-sonnet-20241022";
   const baseURL = process.env.ANTHROPIC_BASE_URL;
 
   if (!apiKey) {
