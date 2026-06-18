@@ -15,7 +15,7 @@ export function SustentoLegal({ citations }: { citations: Citation[] }) {
       <div className="flex flex-wrap gap-1.5">
         {citations.map((c, index) => (
           <button
-            key={c.id || `${c.codigo || 'ley'}-${c.articulo || index}`}
+            key={c.id || `${c.label}-${c.article || index}`}
             onClick={() => openArticle(c)}
             title={`Ver texto literal de ${c.label}`}
             className="group flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent-soft px-3 py-1.5 text-xs font-medium text-accent shadow-tactile transition-all hover:border-accent hover:bg-accent hover:text-white active:translate-y-px cursor-pointer"
