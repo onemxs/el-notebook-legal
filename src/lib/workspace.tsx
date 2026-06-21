@@ -374,6 +374,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   ingestedEventsRef.current = ingestedEvents;
   const branchRef = useRef(branch);
   branchRef.current = branch;
+  const caseDocContentRef = useRef(caseDocContent);
+  caseDocContentRef.current = caseDocContent;
 
   // Case list: from Supabase when authenticated (RLS → own + despacho); the
   // "explorar sin cuenta" demo keeps the illustrative SEED_CASES.
@@ -693,6 +695,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
           branch: currentBranch,
           enabledLaws: enabled.filter((l) => l.enabled).map((l) => l.shortName),
           fileCount: filesRef.current.length,
+          docContent: caseDocContentRef.current,
+          cloud: cloudRef.current,
         });
         setMessages((prev) =>
           prev.map((m) =>
@@ -754,8 +758,6 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   const casePartiesRef = useRef(caseParties);
   casePartiesRef.current = caseParties;
-  const caseDocContentRef = useRef(caseDocContent);
-  caseDocContentRef.current = caseDocContent;
   const caseNameRef = useRef(caseName);
   caseNameRef.current = caseName;
 

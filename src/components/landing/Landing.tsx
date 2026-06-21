@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
 
 function GlassCard({
   icon,
@@ -67,7 +68,7 @@ export function Landing() {
             </span>
           </div>
 
-          <div className="font-sans ml-3 hidden items-center gap-1 rounded-full border border-white/30 bg-white/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#1E3A5F]/50 backdrop-blur-sm sm:flex">
+          <div className="ml-3 hidden items-center gap-1 rounded-full border border-white/30 bg-white/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#1E3A5F]/50 backdrop-blur-sm sm:flex">
             <MapPin size={10} />
             México
           </div>
@@ -75,14 +76,9 @@ export function Landing() {
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={openAuth}
-              className="font-sans flex items-center gap-2 rounded-full bg-[#1E3A5F] px-4 py-2 text-[13px] font-medium text-white shadow-sm transition-all duration-200 hover:bg-[#1E3A5F]/90 active:translate-y-px cursor-pointer sm:px-5"
+              className="flex items-center gap-2 rounded-full bg-[#1E3A5F] px-4 py-2 text-[13px] font-medium text-white shadow-sm transition-all duration-200 hover:bg-[#1E3A5F]/90 active:translate-y-px cursor-pointer sm:px-5"
             >
-              <svg width="15" height="15" viewBox="0 0 18 18" aria-hidden="true" className="shrink-0">
-                <path fill="#fff" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.71-1.57 2.68-3.89 2.68-6.62z" />
-                <path fill="#fff" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z" />
-                <path fill="#fff" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z" />
-                <path fill="#fff" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z" />
-              </svg>
+              <GoogleIcon mono size={15} />
               <span className="hidden sm:inline">Acceder con Google</span>
               <span className="sm:hidden">Acceder</span>
             </button>
@@ -95,7 +91,7 @@ export function Landing() {
         <div className="flex flex-col items-center gap-10 sm:flex-row sm:items-start">
           {/* Hero text block */}
           <div className="flex-1 text-center sm:text-left">
-            <span className="font-sans inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-white/60 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1E3A5F]/50 shadow-sm backdrop-blur-sm">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-white/60 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1E3A5F]/50 shadow-sm backdrop-blur-sm">
               <Sparkles size={12} className="text-[#1E3A5F]" />
               Procesal verídica · México
             </span>
@@ -116,20 +112,15 @@ export function Landing() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
                 onClick={openAuth}
-                className="font-sans flex items-center justify-center gap-2.5 rounded-full bg-[#1E3A5F] px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#1E3A5F]/20 transition-all duration-200 hover:bg-[#1E3A5F]/90 hover:shadow-xl hover:shadow-[#1E3A5F]/25 active:translate-y-px cursor-pointer"
+                className="flex items-center justify-center gap-2.5 rounded-full bg-[#1E3A5F] px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#1E3A5F]/20 transition-all duration-200 hover:bg-[#1E3A5F]/90 hover:shadow-xl hover:shadow-[#1E3A5F]/25 active:translate-y-px cursor-pointer"
               >
-                <svg width="17" height="17" viewBox="0 0 18 18" aria-hidden="true">
-                  <path fill="#fff" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.71-1.57 2.68-3.89 2.68-6.62z" />
-                  <path fill="#fff" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z" />
-                  <path fill="#fff" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z" />
-                  <path fill="#fff" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z" />
-                </svg>
+                <GoogleIcon mono size={17} />
                 Comenzar con Google
                 <ArrowRight size={16} />
               </button>
               <button
                 onClick={explore}
-                className="font-sans flex items-center justify-center gap-2 rounded-full border border-white/40 bg-white/60 px-7 py-3.5 text-sm font-semibold text-[#1E3A5F] shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-white/80 hover:shadow-md active:translate-y-px cursor-pointer"
+                className="flex items-center justify-center gap-2 rounded-full border border-white/40 bg-white/60 px-7 py-3.5 text-sm font-semibold text-[#1E3A5F] shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-white/80 hover:shadow-md active:translate-y-px cursor-pointer"
               >
                 Explorar sin cuenta
               </button>
@@ -147,7 +138,7 @@ export function Landing() {
               </div>
 
               <div className="relative p-6 pb-5 sm:p-7">
-                <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.15em] text-[#1E3A5F]/40">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#1E3A5F]/40">
                   Recurso de Apelación
                 </p>
                 <h4 className="mt-2 font-serif text-[15px] font-medium leading-snug text-[#1E3A5F]">
@@ -159,11 +150,11 @@ export function Landing() {
                   carece de fundamentación y motivación...
                 </p>
                 <div className="mt-4 flex items-center gap-3 border-t border-white/30 pt-3 text-[10px] font-medium text-[#1E3A5F]/40">
-                  <span className="font-sans flex items-center gap-1">
+                  <span className="flex items-center gap-1">
                     <BookOpen size={10} />
                     Toca: ______
                   </span>
-                  <span className="font-sans flex items-center gap-1">
+                  <span className="flex items-center gap-1">
                     <MapPin size={10} />
                     San Andrés Tuxtla, Ver.
                   </span>
@@ -171,11 +162,11 @@ export function Landing() {
               </div>
 
               <div className="absolute -right-2.5 -top-2.5 flex flex-col gap-1.5">
-                <span className="font-sans inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/70 px-2.5 py-1 text-[10px] font-semibold text-[#1E3A5F] shadow-sm backdrop-blur-md">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/70 px-2.5 py-1 text-[10px] font-semibold text-[#1E3A5F] shadow-sm backdrop-blur-md">
                   <ShieldCheck size={10} className="text-[#1E3A5F]" />
                   Hechos analizados: 100%
                 </span>
-                <span className="font-sans inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/70 px-2.5 py-1 text-[10px] font-semibold text-[#1E3A5F] shadow-sm backdrop-blur-md">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/70 px-2.5 py-1 text-[10px] font-semibold text-[#1E3A5F] shadow-sm backdrop-blur-md">
                   <BookOpen size={10} className="text-[#1E3A5F]" />
                   Fundamento: Art. 251 CNPP
                 </span>
@@ -212,7 +203,7 @@ export function Landing() {
               <h2 className="font-serif text-xl font-medium text-[#1E3A5F]">
                 Sesión Segura y cifrada de extremo a extremo
               </h2>
-              <p className="font-sans mt-2 text-sm leading-relaxed text-[#1E3A5F]/60">
+              <p className="mt-2 text-sm leading-relaxed text-[#1E3A5F]/60">
                 Protección estricta del secreto profesional. Encriptación de grado bancario para cada
                 folio procesal.
               </p>

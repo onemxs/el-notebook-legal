@@ -1,7 +1,8 @@
 {
   "functions": {
     "api/analizar.js": { "maxDuration": 30 },
-    "api/generar-documento.js": { "maxDuration": 60 }
+    "api/generar-documento.js": { "maxDuration": 60 },
+    "api/asistente.js": { "maxDuration": 30 }
   },
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
