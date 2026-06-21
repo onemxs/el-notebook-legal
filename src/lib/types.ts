@@ -112,7 +112,7 @@ export interface VideoTranscription {
   createdAt: number;
 }
 
-export type AppView = "landing" | "dashboard" | "workspace";
+export type AppView = "dashboard" | "workspace";
 
 export interface CaseSummary {
   id: string;

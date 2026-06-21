@@ -343,7 +343,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   // ref so persistence side-effects fire against the right case immediately.
   const currentCaseIdRef = useRef<string | null>(null);
 
-  const [view, setView] = useState<AppView>("landing");
+  const [view, setView] = useState<AppView>("dashboard");
   const [cases, setCases] = useState<CaseSummary[]>(SEED_CASES);
   const [caseModalOpen, setCaseModalOpen] = useState(false);
   const [caseModalPreset, setCaseModalPreset] = useState<BranchId | null>(null);

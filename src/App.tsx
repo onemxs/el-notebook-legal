@@ -76,18 +76,9 @@ function Workspace() {
 }
 
 function AppShell() {
-  const { view, setView } = useWorkspace();
-  const { session, signInWithGoogle } = useAuth();
-  if (view === "landing" || !session) {
-    return (
-      <LandingPage
-        onLogin={() => {
-          setView("dashboard");
-          signInWithGoogle();
-        }}
-      />
-    );
-  }
+  // Se monta solo bajo <RequireAccess> (sesión o demo garantizados). La landing
+  // la sirve el router en "/", aquí nunca; mostrar dashboard o workspace.
+  const { view } = useWorkspace();
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-canvas text-ink">
       <TopBar />
