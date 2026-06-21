@@ -295,14 +295,18 @@ export function Onboarding() {
 
           {/* Nav */}
           <div className="mt-6 flex items-center justify-between gap-3">
-            <button
-              onClick={() => (step === 1 ? navigate("/app") : setStep((s) => s - 1))}
-              disabled={busy}
-              className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-medium text-ink-muted transition-colors hover:bg-elevated hover:text-ink disabled:opacity-50 cursor-pointer"
-            >
-              <ArrowLeft size={15} />
-              {step === 1 ? "Omitir" : "Atrás"}
-            </button>
+            {step > 1 ? (
+              <button
+                onClick={() => setStep((s) => s - 1)}
+                disabled={busy}
+                className="flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-medium text-ink-muted transition-colors hover:bg-elevated hover:text-ink disabled:opacity-50 cursor-pointer"
+              >
+                <ArrowLeft size={15} />
+                Atrás
+              </button>
+            ) : (
+              <span />
+            )}
             {step < 3 ? (
               <button
                 onClick={() => setStep((s) => s + 1)}
