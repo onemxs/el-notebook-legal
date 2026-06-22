@@ -13,98 +13,80 @@ import {
 import { useWorkspace } from "@/lib/workspace";
 import { exportarTranscripcion } from "@/lib/export";
 
+interface Field {
+  key: string;
+  label: string;
+  placeholder: string;
+  type?: "text" | "date";
+}
+
 interface Template {
   id: string;
   title: string;
   desc: string;
   icon: typeof FileText;
-  variables: { key: string; label: string; placeholder: string; type?: "text" | "date" }[];
+  fields: Field[];
 }
 
+const FIELD_SCHEMAS: Record<string, Field[]> = {
+  arrendamiento: [
+    { key: "arrendador", label: "Nombre del Arrendador / Dueño", placeholder: "Ej. Juan Pérez" },
+    { key: "arrendatario", label: "Nombre del Arrendatario / Inquilino", placeholder: "Ej. María García" },
+    { key: "domicilio", label: "Domicilio del Inmueble", placeholder: "Calle, número, colonia, CP" },
+    { key: "renta", label: "Renta Mensual ($ MXN)", placeholder: "Ej. 15,000" },
+    { key: "fechaInicio", label: "Fecha de Inicio", placeholder: "", type: "date" },
+    { key: "fechaFin", label: "Fecha de Término", placeholder: "", type: "date" },
+  ],
+  servicios: [
+    { key: "prestador", label: "Nombre del Prestador / Profesional", placeholder: "Ej. Lic. Roberto Méndez" },
+    { key: "cliente", label: "Nombre del Cliente / Contratante", placeholder: "Ej. Carlos Fernández" },
+    { key: "descripcion", label: "Descripción del Servicio", placeholder: "Ej. Consultoría legal corporativa" },
+    { key: "honorarios", label: "Monto de Honorarios ($ MXN)", placeholder: "Ej. 50,000" },
+    { key: "fechaInicio", label: "Fecha de Inicio", placeholder: "", type: "date" },
+  ],
+  nda: [
+    { key: "parteReveladora", label: "Parte Reveladora", placeholder: "Nombre completo" },
+    { key: "parteReceptora", label: "Parte Receptora", placeholder: "Nombre completo" },
+    { key: "materia", label: "Materia de la Información Confidencial", placeholder: "Ej. Secretos comerciales, listas de clientes" },
+    { key: "vigencia", label: "Vigencia de Confidencialidad", placeholder: "", type: "date" },
+  ],
+  pagare: [
+    { key: "deudor", label: "Nombre del Deudor", placeholder: "Nombre completo" },
+    { key: "acreedor", label: "Nombre del Acreedor", placeholder: "Nombre completo" },
+    { key: "cantidad", label: "Cantidad Prestada ($ MXN)", placeholder: "Ej. 100,000" },
+    { key: "vigencia", label: "Fecha de Vencimiento", placeholder: "", type: "date" },
+    { key: "intereses", label: "Tasa de Interés Mensual", placeholder: "Ej. 2% mensual" },
+  ],
+  compraventa: [
+    { key: "vendedor", label: "Nombre del Vendedor", placeholder: "Nombre completo" },
+    { key: "comprador", label: "Nombre del Comprador", placeholder: "Nombre completo" },
+    { key: "bien", label: "Descripción del Bien", placeholder: "Tipo, ubicación, dimensiones" },
+    { key: "precio", label: "Precio de Venta ($ MXN)", placeholder: "Ej. 2,500,000" },
+    { key: "fechaCierre", label: "Fecha de Cierre", placeholder: "", type: "date" },
+  ],
+  divorcio: [
+    { key: "conyuge1", label: "Cónyuge 1", placeholder: "Nombre completo" },
+    { key: "conyuge2", label: "Cónyuge 2", placeholder: "Nombre completo" },
+    { key: "regimen", label: "Régimen Matrimonial", placeholder: "Ej. Sociedad conyugal / Separación de bienes" },
+    { key: "domicilioConyugal", label: "Domicilio Conyugal", placeholder: "Dirección completa" },
+    { key: "pension", label: "Pensión Alimenticia ($ MXN)", placeholder: "Ej. 8,000 mensuales" },
+  ],
+  contestacion: [
+    { key: "demandado", label: "Nombre del Demandado", placeholder: "Nombre completo" },
+    { key: "materia", label: "Materia del Juicio", placeholder: "Ej. Mercantil / Civil / Laboral" },
+    { key: "cuantia", label: "Cuantía del Juicio ($ MXN)", placeholder: "Ej. 500,000" },
+    { key: "juzgado", label: "Juzgado y Expediente", placeholder: "Ej. Juzgado 10 Civil, Exp. 482/2026" },
+  ],
+};
+
 const TEMPLATES: Template[] = [
-  {
-    id: "arrendamiento",
-    title: "Contrato de Arrendamiento",
-    desc: "Inmobiliario con cláusulas de garantía, mantenimiento y términos de pago",
-    icon: Building2,
-    variables: [
-      { key: "nombre", label: "Nombre del arrendador e inquilino", placeholder: "Ej. Juan Pérez y María García" },
-      { key: "inmueble", label: "Domicilio del inmueble", placeholder: "Calle, número, colonia, CP" },
-      { key: "monto", label: "Renta mensual", placeholder: "Ej. $15,000 MXN" },
-      { key: "vigencia", label: "Vigencia del contrato", placeholder: "Ej. 1 año (ene-dic 2026)", type: "date" },
-    ],
-  },
-  {
-    id: "servicios",
-    title: "Prestación de Servicios",
-    desc: "Honorarios, alcances, confidencialidad y causas de rescisión",
-    icon: FileSignature,
-    variables: [
-      { key: "nombre", label: "Prestador y contratante", placeholder: "Nombres completos" },
-      { key: "servicio", label: "Descripción del servicio", placeholder: "Ej. Consultoría legal corporativa" },
-      { key: "monto", label: "Honorarios", placeholder: "Ej. $50,000 MXN + IVA" },
-      { key: "vigencia", label: "Plazo de ejecución", placeholder: "Ej. 6 meses", type: "date" },
-    ],
-  },
-  {
-    id: "nda",
-    title: "Confidencialidad (NDA)",
-    desc: "Acuerdo de confidencialidad recíproco con protección de información sensible",
-    icon: ShieldCheck,
-    variables: [
-      { key: "nombre", label: "Partes del acuerdo", placeholder: "Nombres completos" },
-      { key: "materia", label: "Materia de la información confidencial", placeholder: "Ej. Secretos comerciales, listas de clientes" },
-      { key: "vigencia", label: "Vigencia de confidencialidad", placeholder: "Ej. 3 años", type: "date" },
-    ],
-  },
-  {
-    id: "pagare",
-    title: "Pagaré Ejecutivo",
-    desc: "Título ejecutivo mercantil con intereses y fecha de vencimiento",
-    icon: Receipt,
-    variables: [
-      { key: "nombre", label: "Deudor y acreedor", placeholder: "Nombres completos" },
-      { key: "monto", label: "Cantidad prestada", placeholder: "Ej. $100,000 MXN" },
-      { key: "vigencia", label: "Fecha de vencimiento", placeholder: "Ej. 31 diciembre 2026", type: "date" },
-      { key: "intereses", label: "Tasa de interés mensual", placeholder: "Ej. 2% mensual" },
-    ],
-  },
-  {
-    id: "compraventa",
-    title: "Compraventa de Bienes",
-    desc: "Transmisión de propiedad con declaraciones, precio y condiciones",
-    icon: FileText,
-    variables: [
-      { key: "nombre", label: "Vendedor y comprador", placeholder: "Nombres completos" },
-      { key: "inmueble", label: "Descripción del bien", placeholder: "Tipo, ubicación, dimensiones" },
-      { key: "monto", label: "Precio de venta", placeholder: "Ej. $2,500,000 MXN" },
-      { key: "vigencia", label: "Fecha de cierre", placeholder: "Ej. 30 marzo 2026", type: "date" },
-    ],
-  },
-  {
-    id: "divorcio",
-    title: "Convenio de Divorcio",
-    desc: "Voluntario con propuesta de liquidación de sociedad conyugal y custodia",
-    icon: HeartHandshake,
-    variables: [
-      { key: "nombre", label: "Cónyuges", placeholder: "Nombres completos de ambos" },
-      { key: "materia", label: "Régimen matrimonial", placeholder: "Ej. Sociedad conyugal / Separación de bienes" },
-      { key: "inmueble", label: "Domicilio conyugal", placeholder: "Dirección completa" },
-      { key: "monto", label: "Pensión alimenticia", placeholder: "Ej. $8,000 MXN mensuales" },
-    ],
-  },
-  {
-    id: "contestacion",
-    title: "Contestación de Demanda",
-    desc: "Formato profesional con estructura de excepciones, defensas y ofrecimiento de pruebas",
-    icon: ScrollText,
-    variables: [
-      { key: "nombre", label: "Demandado", placeholder: "Nombre completo" },
-      { key: "materia", label: "Materia del juicio", placeholder: "Ej. Mercantil / Civil / Laboral" },
-      { key: "monto", label: "Cuantía del juicio", placeholder: "Ej. $500,000 MXN" },
-      { key: "vigencia", label: "Juzgado y expediente", placeholder: "Ej. Juzgado 10 Civil, Exp. 482/2026" },
-    ],
-  },
+  { id: "arrendamiento", title: "Contrato de Arrendamiento", desc: "Inmobiliario con cláusulas de garantía, mantenimiento y términos de pago", icon: Building2, fields: FIELD_SCHEMAS.arrendamiento },
+  { id: "servicios", title: "Prestación de Servicios", desc: "Honorarios, alcances, confidencialidad y causas de rescisión", icon: FileSignature, fields: FIELD_SCHEMAS.servicios },
+  { id: "nda", title: "Confidencialidad (NDA)", desc: "Acuerdo de confidencialidad recíproco con protección de información sensible", icon: ShieldCheck, fields: FIELD_SCHEMAS.nda },
+  { id: "pagare", title: "Pagaré Ejecutivo", desc: "Título ejecutivo mercantil con intereses y fecha de vencimiento", icon: Receipt, fields: FIELD_SCHEMAS.pagare },
+  { id: "compraventa", title: "Compraventa de Bienes", desc: "Transmisión de propiedad con declaraciones, precio y condiciones", icon: FileText, fields: FIELD_SCHEMAS.compraventa },
+  { id: "divorcio", title: "Convenio de Divorcio", desc: "Voluntario con propuesta de liquidación de sociedad conyugal y custodia", icon: HeartHandshake, fields: FIELD_SCHEMAS.divorcio },
+  { id: "contestacion", title: "Contestación de Demanda", desc: "Formato profesional con estructura de excepciones, defensas y ofrecimiento de pruebas", icon: ScrollText, fields: FIELD_SCHEMAS.contestacion },
 ];
 
 export function EscribaniaDigital() {
@@ -125,7 +107,7 @@ export function EscribaniaDigital() {
     generateCustomDocument(selectedTemplate, variables, notes);
   };
 
-  const varFields = templ?.variables ?? [];
+  const fields = templ?.fields ?? [];
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -169,17 +151,17 @@ export function EscribaniaDigital() {
           <div className="flex w-[30vw] min-w-[320px] max-w-[420px] shrink-0 flex-col border-r border-hairline bg-aside p-4">
             <div className="flex-1 space-y-4 overflow-y-auto scroll-zone pr-1">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted">Datos del documento</h3>
-              {varFields.map((vf) => (
-                <div key={vf.key}>
-                  <label className="mb-1 block text-[12px] font-medium text-ink" htmlFor={`var-${vf.key}`}>
-                    {vf.label}
+              {fields.map((f) => (
+                <div key={f.key}>
+                  <label className="mb-1 block text-[12px] font-medium text-ink" htmlFor={`f-${f.key}`}>
+                    {f.label}
                   </label>
                   <input
-                    id={`var-${vf.key}`}
-                    type={vf.type ?? "text"}
-                    value={variables[vf.key] || ""}
-                    onChange={(e) => setVariables((prev) => ({ ...prev, [vf.key]: e.target.value }))}
-                    placeholder={vf.placeholder}
+                    id={`f-${f.key}`}
+                    type={f.type ?? "text"}
+                    value={variables[f.key] ?? ""}
+                    onChange={(e) => setVariables((prev) => ({ ...prev, [f.key]: e.target.value }))}
+                    placeholder={f.placeholder}
                     className="w-full rounded-lg border border-hairline bg-panel-solid px-3 py-2 text-sm text-ink placeholder:text-ink-subtle focus:border-accent focus:outline-none [color-scheme:light]"
                   />
                 </div>
@@ -227,7 +209,7 @@ export function EscribaniaDigital() {
                   <p className="text-xs font-medium text-ink-muted">Vista previa</p>
                   <button
                     onClick={() => exportarTranscripcion(
-                      `${templ?.title ?? "Documento"} — ${variables["nombre"] ?? "Cliente"}`,
+                      `${templ?.title ?? "Documento"} — ${(fields[0] && variables[fields[0].key]) ?? "Cliente"}`,
                       documentPreview.replace(/<[^>]+>/g, ""),
                     )}
                     className="flex items-center gap-1.5 rounded-lg border border-hairline px-3 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-elevated hover:text-ink cursor-pointer"

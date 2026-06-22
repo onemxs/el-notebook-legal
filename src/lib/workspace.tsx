@@ -923,15 +923,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       setDocGenLoading(true);
       setDocumentPreview("");
       setTimeout(() => {
-        const name = variables["nombre"] || "[Nombre del cliente]";
-        const matter = variables["materia"] || "[Materia]";
-        const inmueble = variables["inmueble"] || "[Inmueble]";
-        const monto = variables["monto"] || "[Monto]";
-        const vigencia = variables["vigencia"] || "[Vigencia]";
-        const servicio = variables["servicio"] || "[Servicio]";
-        const intereses = variables["intereses"] || "[Intereses]";
         const today = new Date().toLocaleDateString("es-MX");
         const city = "Ciudad de México";
+
+        const fmt = (k: string) => variables[k] || `[${k}]`;
 
         let body = "";
 
@@ -939,46 +934,46 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
           case "arrendamiento":
             body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">CONTRATO DE ARRENDAMIENTO RESIDENCIAL</h2>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  En ${city}, a ${today}, celebran el presente Contrato de Arrendamiento las partes <strong>${name}</strong>, quienes se denominarán en lo sucesivo como "EL ARRENDADOR" y "EL ARRENDATARIO", respectivamente, respecto del inmueble ubicado en <strong>${inmueble}</strong>.
+  En ${city}, a ${today}, comparecen <strong>${fmt("arrendador")}</strong> como ARRENDADOR y <strong>${fmt("arrendatario")}</strong> como ARRENDATARIO, quienes celebran el presente Contrato de Arrendamiento respecto del inmueble ubicado en <strong>${fmt("domicilio")}</strong>.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  EL ARRENDATARIO se obliga a pagar a EL ARRENDADOR la cantidad de <strong>${monto}</strong> como renta mensual, pagadera dentro de los primeros cinco días de cada mes, en el domicilio del inmueble o en la cuenta bancaria que designe EL ARRENDADOR.
+  EL ARRENDATARIO se obliga a pagar a EL ARRENDADOR la cantidad de <strong>$${fmt("renta")} MXN</strong> como renta mensual, pagadera dentro de los primeros cinco días de cada mes, en el domicilio del inmueble o en la cuenta bancaria que designe EL ARRENDADOR.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  El presente arrendamiento tendrá una vigencia de <strong>${vigencia}</strong>, período durante el cual EL ARRENDATARIO se compromete a usar el inmueble única y exclusivamente como habitación, a conservarlo en buen estado y a no realizar modificaciones sin autorización previa por escrito.
+  El presente arrendamiento tendrá una vigencia del <strong>${fmt("fechaInicio")}</strong> al <strong>${fmt("fechaFin")}</strong>, período durante el cual EL ARRENDATARIO se compromete a usar el inmueble única y exclusivamente como habitación, a conservarlo en buen estado y a no realizar modificaciones sin autorización previa por escrito.
 </p>`;
             break;
           case "servicios":
             body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">CONTRATO DE PRESTACIÓN DE SERVICIOS PROFESIONALES</h2>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  En ${city}, a ${today}, comparecen por una parte <strong>${name}</strong>, en lo sucesivo "EL PRESTADOR", y por la otra el contratante de los servicios, en lo sucesivo "EL CLIENTE", para celebrar el presente Contrato de Prestación de Servicios Profesionales.
+  En ${city}, a ${today}, comparecen <strong>${fmt("prestador")}</strong> en lo sucesivo "EL PRESTADOR", y <strong>${fmt("cliente")}</strong> en lo sucesivo "EL CLIENTE", para celebrar el presente Contrato de Prestación de Servicios Profesionales.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  <strong>OBJETO:</strong> EL PRESTADOR se obliga a realizar a favor de EL CLIENTE los siguientes servicios: <strong>${servicio}</strong>, mismos que serán ejecutados con la debida diligencia, ética profesional y conforme a los más altos estándares de la materia.
+  <strong>OBJETO:</strong> EL PRESTADOR se obliga a realizar a favor de EL CLIENTE los siguientes servicios: <strong>${fmt("descripcion")}</strong>, mismos que serán ejecutados con la debida diligencia, ética profesional y conforme a los más altos estándares de la materia.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  Como contraprestación, EL CLIENTE pagará a EL PRESTADOR la cantidad de <strong>${monto}</strong>, en pagos parciales según los términos acordados. El plazo de ejecución del servicio será de <strong>${vigencia}</strong>.
+  Como contraprestación, EL CLIENTE pagará a EL PRESTADOR la cantidad de <strong>$${fmt("honorarios")} MXN</strong>. El plazo de ejecución del servicio iniciará el <strong>${fmt("fechaInicio")}</strong>.
 </p>`;
             break;
           case "nda":
             body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">ACUERDO DE CONFIDENCIALIDAD (NDA)</h2>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  En ${city}, a ${today}, celebran el presente Acuerdo de Confidencialidad las partes <strong>${name}</strong>, en adelante "LAS PARTES", con el fin de proteger la información sensible que intercambien en el marco de su relación comercial y profesional.
+  En ${city}, a ${today}, celebran el presente Acuerdo de Confidencialidad <strong>${fmt("parteReveladora")}</strong> como PARTE REVELADORA y <strong>${fmt("parteReceptora")}</strong> como PARTE RECEPTORA, con el fin de proteger la información sensible que intercambien en el marco de su relación comercial y profesional.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  <strong>MATERIA:</strong> La información confidencial objeto del presente acuerdo comprende <strong>${matter}</strong>, así como cualquier dato, documentación, know-how o información técnica, financiera, comercial o legal que LAS PARTES intercambien.
+  <strong>MATERIA:</strong> La información confidencial objeto del presente acuerdo comprende <strong>${fmt("materia")}</strong>, así como cualquier dato, documentación o información técnica, financiera, comercial o legal que las partes intercambien.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  La obligación de confidencialidad tendrá una vigencia de <strong>${vigencia}</strong> contados a partir de la fecha del presente, y se extiende incluso después de terminada la relación entre LAS PARTES.
+  La obligación de confidencialidad tendrá una vigencia hasta el <strong>${fmt("vigencia")}</strong>, y se extiende incluso después de terminada la relación entre las partes.
 </p>`;
             break;
           case "pagare":
             body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">PAGARÉ EJECUTIVO</h2>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  En ${city}, a ${today}, <strong>${name}</strong>, en su carácter de deudor, reconoce haber recibido de su acreedor la cantidad de <strong>${monto}</strong>, misma que se obliga a devolver en los términos aquí establecidos.
+  En ${city}, a ${today}, <strong>${fmt("deudor")}</strong> en su carácter de DEUDOR, reconoce haber recibido de <strong>${fmt("acreedor")}</strong> en su carácter de ACREEDOR, la cantidad de <strong>$${fmt("cantidad")} MXN</strong>, misma que se obliga a devolver en los términos aquí establecidos.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  La parte deudora se obliga a pagar la cantidad antes señalada a más tardar el día <strong>${vigencia}</strong>, más los intereses moratorios a una tasa de <strong>${intereses}</strong> que se causarán en caso de incumplimiento.
+  La parte deudora se obliga a pagar la cantidad antes señalada a más tardar el día <strong>${fmt("vigencia")}</strong>, más los intereses moratorios a una tasa de <strong>${fmt("intereses")}</strong> que se causarán en caso de incumplimiento.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
   El presente título ejecutivo mercantil se suscribe conforme a lo dispuesto por la Ley General de Títulos y Operaciones de Crédito, y el deudor se constituye en mora sin necesidad de requerimiento judicial o extrajudicial.
@@ -987,34 +982,34 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
           case "compraventa":
             body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">CONTRATO DE COMPRAVENTA DE BIENES</h2>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  En ${city}, a ${today}, celebran el presente Contrato de Compraventa <strong>${name}</strong>, en su carácter de "EL VENDEDOR" y "EL COMPRADOR", respectivamente.
+  En ${city}, a ${today}, comparecen <strong>${fmt("vendedor")}</strong> como VENDEDOR y <strong>${fmt("comprador")}</strong> como COMPRADOR, quienes celebran el presente Contrato de Compraventa.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  <strong>OBJETO:</strong> EL VENDEDOR transfiere la propiedad del bien descrito como <strong>${inmueble}</strong>, libre de gravámenes, vicios ocultos y adeudos, a favor de EL COMPRADOR, quien lo recibe a su entera satisfacción.
+  <strong>OBJETO:</strong> EL VENDEDOR transfiere la propiedad del bien descrito como <strong>${fmt("bien")}</strong>, libre de gravámenes, vicios ocultos y adeudos, a favor de EL COMPRADOR, quien lo recibe a su entera satisfacción.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  El precio de venta convenido es de <strong>${monto}</strong>, mismo que EL COMPRADOR paga en este acto a EL VENDEDOR, quien recibe la cantidad a su entera conformidad. La fecha de cierre y entrega formal del bien será el <strong>${vigencia}</strong>.
+  El precio de venta convenido es de <strong>$${fmt("precio")} MXN</strong>, mismo que EL COMPRADOR paga en este acto a EL VENDEDOR, quien recibe la cantidad a su entera conformidad. La fecha de cierre y entrega formal del bien será el <strong>${fmt("fechaCierre")}</strong>.
 </p>`;
             break;
           case "divorcio":
             body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">CONVENIO DE DIVORCIO VOLUNTARIO</h2>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  En ${city}, a ${today}, comparecen <strong>${name}</strong>, en lo sucesivo "LOS CÓNYUGES", quienes manifiestan su voluntad de disolver el vínculo matrimonial que los une de manera voluntaria y sin mediar causa de responsabilidad, sujetándose a las siguientes cláusulas.
+  En ${city}, a ${today}, comparecen <strong>${fmt("conyuge1")}</strong> y <strong>${fmt("conyuge2")}</strong>, en lo sucesivo "LOS CÓNYUGES", quienes manifiestan su voluntad de disolver el vínculo matrimonial que los une de manera voluntaria y sin mediar causa de responsabilidad.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  <strong>RÉGIMEN MATRIMONIAL:</strong> LOS CÓNYUGES declaran que su matrimonio se rigió bajo el régimen de <strong>${matter}</strong>, por lo que procederán a la liquidación conforme a derecho.
+  <strong>RÉGIMEN MATRIMONIAL:</strong> LOS CÓNYUGES declaran que su matrimonio se rigió bajo el régimen de <strong>${fmt("regimen")}</strong>, por lo que procederán a la liquidación conforme a derecho.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  El domicilio conyugal ubicado en <strong>${inmueble}</strong> será ocupado conforme al acuerdo entre las partes. En concepto de pensión alimenticia, se establece la cantidad de <strong>${monto}</strong>.
+  El domicilio conyugal ubicado en <strong>${fmt("domicilioConyugal")}</strong> será ocupado conforme al acuerdo entre las partes. En concepto de pensión alimenticia, se establece la cantidad de <strong>$${fmt("pension")} MXN</strong>.
 </p>`;
             break;
           case "contestacion":
             body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">CONTESTACIÓN DE DEMANDA</h2>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  <strong>${name}</strong>, por su propio derecho, con domicilio procesal para oír y recibir notificaciones, comparezco ante este H. Tribunal a dar contestación a la demanda instaurada en mi contra, dentro de los términos concedidos por el artículo correspondiente.
+  <strong>${fmt("demandado")}</strong>, por su propio derecho, con domicilio procesal para oír y recibir notificaciones, comparezco ante este H. Tribunal a dar contestación a la demanda instaurada en mi contra, dentro de los términos concedidos por el artículo correspondiente.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  <strong>JUZGADO:</strong> ${vigencia}. <strong>MATERIA:</strong> ${matter}. <strong>CUANTÍA:</strong> ${monto}.
+  <strong>JUZGADO:</strong> ${fmt("juzgado")}. <strong>MATERIA:</strong> ${fmt("materia")}. <strong>CUANTÍA:</strong> $${fmt("cuantia")} MXN.
 </p>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
   Me opongo a la totalidad de las prestaciones reclamadas y formulo las siguientes excepciones y defensas: (1) Falta de acción y de derecho de la parte actora; (2) Improcedencia de la vía; (3) Obscuridad en el planteamiento de las prestaciones. Asimismo, ofrezco las pruebas pertinentes para acreditar mi defensa.
@@ -1023,7 +1018,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
           default:
             body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">DOCUMENTO LEGAL</h2>
 <p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  Documento genérico generado para <strong>${name}</strong> en materia de <strong>${matter}</strong>.
+  Documento genérico generado.
 </p>`;
         }
 
