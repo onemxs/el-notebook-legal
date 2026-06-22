@@ -39,7 +39,8 @@ const MODELS: { id: ModelId; name: string; desc: string; icon: typeof Zap }[] = 
 ];
 
 export function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { settings, updateSettings, perfil } = useAuth();
+  const { perfil } = useAuth();
+  const { settings, updateSettings } = useWorkspace();
   const despacho = perfil?.tipo_plan === "despacho";
   const [dragging, setDragging] = useState(false);
   const [justUpdated, setJustUpdated] = useState(false);
