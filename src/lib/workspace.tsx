@@ -917,29 +917,126 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     }, 2000);
   }, []);
 
-  // ponytail: simulated document generation; replace with LLM prompt + backend endpoint
+  // ponytail: simulated per-template document generation; replace with LLM prompt + backend endpoint
   const generateCustomDocument = useCallback(
-    (_templateId: string, variables: Record<string, string>, notes: string) => {
+    (templateId: string, variables: Record<string, string>, notes: string) => {
       setDocGenLoading(true);
       setDocumentPreview("");
       setTimeout(() => {
         const name = variables["nombre"] || "[Nombre del cliente]";
         const matter = variables["materia"] || "[Materia]";
+        const inmueble = variables["inmueble"] || "[Inmueble]";
+        const monto = variables["monto"] || "[Monto]";
+        const vigencia = variables["vigencia"] || "[Vigencia]";
+        const servicio = variables["servicio"] || "[Servicio]";
+        const intereses = variables["intereses"] || "[Intereses]";
+        const today = new Date().toLocaleDateString("es-MX");
+        const city = "Ciudad de México";
+
+        let body = "";
+
+        switch (templateId) {
+          case "arrendamiento":
+            body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">CONTRATO DE ARRENDAMIENTO RESIDENCIAL</h2>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  En ${city}, a ${today}, celebran el presente Contrato de Arrendamiento las partes <strong>${name}</strong>, quienes se denominarán en lo sucesivo como "EL ARRENDADOR" y "EL ARRENDATARIO", respectivamente, respecto del inmueble ubicado en <strong>${inmueble}</strong>.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  EL ARRENDATARIO se obliga a pagar a EL ARRENDADOR la cantidad de <strong>${monto}</strong> como renta mensual, pagadera dentro de los primeros cinco días de cada mes, en el domicilio del inmueble o en la cuenta bancaria que designe EL ARRENDADOR.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  El presente arrendamiento tendrá una vigencia de <strong>${vigencia}</strong>, período durante el cual EL ARRENDATARIO se compromete a usar el inmueble única y exclusivamente como habitación, a conservarlo en buen estado y a no realizar modificaciones sin autorización previa por escrito.
+</p>`;
+            break;
+          case "servicios":
+            body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">CONTRATO DE PRESTACIÓN DE SERVICIOS PROFESIONALES</h2>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  En ${city}, a ${today}, comparecen por una parte <strong>${name}</strong>, en lo sucesivo "EL PRESTADOR", y por la otra el contratante de los servicios, en lo sucesivo "EL CLIENTE", para celebrar el presente Contrato de Prestación de Servicios Profesionales.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  <strong>OBJETO:</strong> EL PRESTADOR se obliga a realizar a favor de EL CLIENTE los siguientes servicios: <strong>${servicio}</strong>, mismos que serán ejecutados con la debida diligencia, ética profesional y conforme a los más altos estándares de la materia.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  Como contraprestación, EL CLIENTE pagará a EL PRESTADOR la cantidad de <strong>${monto}</strong>, en pagos parciales según los términos acordados. El plazo de ejecución del servicio será de <strong>${vigencia}</strong>.
+</p>`;
+            break;
+          case "nda":
+            body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">ACUERDO DE CONFIDENCIALIDAD (NDA)</h2>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  En ${city}, a ${today}, celebran el presente Acuerdo de Confidencialidad las partes <strong>${name}</strong>, en adelante "LAS PARTES", con el fin de proteger la información sensible que intercambien en el marco de su relación comercial y profesional.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  <strong>MATERIA:</strong> La información confidencial objeto del presente acuerdo comprende <strong>${matter}</strong>, así como cualquier dato, documentación, know-how o información técnica, financiera, comercial o legal que LAS PARTES intercambien.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  La obligación de confidencialidad tendrá una vigencia de <strong>${vigencia}</strong> contados a partir de la fecha del presente, y se extiende incluso después de terminada la relación entre LAS PARTES.
+</p>`;
+            break;
+          case "pagare":
+            body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">PAGARÉ EJECUTIVO</h2>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  En ${city}, a ${today}, <strong>${name}</strong>, en su carácter de deudor, reconoce haber recibido de su acreedor la cantidad de <strong>${monto}</strong>, misma que se obliga a devolver en los términos aquí establecidos.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  La parte deudora se obliga a pagar la cantidad antes señalada a más tardar el día <strong>${vigencia}</strong>, más los intereses moratorios a una tasa de <strong>${intereses}</strong> que se causarán en caso de incumplimiento.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  El presente título ejecutivo mercantil se suscribe conforme a lo dispuesto por la Ley General de Títulos y Operaciones de Crédito, y el deudor se constituye en mora sin necesidad de requerimiento judicial o extrajudicial.
+</p>`;
+            break;
+          case "compraventa":
+            body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">CONTRATO DE COMPRAVENTA DE BIENES</h2>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  En ${city}, a ${today}, celebran el presente Contrato de Compraventa <strong>${name}</strong>, en su carácter de "EL VENDEDOR" y "EL COMPRADOR", respectivamente.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  <strong>OBJETO:</strong> EL VENDEDOR transfiere la propiedad del bien descrito como <strong>${inmueble}</strong>, libre de gravámenes, vicios ocultos y adeudos, a favor de EL COMPRADOR, quien lo recibe a su entera satisfacción.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  El precio de venta convenido es de <strong>${monto}</strong>, mismo que EL COMPRADOR paga en este acto a EL VENDEDOR, quien recibe la cantidad a su entera conformidad. La fecha de cierre y entrega formal del bien será el <strong>${vigencia}</strong>.
+</p>`;
+            break;
+          case "divorcio":
+            body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">CONVENIO DE DIVORCIO VOLUNTARIO</h2>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  En ${city}, a ${today}, comparecen <strong>${name}</strong>, en lo sucesivo "LOS CÓNYUGES", quienes manifiestan su voluntad de disolver el vínculo matrimonial que los une de manera voluntaria y sin mediar causa de responsabilidad, sujetándose a las siguientes cláusulas.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  <strong>RÉGIMEN MATRIMONIAL:</strong> LOS CÓNYUGES declaran que su matrimonio se rigió bajo el régimen de <strong>${matter}</strong>, por lo que procederán a la liquidación conforme a derecho.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  El domicilio conyugal ubicado en <strong>${inmueble}</strong> será ocupado conforme al acuerdo entre las partes. En concepto de pensión alimenticia, se establece la cantidad de <strong>${monto}</strong>.
+</p>`;
+            break;
+          case "contestacion":
+            body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">CONTESTACIÓN DE DEMANDA</h2>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  <strong>${name}</strong>, por su propio derecho, con domicilio procesal para oír y recibir notificaciones, comparezco ante este H. Tribunal a dar contestación a la demanda instaurada en mi contra, dentro de los términos concedidos por el artículo correspondiente.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  <strong>JUZGADO:</strong> ${vigencia}. <strong>MATERIA:</strong> ${matter}. <strong>CUANTÍA:</strong> ${monto}.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  Me opongo a la totalidad de las prestaciones reclamadas y formulo las siguientes excepciones y defensas: (1) Falta de acción y de derecho de la parte actora; (2) Improcedencia de la vía; (3) Obscuridad en el planteamiento de las prestaciones. Asimismo, ofrezco las pruebas pertinentes para acreditar mi defensa.
+</p>`;
+            break;
+          default:
+            body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">DOCUMENTO LEGAL</h2>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  Documento genérico generado para <strong>${name}</strong> en materia de <strong>${matter}</strong>.
+</p>`;
+        }
+
+        const notesHtml = notes
+          ? `<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.6;margin-bottom:12px;color:#475569;border-left:3px solid #1E3A5F;padding-left:12px"><em>Notas del abogado: ${notes}</em></p>`
+          : "";
+
         setDocumentPreview(
-          `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">Poder Notarial — ${name}</h2>
-<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  En la Ciudad de México, a los ${new Date().getDate()} días del mes de ${new Date().toLocaleString("es-MX", { month: "long" })} de ${new Date().getFullYear()}, el Sr./Sra. <strong>${name}</strong>, por su propio derecho, otorga el presente Poder General para Pleitos y Cobranzas, en materia de <strong>${matter}</strong>.
-</p>
-<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  Faculta ampliamente a su apoderado para iniciar y dar seguimiento a todo tipo de procedimientos judiciales y administrativos, incluyendo la facultad de desistirse, transigir, comprometer en árbitros, absolver posiciones, presentar denuncias y querellas, y realizar todo cuanto legalmente sea necesario para la defensa de sus intereses.
-</p>
-${notes ? `<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.6;margin-bottom:12px;color:#475569;border-left:3px solid #1E3A5F;padding-left:12px"><em>Notas del abogado: ${notes}</em></p>` : ""}
-<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;text-align:justify">
-  Se otorga con vigencia indefinida y con facultades para sustituir total o parcialmente el presente poder en los términos del artículo 2581 del Código Civil Federal.
-</p>
+          `${body}
+${notesHtml}
 <hr style="border:none;border-top:1px solid #cbd5e1;margin:24px 0" />
 <p style="font-family:Arial,sans-serif;font-size:9pt;color:#64748b;text-align:center">
-  Documento generado por PasantIA · Escribanía Digital · ${new Date().toLocaleDateString("es-MX")}
+  Documento generado por PasantIA · Notaría Express · ${new Date().toLocaleDateString("es-MX")}
 </p>`,
         );
         setDocGenLoading(false);

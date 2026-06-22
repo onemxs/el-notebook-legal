@@ -18,7 +18,7 @@ interface Template {
   title: string;
   desc: string;
   icon: typeof FileText;
-  variables: { key: string; label: string; placeholder: string }[];
+  variables: { key: string; label: string; placeholder: string; type?: "text" | "date" }[];
 }
 
 const TEMPLATES: Template[] = [
@@ -31,7 +31,7 @@ const TEMPLATES: Template[] = [
       { key: "nombre", label: "Nombre del arrendador e inquilino", placeholder: "Ej. Juan Pérez y María García" },
       { key: "inmueble", label: "Domicilio del inmueble", placeholder: "Calle, número, colonia, CP" },
       { key: "monto", label: "Renta mensual", placeholder: "Ej. $15,000 MXN" },
-      { key: "vigencia", label: "Vigencia del contrato", placeholder: "Ej. 1 año (ene-dic 2026)" },
+      { key: "vigencia", label: "Vigencia del contrato", placeholder: "Ej. 1 año (ene-dic 2026)", type: "date" },
     ],
   },
   {
@@ -43,7 +43,7 @@ const TEMPLATES: Template[] = [
       { key: "nombre", label: "Prestador y contratante", placeholder: "Nombres completos" },
       { key: "servicio", label: "Descripción del servicio", placeholder: "Ej. Consultoría legal corporativa" },
       { key: "monto", label: "Honorarios", placeholder: "Ej. $50,000 MXN + IVA" },
-      { key: "vigencia", label: "Plazo de ejecución", placeholder: "Ej. 6 meses" },
+      { key: "vigencia", label: "Plazo de ejecución", placeholder: "Ej. 6 meses", type: "date" },
     ],
   },
   {
@@ -54,7 +54,7 @@ const TEMPLATES: Template[] = [
     variables: [
       { key: "nombre", label: "Partes del acuerdo", placeholder: "Nombres completos" },
       { key: "materia", label: "Materia de la información confidencial", placeholder: "Ej. Secretos comerciales, listas de clientes" },
-      { key: "vigencia", label: "Vigencia de confidencialidad", placeholder: "Ej. 3 años" },
+      { key: "vigencia", label: "Vigencia de confidencialidad", placeholder: "Ej. 3 años", type: "date" },
     ],
   },
   {
@@ -65,7 +65,7 @@ const TEMPLATES: Template[] = [
     variables: [
       { key: "nombre", label: "Deudor y acreedor", placeholder: "Nombres completos" },
       { key: "monto", label: "Cantidad prestada", placeholder: "Ej. $100,000 MXN" },
-      { key: "vigencia", label: "Fecha de vencimiento", placeholder: "Ej. 31 diciembre 2026" },
+      { key: "vigencia", label: "Fecha de vencimiento", placeholder: "Ej. 31 diciembre 2026", type: "date" },
       { key: "intereses", label: "Tasa de interés mensual", placeholder: "Ej. 2% mensual" },
     ],
   },
@@ -78,7 +78,7 @@ const TEMPLATES: Template[] = [
       { key: "nombre", label: "Vendedor y comprador", placeholder: "Nombres completos" },
       { key: "inmueble", label: "Descripción del bien", placeholder: "Tipo, ubicación, dimensiones" },
       { key: "monto", label: "Precio de venta", placeholder: "Ej. $2,500,000 MXN" },
-      { key: "vigencia", label: "Fecha de cierre", placeholder: "Ej. 30 marzo 2026" },
+      { key: "vigencia", label: "Fecha de cierre", placeholder: "Ej. 30 marzo 2026", type: "date" },
     ],
   },
   {
@@ -176,10 +176,11 @@ export function EscribaniaDigital() {
                   </label>
                   <input
                     id={`var-${vf.key}`}
+                    type={vf.type ?? "text"}
                     value={variables[vf.key] || ""}
                     onChange={(e) => setVariables((prev) => ({ ...prev, [vf.key]: e.target.value }))}
                     placeholder={vf.placeholder}
-                    className="w-full rounded-lg border border-hairline bg-panel-solid px-3 py-2 text-sm text-ink placeholder:text-ink-subtle focus:border-accent focus:outline-none"
+                    className="w-full rounded-lg border border-hairline bg-panel-solid px-3 py-2 text-sm text-ink placeholder:text-ink-subtle focus:border-accent focus:outline-none [color-scheme:light]"
                   />
                 </div>
               ))}
