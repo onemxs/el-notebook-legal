@@ -208,6 +208,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
             </p>
           </div>
         </section>
+
+        {/* DISCLAIMER — HERRAMIENTA, NO SUSTITUTO */}
+        <section className="max-w-[1200px] mx-auto px-6 md:px-12 py-6">
+          <div className="rounded-2xl border border-[#022448]/20 bg-gradient-to-r from-[#022448]/5 to-[#022448]/[0.02] px-6 py-5 md:px-8 md:py-6">
+            <p className="text-sm leading-relaxed text-[#022448]">
+              <span className="font-semibold">PasantIA es tu asistente en litigación.</span> Analizamos expedientes, redactamos escritos, buscamos en el corpus legal. Pero <span className="font-semibold">tú tomas las decisiones</span> — la estrategia, los criterios finales y la responsabilidad jurídica siempre son tuyas. Somos una herramienta potente, no un sustituto del abogado.
+            </p>
+          </div>
+        </section>
       </main>
 
       {/* FOOTER */}
