@@ -131,13 +131,13 @@ export function EscribaniaDigital() {
     <div className="flex h-full flex-col overflow-hidden">
       {/* Category header */}
       <div className="shrink-0 border-b border-hairline px-5 py-3">
-        <h2 className="font-serif text-base font-semibold text-ink">Escribanía Digital</h2>
+        <h2 className="font-serif text-base font-semibold text-ink">Notaría Express</h2>
         <p className="text-xs text-ink-muted">Selecciona un documento y llénalo con los datos del caso</p>
       </div>
 
       {/* Template catalog */}
-      <div className="shrink-0 overflow-x-auto border-b border-hairline scroll-zone">
-        <div className="flex gap-3 px-5 py-4">
+      <div className="shrink-0 border-b border-hairline">
+        <div className="flex flex-wrap justify-center gap-6 max-w-5xl mx-auto py-4">
           {TEMPLATES.map((t) => {
             const active = selectedTemplate === t.id;
             const Icon = t.icon;
@@ -145,7 +145,7 @@ export function EscribaniaDigital() {
               <button
                 key={t.id}
                 onClick={() => select(t.id)}
-                className={`flex w-40 shrink-0 flex-col items-start gap-2 rounded-xl border p-3.5 text-left transition-all cursor-pointer ${
+                className={`flex w-44 flex-col items-start gap-2 rounded-xl border p-3.5 text-left transition-all cursor-pointer ${
                   active
                     ? "border-accent bg-accent-soft ring-1 ring-accent/30"
                     : "border-hairline bg-panel-solid/40 hover:border-accent/40 hover:bg-accent-soft/30"

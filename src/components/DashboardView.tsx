@@ -3,8 +3,6 @@ import {
   FolderPlus,
   AlarmClock,
   FolderOpen,
-  Scale,
-  Database,
   Clock,
   AlertTriangle,
   ChevronRight,
@@ -16,9 +14,12 @@ import {
   Archive,
   Trash2,
   ArchiveX,
+  Briefcase,
+  FileSearch,
+  FileText,
 } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
-import { BRANCH_LIST, BRANCHES } from "@/lib/branches";
+import { BRANCHES } from "@/lib/branches";
 import { BranchIcon } from "@/components/branchIcons";
 import type { CaseSummary } from "@/lib/types";
 
@@ -154,7 +155,7 @@ function CaseCard({
 }
 
 export function DashboardView() {
-  const { activeCases, archivedCases, openCase, openCaseModal, startIntake, settings, setCaseAction } = useWorkspace();
+  const { activeCases, archivedCases, openCase, openCaseModal, startIntake, settings, setCaseAction, setView } = useWorkspace();
   const despachoMode = settings.accountMode === "despacho";
   const upcoming = activeCases.filter((c) => c.deadlineLabel).length;
   const [dragging, setDragging] = useState(false);
@@ -277,8 +278,48 @@ export function DashboardView() {
           </div>
         </section>
 
+        {/* Quick Actions */}
+        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <button
+            onClick={() => openCaseModal()}
+            className="flex items-center gap-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md cursor-pointer"
+          >
+            <span className="rounded-xl bg-blue-50 p-3 text-blue-600">
+              <Briefcase size={22} strokeWidth={1.75} />
+            </span>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-ink">Nuevo Expediente</p>
+              <p className="text-xs text-ink-muted">Inicia un caso o arrastra archivos</p>
+            </div>
+          </button>
+          <button
+            onClick={() => setView("auditoria")}
+            className="flex items-center gap-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md cursor-pointer"
+          >
+            <span className="rounded-xl bg-green-50 p-3 text-green-600">
+              <FileSearch size={22} strokeWidth={1.75} />
+            </span>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-ink">Auditoría Contractual</p>
+              <p className="text-xs text-ink-muted">Analiza riesgos y cláusulas críticas</p>
+            </div>
+          </button>
+          <button
+            onClick={() => setView("escribania")}
+            className="flex items-center gap-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md cursor-pointer"
+          >
+            <span className="rounded-xl bg-purple-50 p-3 text-purple-600">
+              <FileText size={22} strokeWidth={1.75} />
+            </span>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-ink">Notaría Express</p>
+              <p className="text-xs text-ink-muted">Redacta contratos y convenios al instante</p>
+            </div>
+          </button>
+        </div>
+
         {/* Stats */}
-        <section className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <section className="mb-6 mt-5 grid grid-cols-1 gap-6 md:grid-cols-2">
           <StatCard
             icon={<FolderOpen size={20} strokeWidth={1.75} />}
             value={activeCases.length}
@@ -289,16 +330,6 @@ export function DashboardView() {
             value={upcoming}
             label="Plazos por vigilar"
             tone="danger"
-          />
-          <StatCard
-            icon={<Scale size={20} strokeWidth={1.75} />}
-            value={9}
-            label="Ramas del derecho"
-          />
-          <StatCard
-            icon={<Database size={20} strokeWidth={1.75} />}
-            value={settings.datasetUpdatedAt}
-            label="Dataset actualizado"
           />
         </section>
 
@@ -404,37 +435,14 @@ export function DashboardView() {
                 </ul>
               ) : (
                 <div className="rounded-lg border border-dashed border-hairline bg-canvas/40 p-3 text-center">
-                  <p className="text-[11px] text-ink-muted">Sin plazos próximos</p>
+                  <p className="text-[11px] text-ink-muted">⚖️ Agenda al corriente. No hay plazos procesales venciendo hoy.</p>
                 </div>
               )}
             </div>
           </aside>
         </section>
 
-        {/* Compact "Start by branch" bar */}
-        <section className="mt-8 pb-4">
-          <div className="mb-3 flex items-center gap-2">
-            <Sparkles size={15} className="text-accent" />
-            <h3 className="font-serif text-sm font-medium text-ink">Iniciar por rama</h3>
-          </div>
-          <div className="flex gap-1.5 overflow-x-auto pb-2">
-            {BRANCH_LIST.map((b) => (
-              <button
-                key={b.id}
-                onClick={() => openCaseModal(b.id)}
-                title={b.name}
-                className="group flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline bg-panel-solid p-2 text-left transition-all hover:border-accent/40 hover:bg-accent-soft/40 active:scale-[0.97] cursor-pointer"
-              >
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-accent-soft text-accent transition-colors group-hover:bg-accent group-hover:text-white">
-                  <BranchIcon id={b.id} size={14} />
-                </span>
-                <span className="hidden truncate text-[11px] font-medium text-ink lg:inline max-w-[80px]">
-                  {b.name}
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
+
       </div>
     </div>
   );
