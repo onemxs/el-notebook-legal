@@ -13,6 +13,9 @@ import {
   Pencil,
   AlertCircle,
   Filter,
+  Archive,
+  Trash2,
+  ArchiveX,
 } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { BRANCH_LIST, BRANCHES } from "@/lib/branches";
@@ -70,12 +73,24 @@ function StatCard({
   );
 }
 
-function CaseCard({ c, onOpen }: { c: CaseSummary; onOpen: () => void }) {
+function CaseCard({
+  c,
+  onOpen,
+  onArchive,
+  onDelete,
+  despachoMode,
+}: {
+  c: CaseSummary;
+  onOpen: () => void;
+  onArchive?: () => void;
+  onDelete?: () => void;
+  despachoMode?: boolean;
+}) {
   const b = BRANCHES[c.branch];
   return (
     <button
       onClick={onOpen}
-      className="group flex flex-col rounded-2xl border border-hairline bg-panel-solid p-4 text-left shadow-card transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-float active:translate-y-0 cursor-pointer"
+      className="group relative flex flex-col rounded-2xl border border-hairline bg-panel-solid p-4 text-left shadow-card transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-float active:translate-y-0 cursor-pointer"
     >
       <div className="flex items-center gap-2.5">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
@@ -84,6 +99,11 @@ function CaseCard({ c, onOpen }: { c: CaseSummary; onOpen: () => void }) {
         <span className="rounded-full bg-elevated px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-ink-muted">
           {b.name}
         </span>
+        {despachoMode && c.asignadoA && (
+          <span className="rounded-full bg-accent-soft/60 px-2 py-0.5 text-[10px] font-semibold text-accent">
+            {c.asignadoA}
+          </span>
+        )}
         {c.demo && (
           <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent">
             Ejemplo
@@ -111,15 +131,35 @@ function CaseCard({ c, onOpen }: { c: CaseSummary; onOpen: () => void }) {
           <span className="truncate">{c.deadlineLabel}</span>
         </div>
       )}
+      {onArchive && (
+        <span
+          onClick={(e) => { e.stopPropagation(); onArchive(); }}
+          className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-lg text-ink-subtle opacity-0 transition-all hover:bg-elevated hover:text-accent group-hover:opacity-100"
+          title="Archivar"
+        >
+          <Archive size={14} />
+        </span>
+      )}
+      {onDelete && (
+        <span
+          onClick={(e) => { e.stopPropagation(); onDelete(); }}
+          className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-lg text-ink-subtle opacity-0 transition-all hover:bg-danger-soft hover:text-danger group-hover:opacity-100"
+          title="Eliminar permanentemente"
+        >
+          <Trash2 size={14} />
+        </span>
+      )}
     </button>
   );
 }
 
 export function DashboardView() {
-  const { cases, openCase, openCaseModal, startIntake, settings } = useWorkspace();
-  const upcoming = cases.filter((c) => c.deadlineLabel).length;
+  const { activeCases, archivedCases, openCase, openCaseModal, startIntake, settings, setCaseAction } = useWorkspace();
+  const despachoMode = settings.accountMode === "despacho";
+  const upcoming = activeCases.filter((c) => c.deadlineLabel).length;
   const [dragging, setDragging] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [tab, setTab] = useState<"activos" | "archivados">("activos");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filters = [
@@ -130,7 +170,9 @@ export function DashboardView() {
     { id: "laboral", label: "Laboral" },
   ];
 
-  const filteredCases = cases.filter((c) => {
+  const displayCases = tab === "activos" ? activeCases : archivedCases;
+
+  const filteredCases = displayCases.filter((c) => {
     if (activeFilter === "all") return true;
     if (activeFilter === "urgent") return c.deadlineLabel;
     if (activeFilter === "amparo") return c.branch === "amparo";
@@ -139,7 +181,7 @@ export function DashboardView() {
     return true;
   });
 
-  const upcomingDeadlines = cases
+  const upcomingDeadlines = activeCases
     .filter((c): c is typeof c & { deadlineLabel: string } => !!c.deadlineLabel)
     .sort((a, b) => {
       const daysA = extractDaysFromLabel(a.deadlineLabel);
@@ -239,7 +281,7 @@ export function DashboardView() {
         <section className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatCard
             icon={<FolderOpen size={20} strokeWidth={1.75} />}
-            value={cases.length}
+            value={activeCases.length}
             label="Expedientes activos"
           />
           <StatCard
@@ -265,7 +307,28 @@ export function DashboardView() {
           {/* Main cases area */}
           <div className="flex-1">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-serif text-2xl font-medium text-ink">Mis expedientes</h2>
+              <div className="flex items-center gap-3">
+                <h2 className="font-serif text-2xl font-medium text-ink">Expedientes</h2>
+                <div className="flex rounded-lg border border-hairline bg-panel-solid p-0.5">
+                  <button
+                    onClick={() => setTab("activos")}
+                    className={`rounded-md px-2.5 py-1 text-[12px] font-medium transition-all cursor-pointer ${
+                      tab === "activos" ? "bg-accent text-white shadow-sm" : "text-ink-muted hover:text-ink"
+                    }`}
+                  >
+                    Activos ({activeCases.length})
+                  </button>
+                  <button
+                    onClick={() => setTab("archivados")}
+                    className={`rounded-md px-2.5 py-1 text-[12px] font-medium transition-all cursor-pointer ${
+                      tab === "archivados" ? "bg-accent text-white shadow-sm" : "text-ink-muted hover:text-ink"
+                    }`}
+                  >
+                    <ArchiveX size={12} className="mb-0.5 mr-1 inline" />
+                    Archivados ({archivedCases.length})
+                  </button>
+                </div>
+              </div>
               <button
                 onClick={() => openCaseModal()}
                 className="flex items-center gap-1 text-[13px] font-medium text-accent transition-colors hover:text-accent-hover cursor-pointer"
@@ -296,7 +359,14 @@ export function DashboardView() {
             {/* Cases grid */}
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {filteredCases.map((c) => (
-                <CaseCard key={c.id} c={c} onOpen={() => openCase(c.id)} />
+                <CaseCard
+                  key={c.id}
+                  c={c}
+                  onOpen={() => openCase(c.id)}
+                  despachoMode={despachoMode}
+                  onArchive={tab === "activos" ? () => setCaseAction({ mode: "archive", caseId: c.id, caseName: c.name }) : undefined}
+                  onDelete={tab === "archivados" ? () => setCaseAction({ mode: "delete", caseId: c.id, caseName: c.name }) : undefined}
+                />
               ))}
             </div>
             {filteredCases.length === 0 && (

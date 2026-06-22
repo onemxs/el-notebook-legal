@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { getSupabase, SUPA_CONFIGURED } from "./supabase";
+import { getSupabase, SUPA_CONFIGURED, tocarConexion } from "./supabase";
 
 export interface Perfil {
   id: string;
@@ -21,6 +21,7 @@ export interface Perfil {
   rol_organizacion: "dueno" | "invitado" | "ninguno";
   tema: "claro" | "oscuro" | "auto";
   onboarding_completo: boolean;
+  ultima_conexion: string | null;
 }
 
 interface AuthState {
@@ -185,6 +186,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (session) void processPendingInvite();
   }, [session, processPendingInvite]);
+
+  // Touch last-connection timestamp after profile loads
+  useEffect(() => {
+    if (session && perfil) void tocarConexion();
+  }, [session, perfil]);
 
   const value: AuthState = {
     session,

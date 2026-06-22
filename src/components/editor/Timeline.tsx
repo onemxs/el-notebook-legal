@@ -8,9 +8,12 @@ import {
   Flag,
   RotateCw,
   Inbox,
+  Printer,
 } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
-import type { TimelineEvent, TimelineSeverity } from "@/lib/types";
+import type { TimelineEvent, TimelineInconsistency, TimelineSeverity } from "@/lib/types";
+import { exportarReporteCronologia } from "@/lib/export";
+import { BRANCHES } from "@/lib/branches";
 
 const DAY = 86400000;
 /** Above 7 events the horizontal layout gets cramped, so we switch to vertical. */
@@ -380,10 +383,41 @@ function HorizontalTimeline({ events }: { events: TimelineEvent[] }) {
   );
 }
 
+/* ──────────────────────── Inconsistency banner ──────────────────────── */
+
+function InconsistencyBanner({ inconsistencies }: { inconsistencies: TimelineInconsistency[] }) {
+  if (!inconsistencies.length) return null;
+  return (
+    <div className="mb-4 space-y-2">
+      {inconsistencies.map((inc) => {
+        const isError = inc.severidad === "error";
+        return (
+          <div
+            key={inc.id}
+            className={`flex items-start gap-2.5 rounded-xl border p-3 text-[13px] leading-snug animate-slide-up ${
+              isError
+                ? "border-danger/40 bg-danger-soft text-danger"
+                : "border-warning/40 bg-warning-soft text-warning"
+            }`}
+          >
+            <span className="mt-0.5 shrink-0">{isError ? "🚫" : "⚠️"}</span>
+            <div>
+              <p className="font-semibold">
+                {inc.tipo === "fechas" ? "Inconsistencia de fechas" : "Posible contradicción"}
+              </p>
+              <p className="mt-0.5 opacity-80">{inc.descripcion}</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ──────────────────────────── Entry point ──────────────────────────── */
 
 export function Timeline() {
-  const { timeline, timelineLoading, runTimeline } = useWorkspace();
+  const { timeline, timelineLoading, runTimeline, caseName, branch, inconsistencies } = useWorkspace();
   const sortedTimeline = [...(timeline || [])].sort(
     (a, b) => +new Date(a.iso || 0) - +new Date(b.iso || 0)
   );
@@ -443,14 +477,32 @@ export function Timeline() {
             {deadlines > 0 && ` · ${deadlines} ${deadlines === 1 ? "plazo" : "plazos"}`}
           </p>
         </div>
-        <button
-          onClick={runTimeline}
-          className="flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-elevated hover:text-ink cursor-pointer"
-        >
-          <RotateCw size={13} />
-          Regenerar
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() =>
+              exportarReporteCronologia(
+                caseName,
+                BRANCHES[branch].name,
+                sortedTimeline,
+                inconsistencies,
+              )
+            }
+            className="flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-elevated hover:text-ink cursor-pointer"
+          >
+            <Printer size={13} />
+            Exportar
+          </button>
+          <button
+            onClick={runTimeline}
+            className="flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-elevated hover:text-ink cursor-pointer"
+          >
+            <RotateCw size={13} />
+            Regenerar
+          </button>
+        </div>
       </div>
+
+      <InconsistencyBanner inconsistencies={inconsistencies} />
 
       <NextDeadline events={sortedTimeline} />
 

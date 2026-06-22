@@ -5,6 +5,7 @@ export interface Miembro {
   nombre_completo: string | null;
   especialidad: string | null;
   rol_organizacion: "dueno" | "invitado" | "ninguno";
+  ultima_conexion: string | null;
 }
 
 export interface Invitacion {
@@ -22,7 +23,7 @@ export async function listarMiembros(): Promise<Miembro[]> {
   if (!sb) return [];
   const { data } = await sb
     .from("perfiles")
-    .select("id, nombre_completo, especialidad, rol_organizacion")
+    .select("id, nombre_completo, especialidad, rol_organizacion, ultima_conexion")
     .not("organizacion_id", "is", null);
   return (data as Miembro[]) ?? [];
 }

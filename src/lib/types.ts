@@ -65,6 +65,14 @@ export interface CaseFile {
 
 export type TimelineSeverity = "info" | "warning" | "deadline";
 
+export interface TimelineInconsistency {
+  id: string;
+  tipo: "fechas" | "declaraciones";
+  descripcion: string;
+  severidad: "warning" | "error";
+  eventos: string[]; // ids de los TimelineEvent involucrados
+}
+
 export interface TimelineEvent {
   id: string;
   date: string; // display date
@@ -112,7 +120,19 @@ export interface VideoTranscription {
   createdAt: number;
 }
 
-export type AppView = "dashboard" | "workspace";
+export type AppView = "dashboard" | "workspace" | "auditoria" | "escribania" | "configuracion";
+
+export interface ContractAnalysis {
+  riskScore: number; // 0 a 100
+  pros: string[];
+  cons: string[];
+  strategy: string;
+  criticalClauses: Array<{
+    title: string;
+    currentText: string;
+    alternativeText: string;
+  }>;
+}
 
 export interface CaseSummary {
   id: string;
@@ -122,6 +142,9 @@ export interface CaseSummary {
   deadlineLabel?: string;
   urgent?: boolean;
   demo?: boolean; // expediente de ejemplo: al abrirlo se hidrata con contenido ilustrativo
+  archived?: boolean;
+  asignadoA?: string; // nombre del abogado asignado (modo despacho)
+  abogadoId?: string; // id del abogado asignado
 }
 
 export type ModelId = "rapido" | "profundo";
@@ -131,4 +154,5 @@ export interface SystemSettings {
   temperature: number; // locked at 0.0
   secureSession: boolean; // borrado automático
   datasetUpdatedAt: string;
+  accountMode: "abogado" | "despacho";
 }

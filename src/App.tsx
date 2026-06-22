@@ -8,14 +8,19 @@ import { TopBar } from "@/components/TopBar";
 import { DashboardView } from "@/components/DashboardView";
 import { NewCaseModal } from "@/components/NewCaseModal";
 import { IntakeModal } from "@/components/intake/IntakeModal";
+import { ArchiveDeleteModal } from "@/components/cases/ArchiveDeleteModal";
 import { ArchiveroPanel } from "@/components/panels/ArchiveroPanel";
 import { EditorPanel } from "@/components/panels/EditorPanel";
 import { AssistantPanel } from "@/components/panels/AssistantPanel";
+import { AuditoriaContractual } from "@/components/auditoria/AuditoriaContractual";
+import { EscribaniaDigital } from "@/components/escribania/EscribaniaDigital";
+import { Sidebar } from "@/components/nav/Sidebar";
 import { LandingPage } from "@/components/landing/LandingPage";
 import { Onboarding } from "@/components/onboarding/Onboarding";
 import { AdminPanel } from "@/components/admin/AdminPanel";
 import { MembersPanel } from "@/components/equipo/MembersPanel";
 import { AcceptInvite } from "@/components/auth/AcceptInvite";
+import { UnirseDespacho } from "@/components/equipo/UnirseDespacho";
 
 type MobilePanel = "archivero" | "editor" | "asistente";
 
@@ -76,21 +81,31 @@ function Workspace() {
 }
 
 function AppShell() {
-  // Se monta solo bajo <RequireAccess> (sesión o demo garantizados). La landing
-  // la sirve el router en "/", aquí nunca; mostrar dashboard o workspace.
   const { view } = useWorkspace();
+  const main = () => {
+    switch (view) {
+      case "dashboard":
+        return <div className="flex-1 overflow-hidden"><DashboardView /></div>;
+      case "auditoria":
+        return <AuditoriaContractual />;
+      case "escribania":
+        return <EscribaniaDigital />;
+      case "configuracion":
+        return <div className="flex-1 overflow-hidden" />; // ponytail: placeholder, add SettingsView when ready
+      default:
+        return <Workspace />;
+    }
+  };
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-canvas text-ink">
-      <TopBar />
-      {view === "dashboard" ? (
-        <div className="flex-1 overflow-hidden">
-          <DashboardView />
-        </div>
-      ) : (
-        <Workspace />
-      )}
+    <div className="flex h-dvh overflow-hidden bg-canvas text-ink">
+      <Sidebar />
+      <div className="flex flex-1 flex-col min-w-0">
+        <TopBar />
+        {main()}
+      </div>
       <NewCaseModal />
       <IntakeModal />
+      <ArchiveDeleteModal />
     </div>
   );
 }
@@ -191,6 +206,14 @@ export default function App() {
               }
             />
             <Route path="/invitacion/:token" element={<AcceptInvite />} />
+            <Route
+              path="/unirse"
+              element={
+                <RequireAuth>
+                  <UnirseDespacho />
+                </RequireAuth>
+              }
+            />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>

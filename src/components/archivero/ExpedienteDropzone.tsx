@@ -10,10 +10,12 @@ import {
   Loader2,
   Sparkles,
   Video,
+  Download,
 } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { isVideoFile, transcribeVideo } from "@/lib/transcribe";
 import type { CaseFile, CaseFileKind } from "@/lib/types";
+import { exportarTranscripcion } from "@/lib/export";
 
 let fid = 0;
 const newId = () => `f-${Date.now().toString(36)}-${(fid++).toString(36)}`;
@@ -27,7 +29,7 @@ const KIND_ICON: Record<CaseFileKind, typeof FileText> = {
 };
 
 export function ExpedienteDropzone() {
-  const { files, addFiles, addTranscript, ingestDocument, removeFile, caseName } = useWorkspace();
+  const { files, addFiles, addTranscript, ingestDocument, removeFile, caseName, getTranscriptContent } = useWorkspace();
   const [dragging, setDragging] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [transcriptionProgress, setTranscriptionProgress] = useState<{
@@ -217,16 +219,31 @@ export function ExpedienteDropzone() {
                   </p>
                 </div>
                 {!f.analyzing && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFile(f.id);
-                    }}
-                    aria-label={`Eliminar ${f.name}`}
-                    className="rounded-md p-1.5 text-ink-subtle opacity-0 transition-all hover:bg-danger-soft hover:text-danger group-hover:opacity-100 cursor-pointer"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  <div className="flex items-center gap-0.5">
+                    {f.kind === "text" && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const content = getTranscriptContent(f.id);
+                          if (content) exportarTranscripcion(f.name, content);
+                        }}
+                        aria-label={`Exportar ${f.name}`}
+                        className="rounded-md p-1.5 text-ink-subtle opacity-0 transition-all hover:bg-accent-soft hover:text-accent group-hover:opacity-100 cursor-pointer"
+                      >
+                        <Download size={14} />
+                      </button>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFile(f.id);
+                      }}
+                      aria-label={`Eliminar ${f.name}`}
+                      className="rounded-md p-1.5 text-ink-subtle opacity-0 transition-all hover:bg-danger-soft hover:text-danger group-hover:opacity-100 cursor-pointer"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 )}
               </li>
             );

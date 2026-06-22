@@ -69,6 +69,8 @@ export interface CasoRow {
   fechas_clave: { label: string; value: string }[];
   leyes_sugeridas: string[];
   confianza: number;
+  archivado: boolean;
+  abogado_asignado_id?: string | null;
   creado_en: string;
 }
 
@@ -95,6 +97,7 @@ export async function crearCaso(datos: {
   fechas_clave?: { label: string; value: string }[];
   leyes_sugeridas?: string[];
   confianza?: number;
+  abogado_asignado_id?: string;
 }): Promise<CasoRow | null> {
   const c = db();
   if (!c) return null;
@@ -110,6 +113,7 @@ export async function crearCaso(datos: {
         fechas_clave: datos.fechas_clave ?? [],
         leyes_sugeridas: datos.leyes_sugeridas ?? [],
         confianza: datos.confianza ?? 0.95,
+        abogado_asignado_id: datos.abogado_asignado_id ?? null,
       },
     ])
     .select()
@@ -125,6 +129,20 @@ export async function obtenerCasos(): Promise<CasoRow[]> {
     .select("*")
     .order("creado_en", { ascending: false });
   return error ? [] : (data as CasoRow[]);
+}
+
+export async function archiveCaso(id: string): Promise<boolean> {
+  const c = db();
+  if (!c) return false;
+  const { error } = await c.from("casos").update({ archivado: true }).eq("id", id);
+  return !error;
+}
+
+export async function borrarCaso(id: string): Promise<boolean> {
+  const c = db();
+  if (!c) return false;
+  const { error } = await c.from("casos").delete().eq("id", id);
+  return !error;
 }
 
 export async function obtenerCaso(id: string): Promise<CasoRow | null> {
@@ -257,6 +275,38 @@ export async function guardarMensajeChat(datos: {
     .select("id")
     .single();
   return error ? null : (data as { id: string });
+}
+
+/** Update ultima_conexion for the current user. */
+export async function tocarConexion(): Promise<void> {
+  const c = db();
+  if (!c) return;
+  await c.rpc("tocar_conexion");
+}
+
+/** Get the firm's collaboration code (owner only). */
+export async function obtenerCodigoColaboracion(): Promise<string | null> {
+  const c = db();
+  if (!c) return null;
+  const { data } = await c.rpc("obtener_codigo_colaboracion");
+  return (data as string) ?? null;
+}
+
+/** Generate/regenerate the firm's collaboration code (owner only). */
+export async function generarCodigoColaboracion(): Promise<string | null> {
+  const c = db();
+  if (!c) return null;
+  const { data } = await c.rpc("generar_codigo_colaboracion");
+  return (data as string) ?? null;
+}
+
+/** Join a firm using its collaboration code. Returns the firm name on success. */
+export async function unirsePorCodigo(codigo: string): Promise<{ firmName?: string; error?: string }> {
+  const c = db();
+  if (!c) return { error: "Sin conexión a Supabase." };
+  const { data, error } = await c.rpc("unirse_por_codigo", { p_codigo: codigo });
+  if (error) return { error: error.message };
+  return { firmName: (data as string) ?? undefined };
 }
 
 /** Semantic search via the `consultar` Edge Function (embeds query server-side). */

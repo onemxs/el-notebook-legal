@@ -15,11 +15,13 @@ import type {
   CaseSummary,
   ChatMessage,
   Citation,
+  ContractAnalysis,
   ExtractedCase,
   ExtractedField,
   Law,
   SystemSettings,
   TimelineEvent,
+  TimelineInconsistency,
   TimelineSeverity,
 } from "./types";
 import { BRANCHES } from "./branches";
@@ -38,8 +40,11 @@ import {
   guardarDocumento,
   guardarTimelineEventos,
   guardarMensajeChat,
+  archiveCaso,
+  borrarCaso,
   type CasoRow,
 } from "./supabase";
+import { listarMiembros, type Miembro } from "./invites";
 
 let n = 0;
 const uid = (p: string) => `${p}-${Date.now().toString(36)}-${(n++).toString(36)}`;
@@ -74,6 +79,9 @@ const cloneLaws = (id: BranchId): Law[] => BRANCHES[id].laws.map((l) => ({ ...l 
 interface WorkspaceState {
   view: AppView;
   cases: CaseSummary[];
+  recentCases: CaseSummary[];
+  members: Miembro[];
+  caseAction: { mode: "archive" | "delete"; caseId: string; caseName: string } | null;
   caseModalOpen: boolean;
   caseModalPreset: BranchId | null;
   intakeFile: File | null;
@@ -86,6 +94,7 @@ interface WorkspaceState {
   thinking: boolean;
   timeline: TimelineEvent[] | null;
   timelineLoading: boolean;
+  inconsistencies: TimelineInconsistency[];
   editorHtml: string;
   editorVersion: number;
   activeArticle: Citation | null;
@@ -93,6 +102,11 @@ interface WorkspaceState {
   generatingDoc: boolean;
   caseParties: ExtractedField[];
   caseDocContent: string[];
+  activeAnalysis: ContractAnalysis | null;
+  analysisLoading: boolean;
+  selectedTemplate: string | null;
+  documentPreview: string;
+  docGenLoading: boolean;
 }
 
 interface WorkspaceCtx extends WorkspaceState {
@@ -103,7 +117,7 @@ interface WorkspaceCtx extends WorkspaceState {
   closeCaseModal: () => void;
   startIntake: (file: File) => void;
   clearIntake: () => void;
-  startCase: (branch: BranchId, name: string, extraction?: ExtractedCase) => Promise<string>;
+  startCase: (branch: BranchId, name: string, extraction?: ExtractedCase, abogadoId?: string) => Promise<string>;
   toggleLaw: (lawId: string) => void;
   addFiles: (files: CaseFile[]) => void;
   addTranscript: (fileName: string, text: string) => void;
@@ -113,12 +127,23 @@ interface WorkspaceCtx extends WorkspaceState {
   sendMessage: (text: string) => void;
   runTimeline: () => void;
   clearTimeline: () => void;
+  getTranscriptContent: (fileName: string) => string | undefined;
+  inconsistencies: TimelineInconsistency[];
   openArticle: (c: Citation) => void;
   closeArticle: () => void;
   setEditorHtml: (html: string) => void;
   insertDocument: (kind: DocKind) => void;
   docKindsForBranch: DocKind[];
   updateSettings: (patch: Partial<SystemSettings>) => void;
+  archiveCase: (id: string) => void;
+  deleteCase: (id: string) => void;
+  setCaseAction: (action: { mode: "archive" | "delete"; caseId: string; caseName: string } | null) => void;
+  activeCases: CaseSummary[];
+  archivedCases: CaseSummary[];
+  isDespacho: boolean;
+  analyzeContract: (file: File) => void;
+  generateCustomDocument: (templateId: string, variables: Record<string, string>, notes: string) => void;
+  setSelectedTemplate: (id: string | null) => void;
 }
 
 const Ctx = createContext<WorkspaceCtx | null>(null);
@@ -130,6 +155,7 @@ const initialSettings: SystemSettings = {
   temperature: 0,
   secureSession: false,
   datasetUpdatedAt: "10 jun 2026",
+  accountMode: "abogado",
 };
 
 const welcomeMessage = (branch: BranchId): ChatMessage => ({
@@ -345,6 +371,12 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   const [view, setView] = useState<AppView>("dashboard");
   const [cases, setCases] = useState<CaseSummary[]>(SEED_CASES);
+  const [recentCases, setRecentCases] = useState<CaseSummary[]>([]);
+  const [caseAction, setCaseAction] = useState<{
+    mode: "archive" | "delete";
+    caseId: string;
+    caseName: string;
+  } | null>(null);
   const [caseModalOpen, setCaseModalOpen] = useState(false);
   const [caseModalPreset, setCaseModalPreset] = useState<BranchId | null>(null);
   const [intakeFile, setIntakeFile] = useState<File | null>(null);
@@ -359,6 +391,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [thinking, setThinking] = useState(false);
   const [timeline, setTimeline] = useState<TimelineEvent[] | null>(null);
   const [timelineLoading, setTimelineLoading] = useState(false);
+  const [inconsistencies, setInconsistencies] = useState<TimelineInconsistency[]>([]);
   const [ingestedEvents, setIngestedEvents] = useState<TimelineEvent[]>([]);
   const [editorHtml, setEditorHtmlState] = useState("");
   const [editorVersion, setEditorVersion] = useState(0);
@@ -367,11 +400,18 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [generatingDoc, setGeneratingDoc] = useState(false);
   const [caseParties, setCaseParties] = useState<ExtractedField[]>([]);
   const [caseDocContent, setCaseDocContent] = useState<string[]>([]);
+  const [activeAnalysis, setActiveAnalysis] = useState<ContractAnalysis | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [documentPreview, setDocumentPreview] = useState("");
+  const [docGenLoading, setDocGenLoading] = useState(false);
+  const [members, setMembers] = useState<Miembro[]>([]);
 
   const filesRef = useRef(files);
   filesRef.current = files;
   const ingestedEventsRef = useRef(ingestedEvents);
   ingestedEventsRef.current = ingestedEvents;
+  const transcriptMapRef = useRef<Map<string, string>>(new Map());
   const branchRef = useRef(branch);
   branchRef.current = branch;
   const caseDocContentRef = useRef(caseDocContent);
@@ -382,17 +422,23 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
     if (cloud) {
-      void obtenerCasos().then((rows) => {
+      void (async () => {
+        const [rows, team] = await Promise.all([obtenerCasos(), listarMiembros()]);
         if (!active) return;
+        setMembers(team);
+        const memberNames = new Map(team.map((m) => [m.id, m.nombre_completo]));
         setCases(
           rows.map((r: CasoRow) => ({
             id: r.id,
             name: r.nombre,
             branch: r.rama as BranchId,
             updated: relativo(r.creado_en),
+            archived: r.archivado,
+            abogadoId: r.abogado_asignado_id ?? undefined,
+            asignadoA: r.abogado_asignado_id ? (memberNames.get(r.abogado_asignado_id) ?? undefined) : undefined,
           })),
         );
-      });
+      })();
     } else if (demo) {
       setCases(SEED_CASES);
     }
@@ -430,7 +476,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const startCase = useCallback(
-    async (next: BranchId, name: string, extraction?: ExtractedCase) => {
+    async (next: BranchId, name: string, extraction?: ExtractedCase, abogadoId?: string) => {
       const finalName = name.trim() || `Caso ${BRANCHES[next].name}`;
       let id = uid("c");
       if (cloudRef.current) {
@@ -443,6 +489,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
           fechas_clave: extraction?.keyDates,
           leyes_sugeridas: extraction?.suggestedLaws,
           confianza: extraction?.confidence,
+          abogado_asignado_id: abogadoId,
         });
         if (row) id = row.id;
       }
@@ -463,6 +510,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     (id: string) => {
       const found = cases.find((c) => c.id === id);
       if (!found) return;
+      setRecentCases((prev) => {
+        const deduped = prev.filter((c) => c.id !== id);
+        return [found, ...deduped].slice(0, 5);
+      });
       // Demo or local: hydrate from the in-app examples (no cloud).
       if (found.demo || !cloudRef.current) {
         currentCaseIdRef.current = null;
@@ -539,6 +590,22 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   const clearIntake = useCallback(() => setIntakeFile(null), []);
 
+  const archiveCase = useCallback((id: string) => {
+    const found = cases.find((c) => c.id === id);
+    if (!found) return;
+    setCases((prev) => prev.map((c) => (c.id === id ? { ...c, archived: true } : c)));
+    setRecentCases((prev) => prev.filter((c) => c.id !== id));
+    if (cloudRef.current) void archiveCaso(id);
+    if (currentCaseIdRef.current === id) setView("dashboard");
+  }, [cases]);
+
+  const deleteCase = useCallback((id: string) => {
+    setCases((prev) => prev.filter((c) => c.id !== id));
+    setRecentCases((prev) => prev.filter((c) => c.id !== id));
+    if (cloudRef.current) void borrarCaso(id);
+    if (currentCaseIdRef.current === id) setView("dashboard");
+  }, []);
+
   const toggleLaw = useCallback((lawId: string) => {
     setLaws((prev) =>
       prev.map((l) => (l.id === lawId ? { ...l, enabled: !l.enabled } : l)),
@@ -558,8 +625,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   // Finished local transcription: add it to the archivero, feed it to the
   // assistant context, and (cloud) persist only the TEXT to the case's documentos.
   const addTranscript = useCallback((fileName: string, text: string) => {
+    const id = uid("f");
     const file: CaseFile = {
-      id: uid("f"),
+      id,
       name: fileName,
       kind: "text",
       size: `${(text.length / 1024).toFixed(1)} KB`,
@@ -567,6 +635,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     };
     setFiles((prev) => [file, ...prev]);
     setCaseDocContent((prev) => [...prev, text]);
+    transcriptMapRef.current.set(id, text);
     const caso = currentCaseIdRef.current;
     if (caso) void guardarDocumento({ caso_id: caso, nombre: fileName, tipo: "transcription", contenido: text });
   }, []);
@@ -735,6 +804,59 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     [branch, laws, thinking, runAssistant],
   );
 
+  // Cross-compare timeline events to flag date inconsistencies and
+  // contradictory statements across documents.
+  const analizarInconsistencias = useCallback((events: TimelineEvent[]): TimelineInconsistency[] => {
+    const issues: TimelineInconsistency[] = [];
+    if (events.length < 2) return issues;
+    let ic = 0;
+    // ponytail: keyword-pattern heuristic, upgrade to LLM-based contradiction detection if needed
+    for (const a of events) {
+      for (const b of events) {
+        if (a.id >= b.id) continue;
+        const aDate = a.iso ? new Date(a.iso).getTime() : NaN;
+        const bDate = b.iso ? new Date(b.iso).getTime() : NaN;
+        if (Number.isNaN(aDate) || Number.isNaN(bDate)) continue;
+        const aLow = a.title.toLowerCase();
+        const bLow = b.title.toLowerCase();
+        // notification after response → inconsistent
+        if (/notificaci[oó]n/.test(aLow) && /contestaci[oó]n|respuesta/.test(bLow) && aDate > bDate) {
+          issues.push({
+            id: `ic-${ic++}`,
+            tipo: "fechas",
+            descripcion: `La "${a.title}" (${a.date}) ocurre después de la "${b.title}" (${b.date}). Revisar orden cronológico.`,
+            severidad: "error",
+            eventos: [a.id, b.id],
+          });
+        }
+        // demanda after sentencia → inconsistent
+        if (/demanda/.test(aLow) && /sentencia|laudo|resoluci[oó]n/.test(bLow) && aDate > bDate) {
+          issues.push({
+            id: `ic-${ic++}`,
+            tipo: "fechas",
+            descripcion: `La "${a.title}" (${a.date}) ocurre después de la "${b.title}" (${b.date}). La demanda debe preceder a la resolución.`,
+            severidad: "error",
+            eventos: [a.id, b.id],
+          });
+        }
+        // sources differ but dates are same with contradictory titles
+        if (a.source && b.source && a.source !== b.source) {
+          const sameDay = a.iso.slice(0, 10) === b.iso.slice(0, 10);
+          if (sameDay && aLow !== bLow && bDate === aDate) {
+            issues.push({
+              id: `ic-${ic++}`,
+              tipo: "declaraciones",
+              descripcion: `Versiones contradictorias en "${a.source}" y "${b.source}" sobre la misma fecha (${a.date}): "${a.title}" vs "${b.title}".`,
+              severidad: "warning",
+              eventos: [a.id, b.id],
+            });
+          }
+        }
+      }
+    }
+    return issues;
+  }, []);
+
   // Manual (re)build: show the real ingested events when there are any; otherwise
   // synthesize a branch-specific reference chronology so the feature is previewable.
   const runTimeline = useCallback(() => {
@@ -744,12 +866,87 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       const base = real.length
         ? real
         : generateTimeline(branchRef.current, filesRef.current);
-      setTimeline([...base].sort(byChrono));
+      const sorted = [...base].sort(byChrono);
+      setTimeline(sorted);
+      setInconsistencies(analizarInconsistencias(sorted));
       setTimelineLoading(false);
     }, 900);
+  }, [analizarInconsistencias]);
+  
+  const clearTimeline = useCallback(() => {
+    setTimeline(null);
+    setInconsistencies([]);
   }, []);
 
-  const clearTimeline = useCallback(() => setTimeline(null), []);
+  const getTranscriptContent = useCallback((fileId: string): string | undefined => {
+    return transcriptMapRef.current.get(fileId);
+  }, []);
+
+  // ponytail: simulated analysis; replace with real Claude/OpenAI extraction when available
+  const analyzeContract = useCallback((_file: File) => {
+    setAnalysisLoading(true);
+    setActiveAnalysis(null);
+    setTimeout(() => {
+      setActiveAnalysis({
+        riskScore: 75,
+        pros: [
+          "Cláusula de arbitraje bien definida con sede en Ciudad de México",
+          "Plazos de pago alineados a la práctica comercial estándar (30 días)",
+          "Confidencialidad recíproca con 3 años de vigencia posterior",
+        ],
+        cons: [
+          "Letras chiquitas: penalización del 15% sobre el monto total por rescisión anticipada",
+          "No hay límite de responsabilidad para daños indirectos en caso de incumplimiento",
+          "Jurisdicción exclusiva en el domicilio del acreedor, desventaja geográfica",
+        ],
+        strategy: "Recomendamos renegociar la penalización por rescisión (máximo 5%) y agregar un tope de responsabilidad equivalente al 100% del valor del contrato. La cláusula de jurisdicción debería modificarse a neutral (arbitraje institucional CMA).",
+        criticalClauses: [
+          {
+            title: "Penalización por rescisión",
+            currentText: "En caso de rescisión anticipada, la parte incumplida pagará el 15% del monto total del contrato como penalización.",
+            alternativeText: "En caso de rescisión anticipada, la parte incumplida pagará el 5% del monto total del contrato como penalización, con un tope máximo equivalente a 3 mensualidades del servicio contratado.",
+          },
+          {
+            title: "Límite de responsabilidad",
+            currentText: "La parte incumplida será responsable de todos los daños y perjuicios derivados, incluyendo daños indirectos, sin límite alguno.",
+            alternativeText: "La responsabilidad total de cualquiera de las partes se limitará al 100% del valor total del contrato, quedando expresamente excluidos los daños indirectos o pérdida de oportunidades de negocio.",
+          },
+        ],
+      });
+      setAnalysisLoading(false);
+    }, 2000);
+  }, []);
+
+  // ponytail: simulated document generation; replace with LLM prompt + backend endpoint
+  const generateCustomDocument = useCallback(
+    (_templateId: string, variables: Record<string, string>, notes: string) => {
+      setDocGenLoading(true);
+      setDocumentPreview("");
+      setTimeout(() => {
+        const name = variables["nombre"] || "[Nombre del cliente]";
+        const matter = variables["materia"] || "[Materia]";
+        setDocumentPreview(
+          `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">Poder Notarial — ${name}</h2>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  En la Ciudad de México, a los ${new Date().getDate()} días del mes de ${new Date().toLocaleString("es-MX", { month: "long" })} de ${new Date().getFullYear()}, el Sr./Sra. <strong>${name}</strong>, por su propio derecho, otorga el presente Poder General para Pleitos y Cobranzas, en materia de <strong>${matter}</strong>.
+</p>
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+  Faculta ampliamente a su apoderado para iniciar y dar seguimiento a todo tipo de procedimientos judiciales y administrativos, incluyendo la facultad de desistirse, transigir, comprometer en árbitros, absolver posiciones, presentar denuncias y querellas, y realizar todo cuanto legalmente sea necesario para la defensa de sus intereses.
+</p>
+${notes ? `<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.6;margin-bottom:12px;color:#475569;border-left:3px solid #1E3A5F;padding-left:12px"><em>Notas del abogado: ${notes}</em></p>` : ""}
+<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;text-align:justify">
+  Se otorga con vigencia indefinida y con facultades para sustituir total o parcialmente el presente poder en los términos del artículo 2581 del Código Civil Federal.
+</p>
+<hr style="border:none;border-top:1px solid #cbd5e1;margin:24px 0" />
+<p style="font-family:Arial,sans-serif;font-size:9pt;color:#64748b;text-align:center">
+  Documento generado por PasantIA · Escribanía Digital · ${new Date().toLocaleDateString("es-MX")}
+</p>`,
+        );
+        setDocGenLoading(false);
+      }, 1500);
+    },
+    [],
+  );
 
   const openArticle = useCallback((c: Citation) => setActiveArticle(c), []);
   const closeArticle = useCallback(() => setActiveArticle(null), []);
@@ -817,12 +1014,18 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, [settings.secureSession]);
 
   const docKindsForBranch = useMemo(() => getDocKindsForBranch(branch), [branch]);
+  const isDespacho = settings.accountMode === "despacho";
+  const activeCases = useMemo(() => cases.filter((c) => !c.archived), [cases]);
+  const archivedCases = useMemo(() => cases.filter((c) => c.archived), [cases]);
 
   const value = useMemo<WorkspaceCtx>(
     () => ({
       view,
       setView,
       cases,
+      recentCases,
+      caseAction,
+      setCaseAction,
       caseModalOpen,
       caseModalPreset,
       intakeFile,
@@ -858,17 +1061,38 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       sendMessage,
       runTimeline,
       clearTimeline,
+      getTranscriptContent,
+      inconsistencies,
       openArticle,
       closeArticle,
       setEditorHtml,
       insertDocument,
       docKindsForBranch,
       updateSettings,
+      archiveCase,
+      deleteCase,
+      activeCases,
+      archivedCases,
+      members,
+      isDespacho,
+      activeAnalysis,
+      analysisLoading,
+      selectedTemplate,
+      documentPreview,
+      docGenLoading,
+      analyzeContract,
+      generateCustomDocument,
+      setSelectedTemplate,
     }),
     [
       view,
       setView,
       cases,
+      recentCases,
+      members,
+      isDespacho,
+      caseAction,
+      setCaseAction,
       caseModalOpen,
       caseModalPreset,
       intakeFile,
@@ -888,6 +1112,11 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       generatingDoc,
       caseParties,
       caseDocContent,
+      activeAnalysis,
+      analysisLoading,
+      selectedTemplate,
+      documentPreview,
+      docGenLoading,
       goHome,
       openCase,
       openCaseModal,
@@ -904,12 +1133,18 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       sendMessage,
       runTimeline,
       clearTimeline,
+      getTranscriptContent,
+      inconsistencies,
       openArticle,
       closeArticle,
       setEditorHtml,
       insertDocument,
       docKindsForBranch,
       updateSettings,
+      archiveCase,
+      deleteCase,
+      activeCases,
+      archivedCases,
     ],
   );
 

@@ -9,10 +9,13 @@ import {
   ShieldHalf,
   CheckCircle2,
   CircleCheck,
+  UserRound,
+  Building2,
 } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { Toggle } from "@/components/ui/Toggle";
 import { useWorkspace } from "@/lib/workspace";
+import { useAuth } from "@/lib/auth";
 import { CORPUS_SIZE } from "@/lib/corpus";
 import type { ModelId } from "@/lib/types";
 
@@ -36,7 +39,8 @@ const MODELS: { id: ModelId; name: string; desc: string; icon: typeof Zap }[] = 
 ];
 
 export function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { settings, updateSettings } = useWorkspace();
+  const { settings, updateSettings, perfil } = useAuth();
+  const despacho = perfil?.tipo_plan === "despacho";
   const [dragging, setDragging] = useState(false);
   const [justUpdated, setJustUpdated] = useState(false);
 
@@ -162,7 +166,43 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
         </div>
       </section>
 
-      {/* C. Privacy & professional secrecy */}
+      {/* C. Account mode (despacho only) */}
+      {despacho && (
+        <section className="mb-6">
+          <SectionTitle icon={<Building2 size={13} />}>Modo de cuenta</SectionTitle>
+          <div className="grid grid-cols-2 gap-2.5">
+            {[
+              { id: "abogado" as const, icon: UserRound, label: "Abogado", desc: "Solo tus expedientes asignados" },
+              { id: "despacho" as const, icon: Building2, label: "Despacho", desc: "Todos los expedientes del equipo" },
+            ].map((opt) => {
+              const active = settings.accountMode === opt.id;
+              const Icon = opt.icon;
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => updateSettings({ accountMode: opt.id })}
+                  className={`flex flex-col items-start gap-1.5 rounded-xl border p-3.5 text-left transition-all cursor-pointer ${
+                    active
+                      ? "border-accent bg-accent-soft ring-1 ring-accent/30"
+                      : "border-hairline bg-panel-solid hover:border-accent/40"
+                  }`}
+                >
+                  <div className="flex w-full items-center justify-between">
+                    <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${active ? "bg-accent text-white" : "bg-elevated text-accent"}`}>
+                      <Icon size={16} />
+                    </span>
+                    {active && <CircleCheck size={17} className="text-accent" />}
+                  </div>
+                  <span className="text-sm font-semibold text-ink">{opt.label}</span>
+                  <span className="text-[11px] leading-relaxed text-ink-muted">{opt.desc}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* D. Privacy & professional secrecy */}
       <section>
         <SectionTitle icon={<ShieldHalf size={13} />}>
           Privacidad y secreto profesional

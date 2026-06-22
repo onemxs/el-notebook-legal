@@ -12,6 +12,8 @@ import {
   ShieldCheck,
   Users,
   Building2,
+  Home,
+  Archive,
 } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
@@ -25,11 +27,12 @@ export function TopBar() {
   const { theme, toggle } = useTheme();
   const { session, perfil, demo, isSuperadmin, signOut, exitDemo } = useAuth();
   const navigate = useNavigate();
-  const { view, branch, caseName, goHome, openCaseModal } = useWorkspace();
+  const { view, branch, caseName, goHome, openCase, openCaseModal, recentCases } = useWorkspace();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [acctOpen, setAcctOpen] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [recentOpen, setRecentOpen] = useState(false);
   const displayName = perfil?.nombre_completo || session?.user.email || "";
   const initial = (displayName.trim()[0] || "U").toUpperCase();
   const b = BRANCHES[branch];
@@ -62,24 +65,81 @@ export function TopBar() {
 
       {/* Active case / branch — only meaningful inside a workspace */}
       {inWorkspace && (
-        <button
-          onClick={() => openCaseModal()}
-          title="Cambiar de rama o crear expediente"
-          className="ml-1 flex min-w-0 items-center gap-2 rounded-xl border border-hairline bg-panel-solid px-2.5 py-1.5 transition-colors hover:border-accent/40 hover:bg-accent-soft/40 cursor-pointer animate-fade-in"
-        >
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-accent-soft text-accent">
-            <BranchIcon id={branch} size={14} />
-          </span>
-          <span className="hidden min-w-0 text-left md:block">
-            <span className="block text-[10px] font-medium uppercase leading-none tracking-wider text-ink-subtle">
-              {b.name}
-            </span>
-            <span className="block max-w-[200px] truncate text-[12px] font-medium leading-tight text-ink">
-              {caseName}
-            </span>
-          </span>
-          <ChevronDown size={14} className="shrink-0 text-ink-subtle" />
-        </button>
+        <>
+          <button
+            onClick={goHome}
+            title="Volver al inicio"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-elevated hover:text-ink cursor-pointer"
+          >
+            <Home size={18} />
+          </button>
+          <div className="relative">
+            <button
+              onClick={() => setRecentOpen((v) => !v)}
+              title="Cambiar de expediente"
+              className="ml-1 flex min-w-0 items-center gap-2 rounded-xl border border-hairline bg-panel-solid px-2.5 py-1.5 transition-colors hover:border-accent/40 hover:bg-accent-soft/40 cursor-pointer animate-fade-in"
+            >
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-accent-soft text-accent">
+                <BranchIcon id={branch} size={14} />
+              </span>
+              <span className="hidden min-w-0 text-left md:block">
+                <span className="block text-[10px] font-medium uppercase leading-none tracking-wider text-ink-subtle">
+                  {b.name}
+                </span>
+                <span className="block max-w-[200px] truncate text-[12px] font-medium leading-tight text-ink">
+                  {caseName}
+                </span>
+              </span>
+              <ChevronDown size={14} className="shrink-0 text-ink-subtle" />
+            </button>
+            {recentOpen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setRecentOpen(false)} />
+                <div className="absolute left-0 top-full z-20 mt-1.5 w-72 overflow-hidden rounded-xl border border-hairline bg-panel-solid shadow-float animate-scale-in">
+                  <div className="border-b border-hairline px-3.5 py-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-subtle">
+                      Expedientes recientes
+                    </p>
+                  </div>
+                  {recentCases.length === 0 ? (
+                    <div className="px-3.5 py-4 text-center text-[12px] text-ink-muted">
+                      Ningún expediente abierto aún
+                    </div>
+                  ) : (
+                    recentCases.map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => {
+                          setRecentOpen(false);
+                          openCase(c.id);
+                        }}
+                        className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] text-ink transition-colors hover:bg-accent-soft cursor-pointer"
+                      >
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-elevated text-accent">
+                          <BranchIcon id={c.branch} size={12} />
+                        </span>
+                        <span className="min-w-0 flex-1 truncate">{c.name}</span>
+                        <span className="shrink-0 text-[10px] text-ink-subtle">{c.updated}</span>
+                      </button>
+                    ))
+                  )}
+                  <div className="border-t border-hairline">
+                    <button
+                      onClick={() => {
+                        setRecentOpen(false);
+                        goHome();
+                      }}
+                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] text-ink-muted transition-colors hover:bg-accent-soft cursor-pointer"
+                    >
+                      <Archive size={14} />
+                      Todos los expedientes
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </>
       )}
 
       {/* Global search bar — visible on dashboard */}

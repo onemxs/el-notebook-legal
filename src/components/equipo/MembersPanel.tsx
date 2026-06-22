@@ -12,6 +12,7 @@ import {
   UserRound,
   AlertTriangle,
   Clock,
+  RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import {
@@ -22,6 +23,22 @@ import {
   type Miembro,
   type Invitacion,
 } from "@/lib/invites";
+import { obtenerCodigoColaboracion, generarCodigoColaboracion } from "@/lib/supabase";
+
+function relativoConexion(iso: string | null): string {
+  if (!iso) return "Nunca";
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return "Desconocido";
+  const min = Math.floor((Date.now() - t) / 60000);
+  if (min < 1) return "Ahora";
+  if (min < 60) return `Hace ${min} min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `Hace ${h} h`;
+  const d = Math.floor(h / 24);
+  if (d === 1) return "Ayer";
+  if (d < 7) return `Hace ${d} días`;
+  return new Date(t).toLocaleDateString("es-MX", { weekday: "long", hour: "2-digit", minute: "2-digit" });
+}
 
 export function MembersPanel() {
   const { perfil, loading } = useAuth();
@@ -32,6 +49,8 @@ export function MembersPanel() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [codigo, setCodigo] = useState<string | null>(null);
+  const [genBusy, setGenBusy] = useState(false);
 
   const refresh = useCallback(async () => {
     const [m, i] = await Promise.all([listarMiembros(), listarInvitaciones()]);
@@ -43,8 +62,12 @@ export function MembersPanel() {
     if (perfil?.organizacion_id) void refresh();
   }, [perfil?.organizacion_id, refresh]);
 
+  useEffect(() => {
+    if (perfil?.rol_organizacion === "dueno")
+      void obtenerCodigoColaboracion().then(setCodigo);
+  }, [perfil?.rol_organizacion]);
+
   if (loading) return null;
-  // Solo el dueño de un despacho gestiona miembros.
   if (!perfil || perfil.rol_organizacion !== "dueno" || !perfil.organizacion_id) {
     return <Navigate to="/app" replace />;
   }
@@ -65,14 +88,19 @@ export function MembersPanel() {
     if (res.token) void copy(enlaceInvitacion(res.token));
   };
 
-  const copy = async (link: string) => {
+  const copy = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(link);
-      setCopied(link);
-      setTimeout(() => setCopied((c) => (c === link ? null : c)), 2000);
-    } catch {
-      /* clipboard unavailable */
-    }
+      await navigator.clipboard.writeText(text);
+      setCopied(text);
+      setTimeout(() => setCopied((c) => (c === text ? null : c)), 2000);
+    } catch { /* noop */ }
+  };
+
+  const generar = async () => {
+    setGenBusy(true);
+    const code = await generarCodigoColaboracion();
+    if (code) setCodigo(code);
+    setGenBusy(false);
   };
 
   const pendientes = invites.filter((i) => i.estado === "pendiente");
@@ -97,6 +125,47 @@ export function MembersPanel() {
             <p className="text-sm text-ink-muted">Gestiona a tu equipo e invita colaboradores.</p>
           </div>
         </div>
+
+        {/* Código de colaboración — Liquid Glass */}
+        <section className="relative mb-6 overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-br from-accent/10 via-accent/5 to-transparent p-6 shadow-float backdrop-blur-xl">
+          <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-accent/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-8 -left-8 h-28 w-28 rounded-full bg-accent/10 blur-2xl" />
+          <div className="relative">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-accent">
+                  Código de colaboración
+                </p>
+                <p className="mt-0.5 text-xs text-ink-muted">
+                  Comparte este código con abogados externos para que se unan al despacho
+                </p>
+              </div>
+              <button
+                onClick={generar}
+                disabled={genBusy}
+                className="flex items-center gap-1 rounded-lg border border-white/20 bg-white/10 px-2.5 py-1.5 text-[11px] font-medium text-ink-muted transition-colors hover:bg-white/20 hover:text-ink cursor-pointer"
+                title="Generar nuevo código"
+              >
+                <RefreshCw size={12} className={genBusy ? "animate-spin" : ""} />
+                {genBusy ? "Generando…" : "Renovar"}
+              </button>
+            </div>
+            <div className="mt-4 flex items-center justify-center">
+              <div className="rounded-2xl border border-white/30 bg-white/5 px-8 py-4 backdrop-blur-sm">
+                <span className="font-mono text-3xl font-bold tracking-[0.15em] text-ink">
+                  {codigo ?? "PAS-????-MX"}
+                </span>
+              </div>
+              <button
+                onClick={() => codigo && copy(codigo)}
+                className="ml-3 flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm transition-colors hover:bg-white/20 cursor-pointer"
+                title="Copiar código"
+              >
+                {copied === codigo ? <Check size={16} className="text-success" /> : <Copy size={16} className="text-ink-muted" />}
+              </button>
+            </div>
+          </div>
+        </section>
 
         {/* Invitar */}
         <section className="mb-6 rounded-2xl border border-hairline bg-panel-solid p-5 shadow-card">
@@ -193,9 +262,15 @@ export function MembersPanel() {
                     <p className="truncate text-[13px] font-medium text-ink">
                       {m.nombre_completo || "Sin nombre"}
                     </p>
-                    {m.especialidad && (
-                      <p className="truncate text-[11px] text-ink-subtle">{m.especialidad}</p>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {m.especialidad && (
+                        <p className="truncate text-[11px] text-ink-subtle">{m.especialidad}</p>
+                      )}
+                      <p className="flex items-center gap-1 text-[10px] text-ink-muted">
+                        <Clock size={10} />
+                        {relativoConexion(m.ultima_conexion)}
+                      </p>
+                    </div>
                   </div>
                   <span className="shrink-0 rounded-full bg-elevated px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
                     {dueno ? "Dueño" : "Invitado"}
