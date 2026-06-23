@@ -144,6 +144,7 @@ interface WorkspaceCtx extends WorkspaceState {
   analyzeContract: (file: File) => void;
   generateCustomDocument: (templateId: string, variables: Record<string, string>, notes: string) => void;
   setSelectedTemplate: (id: string | null) => void;
+  systemUsage: { iaCreditsUsed: number; iaCreditsLimit: number; localAudioMinutesUsed: number; localAudioMinutesLimit: number };
 }
 
 const Ctx = createContext<WorkspaceCtx | null>(null);
@@ -397,6 +398,12 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [editorVersion, setEditorVersion] = useState(0);
   const [activeArticle, setActiveArticle] = useState<Citation | null>(null);
   const [settings, setSettings] = useState<SystemSettings>(initialSettings);
+  const [systemUsage] = useState({
+    iaCreditsUsed: 42000,
+    iaCreditsLimit: 100000,
+    localAudioMinutesUsed: 90,
+    localAudioMinutesLimit: 180,
+  });
   const [generatingDoc, setGeneratingDoc] = useState(false);
   const [caseParties, setCaseParties] = useState<ExtractedField[]>([]);
   const [caseDocContent, setCaseDocContent] = useState<string[]>([]);
@@ -1090,7 +1097,7 @@ ${notesHtml}
     [],
   );
 
-  // Secure session: wipe client + (in prod) Supabase vectors on tab close.
+  // Secure session: wipe client + vectors on tab close.
   useEffect(() => {
     if (!settings.secureSession) return;
     const wipe = () => {
@@ -1175,6 +1182,7 @@ ${notesHtml}
       analyzeContract,
       generateCustomDocument,
       setSelectedTemplate,
+      systemUsage,
     }),
     [
       view,

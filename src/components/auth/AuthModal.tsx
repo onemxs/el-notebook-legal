@@ -52,7 +52,7 @@ export function AuthModal({
         )}
 
         <p className="text-center text-[11px] text-ink-subtle leading-relaxed">
-          Al continuar, accedes de forma cifrada a tu entorno multi-tenant protegido por Supabase Auth.
+          Al continuar, accedes de forma cifrada a tu entorno multi-tenant protegido por la Nube de PasantIA.
         </p>
       </div>
     </Modal>

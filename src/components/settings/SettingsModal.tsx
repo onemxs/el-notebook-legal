@@ -40,7 +40,7 @@ const MODELS: { id: ModelId; name: string; desc: string; icon: typeof Zap }[] = 
 
 export function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { perfil } = useAuth();
-  const { settings, updateSettings } = useWorkspace();
+  const { settings, updateSettings, systemUsage } = useWorkspace();
   const despacho = perfil?.tipo_plan === "despacho";
   const [dragging, setDragging] = useState(false);
   const [justUpdated, setJustUpdated] = useState(false);
@@ -160,7 +160,7 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
               <UploadCloud size={20} className="text-accent" />
               <p className="text-[13px] font-medium text-ink">Carga manual de Gacetas / DOF</p>
               <p className="text-[11px] text-ink-subtle">
-                Arrastra el PDF de una reforma para re-indexar los artículos en Supabase
+                Arrastra el PDF de una reforma para re-indexar los artículos en la Base de Datos Procesal
               </p>
             </>
           )}
@@ -203,7 +203,44 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
         </section>
       )}
 
-      {/* D. Privacy & professional secrecy */}
+      {/* D. Plan & consumption */}
+      <section className="mb-6">
+        <SectionTitle icon={<Zap size={13} />}>Plan y Consumo del Despacho</SectionTitle>
+        <div className="space-y-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md">
+          <div>
+            <div className="mb-1.5 flex items-center justify-between text-[12px]">
+              <span className="font-medium text-ink">Créditos de Inteligencia Artificial</span>
+              <span className="text-ink-muted">{systemUsage.iaCreditsUsed.toLocaleString()} / {systemUsage.iaCreditsLimit.toLocaleString()} tokens</span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.round((systemUsage.iaCreditsUsed / systemUsage.iaCreditsLimit) * 100)}%`, backgroundColor: "#022448" }}
+              />
+            </div>
+            <p className="mt-1 text-[11px] text-ink-muted">
+              {Math.round((systemUsage.iaCreditsUsed / systemUsage.iaCreditsLimit) * 100)}% de créditos de IA consumidos este mes ({systemUsage.iaCreditsUsed.toLocaleString()} / {systemUsage.iaCreditsLimit.toLocaleString()} tokens)
+            </p>
+          </div>
+          <div>
+            <div className="mb-1.5 flex items-center justify-between text-[12px]">
+              <span className="font-medium text-ink">Procesamiento Local de Audiencias</span>
+              <span className="text-ink-muted">{systemUsage.localAudioMinutesUsed} / {systemUsage.localAudioMinutesLimit} min</span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.round((systemUsage.localAudioMinutesUsed / systemUsage.localAudioMinutesLimit) * 100)}%`, backgroundColor: "#022448" }}
+              />
+            </div>
+            <p className="mt-1 text-[11px] text-ink-muted">
+              {systemUsage.localAudioMinutesUsed} de {systemUsage.localAudioMinutesLimit} minutos de procesamiento de audio local utilizados (Coste de servidor: Incluido en Plan)
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* E. Privacy & professional secrecy */}
       <section>
         <SectionTitle icon={<ShieldHalf size={13} />}>
           Privacidad y secreto profesional
@@ -216,7 +253,7 @@ export function SettingsModal({ open, onClose }: { open: boolean; onClose: () =>
             <p className="text-[13px] font-medium text-ink">Modo Sesión Segura</p>
             <p className="mt-0.5 text-[11px] leading-relaxed text-ink-muted">
               Al cerrar la pestaña se eliminan por completo los documentos del cliente y sus
-              vectores en Supabase. Solo se conserva lo que exportes a tu computadora.
+              vectores en la Nube de PasantIA. Solo se conserva lo que exportes a tu computadora.
             </p>
           </div>
           <Toggle

@@ -303,7 +303,7 @@ export async function generarCodigoColaboracion(): Promise<string | null> {
 /** Join a firm using its collaboration code. Returns the firm name on success. */
 export async function unirsePorCodigo(codigo: string): Promise<{ firmName?: string; error?: string }> {
   const c = db();
-  if (!c) return { error: "Sin conexión a Supabase." };
+  if (!c) return { error: "Sin conexión al Servidor Seguro." };
   const { data, error } = await c.rpc("unirse_por_codigo", { p_codigo: codigo });
   if (error) return { error: error.message };
   return { firmName: (data as string) ?? undefined };

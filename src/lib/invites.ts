@@ -45,7 +45,7 @@ export async function crearInvitacion(
   email: string,
 ): Promise<{ token?: string; error?: string }> {
   const sb = getSupabase();
-  if (!sb) return { error: "Sin conexión a Supabase." };
+  if (!sb) return { error: "Sin conexión al Servidor Seguro." };
   const { data, error } = await sb
     .from("invitaciones")
     .insert({ organizacion_id: organizacionId, email_invitado: email.trim().toLowerCase() })

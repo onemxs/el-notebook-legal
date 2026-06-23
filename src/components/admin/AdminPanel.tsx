@@ -64,7 +64,7 @@ export function AdminPanel() {
   useEffect(() => {
     const sb = getSupabase();
     if (!sb) {
-      setError("Sin conexión a Supabase.");
+      setError("Sin conexión al Servidor Seguro.");
       return;
     }
     sb.rpc("admin_dashboard").then(({ data, error }) => {

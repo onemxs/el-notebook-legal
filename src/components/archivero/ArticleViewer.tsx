@@ -105,7 +105,7 @@ export function ArticleViewer() {
             <p className="max-w-xs text-xs text-ink-muted">
               {SUPA_CONFIGURED
                 ? "Este artículo no está en el corpus indexado. Ejecuta la ingesta o verifica el código."
-                : "Este precepto aún no está en el corpus local. Conecta Supabase e ingesta el corpus para el texto completo."}
+                : "Este precepto aún no está en el corpus local. Conecta la Base de Datos Procesal e ingesta el corpus para el texto completo."}
             </p>
           </div>
         )}

@@ -114,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = useCallback(async () => {
     const sb = getSupabase();
-    if (!sb) return { error: "Supabase no está configurado." };
+    if (!sb) return { error: "El servidor seguro no responde." };
     const { error } = await sb.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/app` },
@@ -124,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithEmail = useCallback(async (email: string, password: string) => {
     const sb = getSupabase();
-    if (!sb) return { error: "Supabase no está configurado." };
+    if (!sb) return { error: "El servidor seguro no responde." };
     const { error } = await sb.auth.signInWithPassword({ email, password });
     return error ? { error: error.message } : {};
   }, []);
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUpWithEmail = useCallback(
     async (email: string, password: string, nombre: string) => {
       const sb = getSupabase();
-      if (!sb) return { error: "Supabase no está configurado." };
+      if (!sb) return { error: "El servidor seguro no responde." };
       const { data, error } = await sb.auth.signUp({
         email,
         password,
@@ -174,7 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       /* noop */
     }
     const sb = getSupabase();
-    if (!sb) return { error: "Sin conexión a Supabase." };
+    if (!sb) return { error: "Sin conexión al Servidor Seguro." };
     const { error } = await sb.rpc("aceptar_invitacion", { p_token: token });
     if (error) return { error: error.message };
     await loadPerfil(session.user.id);
