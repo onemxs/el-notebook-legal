@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UserRound, Building2, ShieldCheck, Users, Copy, CheckCheck, Upload, Award } from "lucide-react";
+import { UserRound, Building2, ShieldCheck, Users, Copy, CheckCheck, Upload, Award, Save } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { useAuth } from "@/lib/auth";
 import { Toggle } from "@/components/ui/Toggle";
@@ -32,8 +32,12 @@ export function ConfiguracionView() {
   const [nombreDespacho, setNombreDespacho] = useState("Mi Despacho");
   const [especialidad, setEspecialidad] = useState(perfil?.especialidad ?? "");
   const [cedula, setCedula] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [direccion, setDireccion] = useState("");
   const [copiado, setCopiado] = useState(false);
   const [referralCopied, setReferralCopied] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const isDespacho = settings.accountMode === "despacho";
 
   const copiarCodigo = () => {
@@ -65,16 +69,20 @@ export function ConfiguracionView() {
               </h2>
               <div className="space-y-3.5">
                 <div>
-                  <label className="mb-1 block text-[11px] font-medium text-gray-500">Nombre del Despacho</label>
+                  <label htmlFor="input-nombre-despacho" className="mb-1 block text-[11px] font-medium text-gray-500">Nombre del Despacho</label>
                   <input
+                    id="input-nombre-despacho"
+                    name="nombre_despacho"
                     value={nombreDespacho}
                     onChange={(e) => setNombreDespacho(e.target.value)}
                     className="w-full rounded-lg border border-hairline bg-white/80 px-3 py-2 text-sm text-[#022448] placeholder:text-gray-300 focus:border-[#022448] focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-[11px] font-medium text-gray-500">Especialidad</label>
+                  <label htmlFor="input-especialidad" className="mb-1 block text-[11px] font-medium text-gray-500">Especialidad</label>
                   <input
+                    id="input-especialidad"
+                    name="especialidad"
                     value={especialidad}
                     onChange={(e) => setEspecialidad(e.target.value)}
                     placeholder="Ej. Mercantil, Civil, Laboral"
@@ -82,11 +90,35 @@ export function ConfiguracionView() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-[11px] font-medium text-gray-500">Cédula Profesional</label>
+                  <label htmlFor="input-cedula" className="mb-1 block text-[11px] font-medium text-gray-500">Cédula Profesional</label>
                   <input
+                    id="input-cedula"
+                    name="cedula_profesional"
                     value={cedula}
                     onChange={(e) => setCedula(e.target.value)}
                     placeholder="Ej. 12345678"
+                    className="w-full rounded-lg border border-hairline bg-white/80 px-3 py-2 text-sm text-[#022448] placeholder:text-gray-300 focus:border-[#022448] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="input-telefono" className="mb-1 block text-[11px] font-medium text-gray-500">Teléfono de Contacto</label>
+                  <input
+                    id="input-telefono"
+                    name="telefono_contacto"
+                    value={telefono}
+                    onChange={(e) => setTelefono(e.target.value)}
+                    placeholder="Ej. +52 55 1234 5678"
+                    className="w-full rounded-lg border border-hairline bg-white/80 px-3 py-2 text-sm text-[#022448] placeholder:text-gray-300 focus:border-[#022448] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="input-direccion" className="mb-1 block text-[11px] font-medium text-gray-500">Dirección del Despacho</label>
+                  <input
+                    id="input-direccion"
+                    name="direccion_despacho"
+                    value={direccion}
+                    onChange={(e) => setDireccion(e.target.value)}
+                    placeholder="Ej. Av. Reforma 222, Col. Juárez, CDMX"
                     className="w-full rounded-lg border border-hairline bg-white/80 px-3 py-2 text-sm text-[#022448] placeholder:text-gray-300 focus:border-[#022448] focus:outline-none"
                   />
                 </div>
@@ -163,9 +195,11 @@ export function ConfiguracionView() {
               {isDespacho && (
                 <>
                   <div className="mb-4">
-                    <label className="mb-1 block text-[11px] font-medium text-gray-500">Código de Invitación</label>
+                    <label htmlFor="input-codigo-invitacion" className="mb-1 block text-[11px] font-medium text-gray-500">Código de Invitación</label>
                     <div className="flex gap-2">
                       <input
+                        id="input-codigo-invitacion"
+                        name="codigo_invitacion"
                         readOnly
                         value="PAS-47D2-K9M8"
                         className="flex-1 rounded-lg border border-hairline bg-white/80 px-3 py-2 text-sm font-mono tracking-widest text-[#022448] focus:outline-none"
@@ -211,9 +245,11 @@ export function ConfiguracionView() {
                 <Award size={16} /> Programa de Referidos Jurídicos
               </h2>
               <div className="mb-4">
-                <label className="mb-1 block text-[11px] font-medium text-gray-500">Tu enlace de invitación</label>
+                <label htmlFor="input-enlace-referido" className="mb-1 block text-[11px] font-medium text-gray-500">Tu enlace de invitación</label>
                 <div className="flex gap-2">
                   <input
+                    id="input-enlace-referido"
+                    name="enlace_referido"
                     readOnly
                     value={`https://pasantia.mx/registro?ref=${referralData.inviteCode}`}
                     className="flex-1 rounded-lg border border-hairline bg-white/80 px-3 py-2 text-[11px] font-mono text-[#022448] focus:outline-none"
@@ -246,8 +282,30 @@ export function ConfiguracionView() {
             </div>
           </div>
         </div>
+        <div className="mt-8 flex justify-end">
+          <button
+            onClick={() => {
+              setIsSaving(true);
+              setTimeout(() => {
+                setIsSaving(false);
+                setSaveSuccess(true);
+                setTimeout(() => setSaveSuccess(false), 2500);
+              }, 1200);
+            }}
+            disabled={isSaving}
+            className="flex items-center gap-2 rounded-xl bg-[#022448] px-6 py-2.5 font-medium text-white shadow-md transition-all hover:bg-[#022448]/90 active:scale-95 disabled:opacity-60"
+          >
+            <Save size={16} className={isSaving ? "animate-spin" : ""} />
+            {isSaving ? "Guardando…" : "Guardar Configuración"}
+          </button>
+        </div>
       </div>
-      {/* Toast */}
+      {/* Toasts */}
+      {saveSuccess && (
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 animate-fade-in rounded-xl bg-green-600 px-5 py-3 text-sm font-medium text-white shadow-float">
+          Configuración guardada con éxito
+        </div>
+      )}
       {referralCopied && (
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 animate-fade-in rounded-xl bg-[#022448] px-5 py-3 text-sm font-medium text-white shadow-float">
           ¡Enlace de invitación copiado con éxito!
