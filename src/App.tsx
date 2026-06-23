@@ -21,6 +21,7 @@ import { AdminPanel } from "@/components/admin/AdminPanel";
 import { MembersPanel } from "@/components/equipo/MembersPanel";
 import { AcceptInvite } from "@/components/auth/AcceptInvite";
 import { UnirseDespacho } from "@/components/equipo/UnirseDespacho";
+import { ConfiguracionView } from "@/components/settings/ConfiguracionView";
 
 type MobilePanel = "archivero" | "editor" | "asistente";
 
@@ -94,7 +95,7 @@ function AppShell() {
       case "escribania":
         return <EscribaniaDigital />;
       case "configuracion":
-        return <div className="flex-1 overflow-hidden" />; // ponytail: placeholder, add SettingsView when ready
+        return <ConfiguracionView />;
       default:
         return <Workspace />;
     }
