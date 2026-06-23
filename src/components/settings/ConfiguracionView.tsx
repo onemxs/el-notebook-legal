@@ -21,9 +21,9 @@ function Bar({ used, limit, label, detail }: { used: number; limit: number; labe
 }
 
 const MIEMBROS_SIMULADOS = [
-  { nombre: "Lic. Omar Hernández", rol: "Dueño", ultima: "Hace 2 min" },
-  { nombre: "Lic. María F. López", rol: "Colaborador", ultima: "Hace 15 min" },
-  { nombre: "Lic. Roberto Méndez", rol: "Colaborador", ultima: "Ayer 6:30pm" },
+  { id: "1", nombre_completo: "Lic. Omar Hernández", rol_organizacion: "dueno" as const, ultima_conexion: "Hace 2 min" },
+  { id: "2", nombre_completo: "Lic. María F. López", rol_organizacion: "invitado" as const, ultima_conexion: "Hace 15 min" },
+  { id: "3", nombre_completo: "Lic. Roberto Méndez", rol_organizacion: "invitado" as const, ultima_conexion: "Ayer 6:30pm" },
 ];
 
 export function ConfiguracionView() {
@@ -190,13 +190,13 @@ export function ConfiguracionView() {
                           className="flex items-center gap-3 rounded-lg border border-hairline bg-white/40 px-3 py-2.5"
                         >
                           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#022448]/10 text-[11px] font-bold text-[#022448]">
-                            {(m.nombre ?? m.nombre_completo ?? "?")[0]}
+                            {(m.nombre_completo ?? "?")[0]}
                           </div>
                           <div className="flex-1">
-                            <p className="text-[12px] font-medium text-[#022448]">{m.nombre ?? m.nombre_completo}</p>
-                            <p className="text-[10px] text-gray-500">{m.rol ?? m.rol_organizacion}</p>
+                            <p className="text-[12px] font-medium text-[#022448]">{m.nombre_completo}</p>
+                            <p className="text-[10px] text-gray-500">{m.rol_organizacion === "dueno" ? "Dueño" : m.rol_organizacion === "invitado" ? "Invitado" : m.rol_organizacion}</p>
                           </div>
-                          <span className="text-[10px] text-gray-400">{m.ultima ?? "Desconectado"}</span>
+                          <span className="text-[10px] text-gray-400">{m.ultima_conexion ?? "Desconectado"}</span>
                         </div>
                       ))}
                     </div>
