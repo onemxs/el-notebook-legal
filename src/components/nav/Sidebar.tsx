@@ -13,6 +13,11 @@ export function Sidebar({ isMobileMenuOpen, onClose }: { isMobileMenuOpen: boole
   const { session, demo } = useAuth();
   if (!session && !demo) return null;
   const navigate = (id: string) => { setView(id as any); onClose(); };
+  const handleConfigClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setView("configuracion");
+  };
 
   return (
     <nav className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-hairline bg-panel-solid/60 backdrop-blur-sm transition-transform duration-300 ${
@@ -53,10 +58,10 @@ export function Sidebar({ isMobileMenuOpen, onClose }: { isMobileMenuOpen: boole
       {/* Bottom — profile / config */}
       <div className="border-t border-hairline p-2">
         <div
-          onClick={() => navigate("configuracion")}
-          className="flex cursor-pointer items-center justify-between rounded-xl border border-white/60 bg-white/40 p-3 shadow-sm transition-all hover:bg-white/80"
+          onClick={handleConfigClick}
+          className="mt-auto flex cursor-pointer items-center justify-between rounded-xl border border-white/60 bg-white/40 p-3 shadow-sm transition-all hover:bg-white/80 select-none"
         >
-          <div className="flex items-center gap-3">
+          <div className="pointer-events-none flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#022448] text-sm font-bold text-white">
               O
             </div>
@@ -65,7 +70,7 @@ export function Sidebar({ isMobileMenuOpen, onClose }: { isMobileMenuOpen: boole
               <span className="text-[10px] text-gray-500">Configuración</span>
             </div>
           </div>
-          <span className="text-sm text-gray-400">⚙️</span>
+          <span className="pointer-events-none text-sm text-gray-400">⚙️</span>
         </div>
       </div>
     </nav>
