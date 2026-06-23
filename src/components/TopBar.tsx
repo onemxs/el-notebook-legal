@@ -4,7 +4,6 @@ import {
   Scale,
   Sun,
   Moon,
-  Settings,
   FolderPlus,
   ChevronDown,
   Search,
@@ -184,15 +183,6 @@ export function TopBar({ onMenuToggle }: { onMenuToggle?: () => void }) {
         >
           {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
         </button>
-        <button
-          onClick={() => setSettingsOpen(true)}
-          className={iconBtn}
-          aria-label="Configuración avanzada"
-          title="Configuración"
-        >
-          <Settings size={18} />
-        </button>
-
         {/* Account / demo control */}
         {demo ? (
           <button

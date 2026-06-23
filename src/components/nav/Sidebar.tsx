@@ -1,12 +1,11 @@
 import { useWorkspace } from "@/lib/workspace";
 import { useAuth } from "@/lib/auth";
-import { Briefcase, FileSearch, FilePlus, Settings } from "lucide-react";
+import { Briefcase, FileSearch, FilePlus } from "lucide-react";
 
 const MODULES = [
-  { id: "dashboard" as const, label: "Casos Activos", icon: Briefcase, top: true },
-  { id: "auditoria" as const, label: "Auditoría Contractual", icon: FileSearch, top: true },
-  { id: "escribania" as const, label: "Notaría Express", icon: FilePlus, top: true },
-  { id: "configuracion" as const, label: "Configuración", icon: Settings, top: false },
+  { id: "dashboard" as const, label: "Casos Activos", icon: Briefcase },
+  { id: "auditoria" as const, label: "Auditoría Contractual", icon: FileSearch },
+  { id: "escribania" as const, label: "Notaría Express", icon: FilePlus },
 ];
 
 export function Sidebar({ isMobileMenuOpen, onClose }: { isMobileMenuOpen: boolean; onClose: () => void }) {
@@ -32,7 +31,7 @@ export function Sidebar({ isMobileMenuOpen, onClose }: { isMobileMenuOpen: boole
 
       {/* Top items */}
       <div className="flex flex-1 flex-col gap-1 px-3 py-4">
-        {MODULES.filter((m) => m.top).map(({ id, label, icon: Icon }) => {
+        {MODULES.map(({ id, label, icon: Icon }) => {
           const active = view === id;
           return (
             <button
@@ -51,24 +50,23 @@ export function Sidebar({ isMobileMenuOpen, onClose }: { isMobileMenuOpen: boole
         })}
       </div>
 
-      {/* Bottom — config */}
-      <div className="border-t border-hairline px-3 py-3">
-        {(() => {
-          const active = view === "configuracion";
-          return (
-            <button
-              onClick={() => navigate("configuracion")}
-              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-all cursor-pointer ${
-                active
-                  ? "bg-accent text-white shadow-sm"
-                  : "text-ink-muted hover:bg-elevated hover:text-ink"
-              }`}
-            >
-              <Settings size={20} strokeWidth={active ? 2.2 : 1.75} />
-              <span className="text-sm font-medium">Configuración</span>
-            </button>
-          );
-        })()}
+      {/* Bottom — profile / config */}
+      <div className="border-t border-hairline p-2">
+        <div
+          onClick={() => navigate("configuracion")}
+          className="flex cursor-pointer items-center justify-between rounded-xl border border-white/60 bg-white/40 p-3 shadow-sm transition-all hover:bg-white/80"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#022448] text-sm font-bold text-white">
+              O
+            </div>
+            <div className="flex flex-col text-left">
+              <span className="text-xs font-semibold text-[#022448]">Mi Despacho</span>
+              <span className="text-[10px] text-gray-500">Configuración</span>
+            </div>
+          </div>
+          <span className="text-sm text-gray-400">⚙️</span>
+        </div>
       </div>
     </nav>
   );
