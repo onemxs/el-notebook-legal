@@ -39,32 +39,32 @@
 }
 
 .dark {
-  --canvas: #1a1813; /* warm near-black slate */
-  --panel: #232019;
-  --panel-solid: #232019;
-  --aside: #1f1c16;
-  --elevated: #2b2820;
-  --paper: #221f18;
+  --canvas: #090D16; /* deep midnight navy — Apple Pro space */
+  --panel: rgba(255, 255, 255, 0.04);
+  --panel-solid: #111622;
+  --aside: #111622;
+  --elevated: rgba(255, 255, 255, 0.06);
+  --paper: #0c111c;
   --hairline: rgba(255, 255, 255, 0.10);
 
-  --ink: #f3f1eb; /* bone */
-  --ink-muted: #bdb9ad;
-  --ink-subtle: #8a8478;
+  --ink: #ffffff; /* pure white titles */
+  --ink-muted: #9aa3b0; /* silver-gray secondary */
+  --ink-subtle: #6b7280;
 
-  --accent: #adc8f5; /* soft light blue */
-  --accent-hover: #c6d8fa;
-  --accent-soft: rgba(173, 200, 245, 0.14);
-  --accent-ring: rgba(173, 200, 245, 0.45);
-  --titanium: #9aa3b0;
+  --accent: #5e9eff; /* crisp blue accent */
+  --accent-hover: #7bb2ff;
+  --accent-soft: rgba(94, 158, 255, 0.14);
+  --accent-ring: rgba(94, 158, 255, 0.40);
+  --titanium: #8892a0;
 
-  --success: #6ee7a8;
-  --warning: #edbf7f;
-  --warning-soft: rgba(237, 191, 127, 0.15);
-  --danger: #ff6b6b;
-  --danger-soft: rgba(255, 107, 107, 0.15);
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.15);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.15);
 
-  --scrollbar-thumb: #34302a;
-  --scrollbar-thumb-hover: #423d35;
+  --scrollbar-thumb: #2a2f3a;
+  --scrollbar-thumb-hover: #3a404d;
 
   color-scheme: dark;
 }

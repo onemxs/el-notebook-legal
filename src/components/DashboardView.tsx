@@ -282,9 +282,9 @@ export function DashboardView() {
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
           <button
             onClick={() => openCaseModal()}
-            className="flex items-center gap-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md cursor-pointer"
+            className="flex items-center gap-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md cursor-pointer dark:border-white/10 dark:bg-white/[0.04] dark:shadow-2xl"
           >
-            <span className="rounded-xl bg-blue-50 p-3 text-blue-600">
+            <span className="rounded-xl bg-blue-50 p-3 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
               <Briefcase size={22} strokeWidth={1.75} />
             </span>
             <div className="text-left">
@@ -294,9 +294,9 @@ export function DashboardView() {
           </button>
           <button
             onClick={() => setView("auditoria")}
-            className="flex items-center gap-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md cursor-pointer"
+            className="flex items-center gap-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md cursor-pointer dark:border-white/10 dark:bg-white/[0.04] dark:shadow-2xl"
           >
-            <span className="rounded-xl bg-green-50 p-3 text-green-600">
+            <span className="rounded-xl bg-green-50 p-3 text-green-600 dark:bg-green-500/20 dark:text-green-400">
               <FileSearch size={22} strokeWidth={1.75} />
             </span>
             <div className="text-left">
@@ -306,9 +306,9 @@ export function DashboardView() {
           </button>
           <button
             onClick={() => setView("escribania")}
-            className="flex items-center gap-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md cursor-pointer"
+            className="flex items-center gap-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md cursor-pointer dark:border-white/10 dark:bg-white/[0.04] dark:shadow-2xl"
           >
-            <span className="rounded-xl bg-purple-50 p-3 text-purple-600">
+            <span className="rounded-xl bg-purple-50 p-3 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400">
               <FileText size={22} strokeWidth={1.75} />
             </span>
             <div className="text-left">
