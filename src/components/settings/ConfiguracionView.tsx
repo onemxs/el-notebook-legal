@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UserRound, Building2, ShieldCheck, Users, Copy, CheckCheck, Upload, ArrowLeft } from "lucide-react";
+import { UserRound, Building2, ShieldCheck, Users, Copy, CheckCheck, Upload, Award } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { useAuth } from "@/lib/auth";
 import { Toggle } from "@/components/ui/Toggle";
@@ -27,18 +27,25 @@ const MIEMBROS_SIMULADOS = [
 ];
 
 export function ConfiguracionView() {
-  const { settings, updateSettings, systemUsage, members } = useWorkspace();
+  const { settings, updateSettings, systemUsage, members, referralData } = useWorkspace();
   const { perfil } = useAuth();
   const [nombreDespacho, setNombreDespacho] = useState("Mi Despacho");
   const [especialidad, setEspecialidad] = useState(perfil?.especialidad ?? "");
   const [cedula, setCedula] = useState("");
   const [copiado, setCopiado] = useState(false);
+  const [referralCopied, setReferralCopied] = useState(false);
   const isDespacho = settings.accountMode === "despacho";
 
   const copiarCodigo = () => {
     navigator.clipboard.writeText("PAS-47D2-K9M8").then(() => {
       setCopiado(true);
       setTimeout(() => setCopiado(false), 2000);
+    });
+  };
+  const copiarReferral = () => {
+    navigator.clipboard.writeText(`https://pasantia.mx/registro?ref=${referralData.inviteCode}`).then(() => {
+      setReferralCopied(true);
+      setTimeout(() => setReferralCopied(false), 2500);
     });
   };
 
@@ -197,9 +204,55 @@ export function ConfiguracionView() {
                 </>
               )}
             </div>
+
+            {/* Programa de Referidos */}
+            <div className="rounded-2xl border border-white/80 bg-white/60 p-5 shadow-sm backdrop-blur-md">
+              <h2 className="mb-4 flex items-center gap-2 text-[13px] font-semibold text-[#022448]">
+                <Award size={16} /> Programa de Referidos Jurídicos
+              </h2>
+              <div className="mb-4">
+                <label className="mb-1 block text-[11px] font-medium text-gray-500">Tu enlace de invitación</label>
+                <div className="flex gap-2">
+                  <input
+                    readOnly
+                    value={`https://pasantia.mx/registro?ref=${referralData.inviteCode}`}
+                    className="flex-1 rounded-lg border border-hairline bg-white/80 px-3 py-2 text-[11px] font-mono text-[#022448] focus:outline-none"
+                  />
+                  <button
+                    onClick={copiarReferral}
+                    className="flex items-center gap-1.5 rounded-lg border border-hairline bg-white/80 px-3 py-2 text-[11px] font-medium text-[#022448] transition-colors hover:bg-white cursor-pointer"
+                  >
+                    {referralCopied ? <CheckCheck size={14} /> : <Copy size={14} />}
+                    {referralCopied ? "Copiado" : "Copiar"}
+                  </button>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div className="rounded-xl border border-white/60 bg-white/40 px-4 py-3.5">
+                  <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Abogados Invitados</p>
+                  <p className="mt-1 font-serif text-2xl font-medium text-[#022448]">{referralData.totalInvited}</p>
+                </div>
+                <div className="rounded-xl border border-white/60 bg-white/40 px-4 py-3.5">
+                  <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Registros Exitosos</p>
+                  <p className="mt-1 font-serif text-2xl font-medium text-[#022448]">{referralData.activeSubscriptions}</p>
+                </div>
+                <div className="rounded-xl border border-green-200 bg-green-50/70 px-4 py-3.5">
+                  <p className="text-[10px] font-medium uppercase tracking-wider text-green-600">Próxima Factura</p>
+                  <p className="mt-1 text-[12px] font-semibold text-green-800">
+                    {referralData.stripeRewardApplied ? "Próximo mes: $0.00 MXN (Bonificación Aplicada)" : "Próximo mes: Pendiente"}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      {/* Toast */}
+      {referralCopied && (
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 animate-fade-in rounded-xl bg-[#022448] px-5 py-3 text-sm font-medium text-white shadow-float">
+          ¡Enlace de invitación copiado con éxito!
+        </div>
+      )}
     </div>
   );
 }

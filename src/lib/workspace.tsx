@@ -145,6 +145,7 @@ interface WorkspaceCtx extends WorkspaceState {
   generateCustomDocument: (templateId: string, variables: Record<string, string>, notes: string) => void;
   setSelectedTemplate: (id: string | null) => void;
   systemUsage: { iaCreditsUsed: number; iaCreditsLimit: number; localAudioMinutesUsed: number; localAudioMinutesLimit: number };
+  referralData: { inviteCode: string; totalInvited: number; activeSubscriptions: number; stripeRewardApplied: boolean };
 }
 
 const Ctx = createContext<WorkspaceCtx | null>(null);
@@ -413,6 +414,12 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [documentPreview, setDocumentPreview] = useState("");
   const [docGenLoading, setDocGenLoading] = useState(false);
   const [members, setMembers] = useState<Miembro[]>([]);
+  const [referralData] = useState({
+    inviteCode: "PAS-ONESIMO-78",
+    totalInvited: 3,
+    activeSubscriptions: 1,
+    stripeRewardApplied: true,
+  });
 
   const filesRef = useRef(files);
   filesRef.current = files;
@@ -1183,6 +1190,7 @@ ${notesHtml}
       generateCustomDocument,
       setSelectedTemplate,
       systemUsage,
+      referralData,
     }),
     [
       view,
