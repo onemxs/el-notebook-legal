@@ -82,6 +82,9 @@ function Workspace() {
 
 function AppShell() {
   const { view } = useWorkspace();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const closeMobile = () => setIsMobileMenuOpen(false);
+  const toggleMobile = () => setIsMobileMenuOpen((v) => !v);
   const main = () => {
     switch (view) {
       case "dashboard":
@@ -98,9 +101,12 @@ function AppShell() {
   };
   return (
     <div className="flex h-dvh overflow-hidden bg-canvas text-ink">
-      <Sidebar />
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm md:hidden" onClick={closeMobile} />
+      )}
+      <Sidebar isMobileMenuOpen={isMobileMenuOpen} onClose={closeMobile} />
       <div className="flex flex-1 flex-col min-w-0">
-        <TopBar />
+        <TopBar onMenuToggle={toggleMobile} />
         {main()}
       </div>
       <NewCaseModal />

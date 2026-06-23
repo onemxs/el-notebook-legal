@@ -14,6 +14,7 @@ import {
   Building2,
   Home,
   Archive,
+  Menu,
 } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
@@ -23,7 +24,7 @@ import { BranchIcon } from "@/components/branchIcons";
 import { SettingsModal } from "@/components/settings/SettingsModal";
 import { CrearDespachoModal } from "@/components/equipo/CrearDespachoModal";
 
-export function TopBar() {
+export function TopBar({ onMenuToggle }: { onMenuToggle?: () => void }) {
   const { theme, toggle } = useTheme();
   const { session, perfil, demo, isSuperadmin, signOut, exitDemo } = useAuth();
   const navigate = useNavigate();
@@ -44,6 +45,14 @@ export function TopBar() {
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-3 border-b border-hairline bg-canvas px-3 sm:px-4">
+      {/* Mobile hamburger */}
+      <button
+        onClick={onMenuToggle}
+        className="mr-1 flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-elevated hover:text-ink md:hidden cursor-pointer"
+        aria-label="Abrir menú"
+      >
+        <Menu size={20} />
+      </button>
       {/* Brand — doubles as the home button */}
       <button
         onClick={goHome}

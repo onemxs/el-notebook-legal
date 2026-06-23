@@ -9,13 +9,16 @@ const MODULES = [
   { id: "configuracion" as const, label: "Configuración", icon: Settings, top: false },
 ];
 
-export function Sidebar() {
+export function Sidebar({ isMobileMenuOpen, onClose }: { isMobileMenuOpen: boolean; onClose: () => void }) {
   const { view, setView } = useWorkspace();
   const { session, demo } = useAuth();
   if (!session && !demo) return null;
+  const navigate = (id: string) => { setView(id as any); onClose(); };
 
   return (
-    <nav className="flex w-64 shrink-0 flex-col border-r border-hairline bg-panel-solid/60 backdrop-blur-sm">
+    <nav className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-hairline bg-panel-solid/60 backdrop-blur-sm transition-transform duration-300 ${
+      isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+    } md:static md:translate-x-0`}>
       {/* Brand */}
       <div className="flex items-center gap-3 border-b border-hairline px-5 py-4">
         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-white">
@@ -34,7 +37,7 @@ export function Sidebar() {
           return (
             <button
               key={id}
-              onClick={() => setView(id)}
+              onClick={() => navigate(id)}
               className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-all cursor-pointer ${
                 active
                   ? "bg-accent text-white shadow-sm"
@@ -54,7 +57,7 @@ export function Sidebar() {
           const active = view === "configuracion";
           return (
             <button
-              onClick={() => setView("configuracion")}
+              onClick={() => navigate("configuracion")}
               className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition-all cursor-pointer ${
                 active
                   ? "bg-accent text-white shadow-sm"
