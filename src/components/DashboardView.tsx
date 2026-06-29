@@ -14,9 +14,9 @@ import {
   Archive,
   Trash2,
   ArchiveX,
-  Briefcase,
-  FileSearch,
-  FileText,
+  Users,
+  Building2 as BuildingIcon,
+  Gavel,
 } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { BRANCHES } from "@/lib/branches";
@@ -155,7 +155,7 @@ function CaseCard({
 }
 
 export function DashboardView() {
-  const { activeCases, archivedCases, openCase, openCaseModal, startIntake, settings, setCaseAction, setView } = useWorkspace();
+  const { activeCases, archivedCases, openCase, openCaseModal, startIntake, settings, setCaseAction } = useWorkspace();
   const despachoMode = settings.accountMode === "despacho";
   const upcoming = activeCases.filter((c) => c.deadlineLabel).length;
   const [dragging, setDragging] = useState(false);
@@ -278,42 +278,42 @@ export function DashboardView() {
           </div>
         </section>
 
-        {/* Quick Actions */}
+        {/* Quick Actions — launches by branch */}
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
           <button
-            onClick={() => openCaseModal()}
+            onClick={() => openCaseModal("civil")}
             className="flex items-center gap-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md cursor-pointer dark:border-white/10 dark:bg-white/[0.04] dark:shadow-2xl"
           >
             <span className="rounded-xl bg-blue-50 p-3 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
-              <Briefcase size={22} strokeWidth={1.75} />
+              <Users size={22} strokeWidth={1.75} />
             </span>
             <div className="text-left">
-              <p className="text-sm font-semibold text-ink">Nuevo Expediente</p>
-              <p className="text-xs text-ink-muted">Inicia un caso o arrastra archivos</p>
+              <p className="text-sm font-semibold text-ink">Litigio Civil / Familiar</p>
+              <p className="text-xs text-ink-muted">Iniciar Divorcio, Pensión Alimenticia o Intestado</p>
             </div>
           </button>
           <button
-            onClick={() => setView("auditoria")}
+            onClick={() => openCaseModal("mercantil")}
             className="flex items-center gap-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md cursor-pointer dark:border-white/10 dark:bg-white/[0.04] dark:shadow-2xl"
           >
             <span className="rounded-xl bg-green-50 p-3 text-green-600 dark:bg-green-500/20 dark:text-green-400">
-              <FileSearch size={22} strokeWidth={1.75} />
+              <BuildingIcon size={22} strokeWidth={1.75} />
             </span>
             <div className="text-left">
-              <p className="text-sm font-semibold text-ink">Auditoría Contractual</p>
-              <p className="text-xs text-ink-muted">Analiza riesgos y cláusulas críticas</p>
+              <p className="text-sm font-semibold text-ink">Corporativo / Mercantil</p>
+              <p className="text-xs text-ink-muted">Cobranza de Pagarés, Contratos Comerciales y NDA</p>
             </div>
           </button>
           <button
-            onClick={() => setView("escribania")}
+            onClick={() => openCaseModal("penal")}
             className="flex items-center gap-4 rounded-2xl border border-white/80 bg-white/60 p-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md cursor-pointer dark:border-white/10 dark:bg-white/[0.04] dark:shadow-2xl"
           >
             <span className="rounded-xl bg-purple-50 p-3 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400">
-              <FileText size={22} strokeWidth={1.75} />
+              <Gavel size={22} strokeWidth={1.75} />
             </span>
             <div className="text-left">
-              <p className="text-sm font-semibold text-ink">Notaría Express</p>
-              <p className="text-xs text-ink-muted">Redacta contratos y convenios al instante</p>
+              <p className="text-sm font-semibold text-ink">Defensa Penal / Amparo</p>
+              <p className="text-xs text-ink-muted">Contra actos de autoridad y vinculación a proceso</p>
             </div>
           </button>
         </div>

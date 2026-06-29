@@ -26,6 +26,7 @@ interface Template {
   desc: string;
   icon: typeof FileText;
   fields: Field[];
+  category: "civil" | "mercantil" | "penal";
 }
 
 const FIELD_SCHEMAS: Record<string, Field[]> = {
@@ -80,19 +81,25 @@ const FIELD_SCHEMAS: Record<string, Field[]> = {
 };
 
 const TEMPLATES: Template[] = [
-  { id: "arrendamiento", title: "Contrato de Arrendamiento", desc: "Inmobiliario con cláusulas de garantía, mantenimiento y términos de pago", icon: Building2, fields: FIELD_SCHEMAS.arrendamiento },
-  { id: "servicios", title: "Prestación de Servicios", desc: "Honorarios, alcances, confidencialidad y causas de rescisión", icon: FileSignature, fields: FIELD_SCHEMAS.servicios },
-  { id: "nda", title: "Confidencialidad (NDA)", desc: "Acuerdo de confidencialidad recíproco con protección de información sensible", icon: ShieldCheck, fields: FIELD_SCHEMAS.nda },
-  { id: "pagare", title: "Pagaré Ejecutivo", desc: "Título ejecutivo mercantil con intereses y fecha de vencimiento", icon: Receipt, fields: FIELD_SCHEMAS.pagare },
-  { id: "compraventa", title: "Compraventa de Bienes", desc: "Transmisión de propiedad con declaraciones, precio y condiciones", icon: FileText, fields: FIELD_SCHEMAS.compraventa },
-  { id: "divorcio", title: "Convenio de Divorcio", desc: "Voluntario con propuesta de liquidación de sociedad conyugal y custodia", icon: HeartHandshake, fields: FIELD_SCHEMAS.divorcio },
-  { id: "contestacion", title: "Contestación de Demanda", desc: "Formato profesional con estructura de excepciones, defensas y ofrecimiento de pruebas", icon: ScrollText, fields: FIELD_SCHEMAS.contestacion },
+  { id: "arrendamiento", title: "Contrato de Arrendamiento", desc: "Inmobiliario con cláusulas de garantía, mantenimiento y términos de pago", icon: Building2, fields: FIELD_SCHEMAS.arrendamiento, category: "civil" },
+  { id: "servicios", title: "Prestación de Servicios", desc: "Honorarios, alcances, confidencialidad y causas de rescisión", icon: FileSignature, fields: FIELD_SCHEMAS.servicios, category: "mercantil" },
+  { id: "nda", title: "Confidencialidad (NDA)", desc: "Acuerdo de confidencialidad recíproco con protección de información sensible", icon: ShieldCheck, fields: FIELD_SCHEMAS.nda, category: "mercantil" },
+  { id: "pagare", title: "Pagaré Ejecutivo", desc: "Título ejecutivo mercantil con intereses y fecha de vencimiento", icon: Receipt, fields: FIELD_SCHEMAS.pagare, category: "mercantil" },
+  { id: "compraventa", title: "Compraventa de Bienes", desc: "Transmisión de propiedad con declaraciones, precio y condiciones", icon: FileText, fields: FIELD_SCHEMAS.compraventa, category: "civil" },
+  { id: "divorcio", title: "Convenio de Divorcio", desc: "Voluntario con propuesta de liquidación de sociedad conyugal y custodia", icon: HeartHandshake, fields: FIELD_SCHEMAS.divorcio, category: "civil" },
+  { id: "contestacion", title: "Contestación de Demanda", desc: "Formato profesional con estructura de excepciones, defensas y ofrecimiento de pruebas", icon: ScrollText, fields: FIELD_SCHEMAS.contestacion, category: "mercantil" },
 ];
 
 export function EscribaniaDigital() {
   const { selectedTemplate, setSelectedTemplate, documentPreview, docGenLoading, generateCustomDocument } = useWorkspace();
   const [variables, setVariables] = useState<Record<string, string>>({});
   const [notes, setNotes] = useState("");
+  const [activeCategory, setActiveCategory] = useState("Todos");
+
+  const CATEGORIES = ["Todos", "Civil/Familiar", "Mercantil", "Penal/Amparo"] as const;
+  const CATEGORY_MAP: Record<string, string> = { "Civil/Familiar": "civil", Mercantil: "mercantil", "Penal/Amparo": "penal" };
+
+  const filtered = activeCategory === "Todos" ? TEMPLATES : TEMPLATES.filter((t) => t.category === CATEGORY_MAP[activeCategory]);
 
   const templ = selectedTemplate ? TEMPLATES.find((t) => t.id === selectedTemplate) : null;
 
@@ -117,10 +124,31 @@ export function EscribaniaDigital() {
         <p className="text-xs text-ink-muted">Selecciona un documento y llénalo con los datos del caso</p>
       </div>
 
+      {/* Category tabs */}
+      <div className="shrink-0 border-b border-hairline">
+        <div className="flex justify-center py-4">
+          <div className="flex gap-2 rounded-xl bg-gray-100 p-1 dark:bg-white/5">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => { setActiveCategory(cat); setSelectedTemplate(null); }}
+                className={`rounded-lg px-4 py-1.5 text-xs font-medium transition-all cursor-pointer ${
+                  activeCategory === cat
+                    ? "bg-white text-[#022448] shadow-sm dark:bg-white/10 dark:text-white"
+                    : "text-gray-500 hover:text-[#022448] dark:text-gray-400 dark:hover:text-white"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Template catalog */}
       <div className="shrink-0 border-b border-hairline">
         <div className="flex flex-wrap justify-center gap-6 max-w-5xl mx-auto py-4">
-          {TEMPLATES.map((t) => {
+          {filtered.map((t) => {
             const active = selectedTemplate === t.id;
             const Icon = t.icon;
             return (
