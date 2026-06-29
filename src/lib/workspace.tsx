@@ -946,16 +946,131 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
         switch (templateId) {
           case "arrendamiento":
-            body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">CONTRATO DE ARRENDAMIENTO RESIDENCIAL</h2>
-<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  En ${city}, a ${today}, comparecen <strong>${fmt("arrendador")}</strong> como ARRENDADOR y <strong>${fmt("arrendatario")}</strong> como ARRENDATARIO, quienes celebran el presente Contrato de Arrendamiento respecto del inmueble ubicado en <strong>${fmt("domicilio")}</strong>.
+            const arrendador = fmt("arrendador");
+            const arrendatario = fmt("arrendatario");
+            const inmueble = fmt("domicilio");
+            const renta = fmt("renta");
+            const fiadorIncluido = variables.fiador === "Sí";
+            const extincion = variables.extincion_dominio === "Sí";
+            const mora = variables.moratorio || "2";
+            const juris = variables.jurisdiccion || "Tribunales de la Ciudad de México";
+            const vigencia = variables.vigencia || "12";
+            body = `<h1 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:4px">CONTRATO DE ARRENDAMIENTO</h1>
+<p style="font-family:Arial,sans-serif;font-size:9pt;text-align:center;color:#475569;margin-bottom:20px">Versión Blindada — ${today}</p>
+
+<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;font-size:11pt;margin-top:24px;margin-bottom:8px">P R O E M I O</h2>
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:12px;text-align:justify">
+En la ${city}, siendo las ___ horas del día ___ de ______________ de 20___, comparecen por una parte <strong>${arrendador}</strong>, a quien en lo sucesivo se le denominará "EL ARRENDADOR", y por otra parte <strong>${arrendatario}</strong>, a quien en lo sucesivo se le denominará "EL ARRENDATARIO", quienes manifiestan su voluntad de celebrar el presente Contrato de Arrendamiento, al tenor de las siguientes declaraciones y cláusulas.
 </p>
-<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  EL ARRENDATARIO se obliga a pagar a EL ARRENDADOR la cantidad de <strong>$${fmt("renta")} MXN</strong> como renta mensual, pagadera dentro de los primeros cinco días de cada mes, en el domicilio del inmueble o en la cuenta bancaria que designe EL ARRENDADOR.
+
+<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;font-size:11pt;margin-top:24px;margin-bottom:8px">D E C L A R A C I O N E S</h2>
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:6px;text-align:justify"><strong>I.</strong> EL ARRENDADOR declara bajo protesta de decir verdad:</p>
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:6px;text-align:justify;padding-left:20px">
+a) Ser legítimo propietario del inmueble ubicado en <strong>${inmueble}</strong>, mismo que se encuentra libre de gravámenes, hipotecas, embargos, litigios o cualquier limitación de dominio que pudiera afectar el presente arrendamiento.<br/>
+b) Tener capacidad jurídica y poder de disposición plena para celebrar este contrato.<br/>
+c) Que el inmueble cuenta con las condiciones de habitabilidad, seguridad sanitaria y servicios necesarios para su uso como vivienda habitual.
 </p>
-<p style="font-family:Georgia,serif;font-size:11pt;line-height:1.7;margin-bottom:12px;text-align:justify">
-  El presente arrendamiento tendrá una vigencia del <strong>${fmt("fechaInicio")}</strong> al <strong>${fmt("fechaFin")}</strong>, período durante el cual EL ARRENDATARIO se compromete a usar el inmueble única y exclusivamente como habitación, a conservarlo en buen estado y a no realizar modificaciones sin autorización previa por escrito.
-</p>`;
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:6px;text-align:justify"><strong>II.</strong> EL ARRENDATARIO declara bajo protesta de decir verdad:</p>
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:6px;text-align:justify;padding-left:20px">
+a) Conocer el inmueble objeto del presente arrendamiento y reconocer que se encuentra en condiciones óptimas para el uso convenido.<br/>
+b) Contar con solvencia económica suficiente para cumplir con las obligaciones derivadas de este contrato.<br/>
+c) Que destinará el inmueble exclusivamente como casa habitación, quedando estrictamente prohibido cualquier uso comercial, industrial o distinto al pactado.
+</p>
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:12px;text-align:justify"><strong>III.</strong> Ambas partes reconocen que el presente contrato se rige por lo dispuesto en el Código Civil Federal y las disposiciones aplicables del Estado correspondiente.</p>
+
+<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;font-size:11pt;margin-top:24px;margin-bottom:8px">C L Á U S U L A S</h2>
+
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>PRIMERA. — OBJETO.</strong> EL ARRENDADOR da en arrendamiento a EL ARRENDATARIO el inmueble descrito, mismo que EL ARRENDATARIO recibe a su entera satisfacción y se obliga a usar única y exclusivamente como casa habitación, quedando terminantemente prohibido destinarlo a otro fin.
+</p>
+
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>SEGUNDA. — PRECIO Y FORMA DE PAGO.</strong> EL ARRENDATARIO se obliga a pagar a EL ARRENDADOR la cantidad de <strong>$${renta} MXN</strong> mensuales, que cubrirá precisamente dentro de los primeros cinco días naturales de cada mes, en efectivo contra recibo o mediante transferencia bancaria a la cuenta que designe EL ARRENDADOR. El pago deberá realizarse en moneda nacional, quedando prohibido el pago en especie o mediante compensación.
+</p>
+
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>TERCERA. — VIGENCIA.</strong> El presente arrendamiento tendrá una vigencia de <strong>${vigencia} meses</strong>, contados a partir de la fecha de firma del presente instrumento. Al término del plazo pactado, si ninguna de las partes manifiesta por escrito su voluntad de no renovar con al menos treinta días naturales de antelación, el contrato se prorrogará por plazo indefinido, quedando a salvo el derecho de cualquiera de las partes para darlo por terminado mediante aviso por escrito con treinta días de anticipación.
+</p>
+
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>CUARTA. — INTERESES MORATORIOS.</strong> En caso de retraso en el pago de la renta, EL ARRENDATARIO cubrirá a EL ARRENDADOR un interés moratorio del <strong>${mora}% mensual</strong> sobre el monto total adeudado, calculado por día natural de retraso, sin que ello implique novación o espera alguna.
+</p>
+
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>QUINTA. — PENALIDAD POR RETRASO.</strong> Si EL ARRENDATARIO incurre en mora en el pago de dos o más rentas, consecutivas o alternadas, EL ARRENDADOR tendrá derecho a dar por rescindido el contrato de pleno derecho, exigiendo el pago de todas las rentas vencidas y las que faltaren por vencer, así como una penalidad equivalente al veinte por ciento del monto total de las rentas pendientes.
+</p>
+
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>SEXTA. — PROHIBICIÓN DE SUBARRENDAMIENTO.</strong> Queda estrictamente prohibido a EL ARRENDATARIO subarrendar, ceder los derechos del presente contrato, dar en comodato, o permitir el uso del inmueble a terceros bajo cualquier título, sea oneroso o gratuito, incluyendo plataformas digitales de hospedaje temporal como Airbnb, Booking.com o similares. El incumplimiento de esta cláusula dará lugar a la rescisión automática del contrato.
+</p>
+
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>SÉPTIMA. — DEPÓSITO EN GARANTÍA.</strong> EL ARRENDATARIO entrega en este acto a EL ARRENDADOR la cantidad equivalente a un mes de renta como depósito en garantía, mismo que no generará intereses y será devuelto al término del arrendamiento, una vez desocupado el inmueble y comprobado que no existen adeudos ni daños imputables a EL ARRENDATARIO, descontando los montos que por concepto de reparaciones o servicios adeudados correspondan.
+</p>
+
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>OCTAVA. — MANTENIMIENTO E INSPECCIÓN.</strong> EL ARRENDATARIO se obliga a conservar el inmueble en el mismo estado en que lo recibió, realizando por su cuenta las reparaciones menores que demande el uso ordinario. EL ARRENDADOR tendrá derecho a inspeccionar el inmueble previo aviso de al menos 48 horas, en días hábiles y en horario razonable, para verificar su estado de conservación. EL ARRENDATARIO se obliga a permitir el acceso bajo apercibimiento de constituirse en mora.
+</p>
+
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>NOVENA. — MODIFICACIONES.</strong> EL ARRENDATARIO no podrá realizar modificaciones, alteraciones, construcciones o mejoras al inmueble sin autorización previa y por escrito de EL ARRENDADOR. Cualquier mejora realizada quedará en beneficio del inmueble sin derecho a reembolso.
+</p>
+
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>DÉCIMA. — CAUSAS DE RESCISIÓN.</strong> Son causas de rescisión del presente contrato, además de las previstas en la ley: a) La falta de pago puntual de una sola renta; b) El destino del inmueble a un uso distinto al pactado; c) El subarrendamiento o cesión de derechos; d) Los actos de molestia a los vecinos o infracciones al reglamento de la propiedad; e) El deterioro intencional o por negligencia del inmueble.
+</p>${fiadorIncluido ? `
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>DÉCIMA PRIMERA. — FIADOR / OBLIGADO SOLIDARIO.</strong> En este acto se constituye como fiador y obligado solidario el C. [Nombre del Fiador], quien renuncia expresamente a los beneficios de orden, excusión y división, así como a cualquier otro que le favorezca, obligándose al pago de todas las cantidades que EL ARRENDATARIO adeude por cualquier concepto derivado del presente contrato, incluyendo rentas, intereses moratorios, penalidades y gastos de cobranza.
+</p>` : ""}${extincion ? `
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>DÉCIMA SEGUNDA. — EXTINCIÓN DE DOMINIO.</strong> EL ARRENDATARIO y, en su caso, EL FIADOR, declaran bajo protesta de decir verdad que los recursos económicos con los que cubrirán las obligaciones derivadas del presente contrato provienen de actividades lícitas y debidamente declaradas ante las autoridades fiscales competentes. En caso de que se inicie un procedimiento de extinción de dominio sobre el inmueble o sobre los recursos de cualquiera de las partes, el presente contrato quedará rescindido de pleno derecho sin responsabilidad para EL ARRENDADOR.
+</p>` : ""}
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>${fiadorIncluido && extincion ? "DÉCIMA TERCERA" : fiadorIncluido || extincion ? "DÉCIMA SEGUNDA" : "DÉCIMA PRIMERA"}. — JURISDICCIÓN.</strong> Para la interpretación y cumplimiento del presente contrato, las partes se someten expresamente a la competencia de los <strong>${juris}</strong>, renunciando a cualquier otro fuero que pudiera corresponderles en razón de su domicilio presente o futuro.
+</p>
+
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>${fiadorIncluido && extincion ? "DÉCIMA CUARTA" : fiadorIncluido || extincion ? "DÉCIMA TERCERA" : "DÉCIMA SEGUNDA"}. — LEGISLACIÓN APLICABLE.</strong> El presente contrato se rige por las disposiciones del Código Civil Federal, el Código de Comercio y las leyes supletorias aplicables en el territorio mexicano.
+</p>
+
+<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.7;margin-bottom:8px;text-align:justify">
+<strong>${fiadorIncluido && extincion ? "DÉCIMA QUINTA" : fiadorIncluido || extincion ? "DÉCIMA CUARTA" : "DÉCIMA TERCERA"}. — FIRMAS.</strong> Leído que fue el presente contrato y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en la Ciudad de México, a la fecha de su presentación.
+</p>
+
+<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;font-size:11pt;margin-top:24px;margin-bottom:16px">F I R M A S</h2>
+
+<div style="display:flex;justify-content:space-between;margin-top:40px">
+<div style="text-align:center;width:45%">
+<div style="border-top:1px solid #1E3A5F;margin-bottom:4px;padding-top:4px">
+<p style="font-family:Georgia,serif;font-size:9pt;margin:0"><strong>${arrendador}</strong></p>
+<p style="font-family:Arial,sans-serif;font-size:8pt;color:#475569;margin:2px 0">ARRENDADOR</p>
+</div>
+</div>
+<div style="text-align:center;width:45%">
+<div style="border-top:1px solid #1E3A5F;margin-bottom:4px;padding-top:4px">
+<p style="font-family:Georgia,serif;font-size:9pt;margin:0"><strong>${arrendatario}</strong></p>
+<p style="font-family:Arial,sans-serif;font-size:8pt;color:#475569;margin:2px 0">ARRENDATARIO</p>
+</div>
+</div>
+</div>
+
+<div style="display:flex;justify-content:space-between;margin-top:60px">
+<div style="text-align:center;width:30%">
+<div style="border-top:1px solid #1E3A5F;margin-bottom:4px;padding-top:4px">
+<p style="font-family:Arial,sans-serif;font-size:8pt;color:#475569;margin:2px 0">TESTIGO</p>
+</div>
+</div>
+<div style="text-align:center;width:30%">
+<div style="border-top:1px solid #1E3A5F;margin-bottom:4px;padding-top:4px">
+<p style="font-family:Arial,sans-serif;font-size:8pt;color:#475569;margin:2px 0">TESTIGO</p>
+</div>
+</div>
+<div style="text-align:center;width:30%">
+<div style="border-top:1px solid #1E3A5F;margin-bottom:4px;padding-top:4px">
+<p style="font-family:Arial,sans-serif;font-size:8pt;color:#475569;margin:2px 0">${fiadorIncluido ? "FIADOR" : ""}</p>
+</div>
+</div>
+</div>`;
             break;
           case "servicios":
             body = `<h2 style="font-family:Arial,sans-serif;color:#1E3A5F;text-align:center;margin-bottom:20px">CONTRATO DE PRESTACIÓN DE SERVICIOS PROFESIONALES</h2>

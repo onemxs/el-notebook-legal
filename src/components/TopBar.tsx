@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Scale,
   Sun,
   Moon,
   FolderPlus,
@@ -11,9 +10,9 @@ import {
   ShieldCheck,
   Users,
   Building2,
-  Home,
   Archive,
   Menu,
+  ArrowLeft,
 } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
@@ -52,35 +51,22 @@ export function TopBar({ onMenuToggle }: { onMenuToggle?: () => void }) {
       >
         <Menu size={20} />
       </button>
-      {/* Brand — doubles as the home button */}
-      <button
-        onClick={goHome}
-        title="Ir al inicio"
-        className="group flex items-center gap-2.5 rounded-xl py-1 pr-2 transition-colors hover:bg-elevated cursor-pointer"
-      >
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-white transition-transform group-hover:scale-105">
-          <Scale size={18} strokeWidth={1.75} />
-        </span>
-        <span className="hidden text-left sm:block">
-          <span className="block font-serif text-[19px] font-semibold leading-none tracking-tight text-ink">
-            PasantIA
-          </span>
-          <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-subtle">
-            Inteligencia jurídica · México
-          </span>
-        </span>
-      </button>
+      {/* Back to dashboard */}
+      {inWorkspace ? (
+        <button
+          onClick={goHome}
+          className="flex items-center gap-2 rounded-xl p-2 text-[#022448] transition-all hover:bg-gray-100 dark:text-white dark:hover:bg-white/10 cursor-pointer"
+        >
+          <ArrowLeft size={18} />
+          <span className="text-sm font-medium">Volver al Inicio</span>
+        </button>
+      ) : (
+        <div className="w-9" /> /* spacer to keep alignment */
+      )}
 
       {/* Active case / branch — only meaningful inside a workspace */}
       {inWorkspace && (
         <>
-          <button
-            onClick={goHome}
-            title="Volver al inicio"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-elevated hover:text-ink cursor-pointer"
-          >
-            <Home size={18} />
-          </button>
           <div className="relative">
             <button
               onClick={() => setRecentOpen((v) => !v)}
