@@ -19,7 +19,6 @@ import { useAuth } from "@/lib/auth";
 import { useWorkspace } from "@/lib/workspace";
 import { BRANCHES } from "@/lib/branches";
 import { BranchIcon } from "@/components/branchIcons";
-import { SettingsModal } from "@/components/settings/SettingsModal";
 import { CrearDespachoModal } from "@/components/equipo/CrearDespachoModal";
 
 export function TopBar({ onMenuToggle }: { onMenuToggle?: () => void }) {
@@ -27,7 +26,6 @@ export function TopBar({ onMenuToggle }: { onMenuToggle?: () => void }) {
   const { session, perfil, demo, isSuperadmin, signOut, exitDemo } = useAuth();
   const navigate = useNavigate();
   const { view, branch, caseName, goHome, openCase, openCaseModal, recentCases } = useWorkspace();
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [acctOpen, setAcctOpen] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
@@ -257,7 +255,6 @@ export function TopBar({ onMenuToggle }: { onMenuToggle?: () => void }) {
         ) : null}
       </div>
 
-      <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <CrearDespachoModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
     </header>
   );

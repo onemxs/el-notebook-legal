@@ -100,8 +100,6 @@ interface WorkspaceState {
   activeArticle: Citation | null;
   settings: SystemSettings;
   generatingDoc: boolean;
-  caseParties: ExtractedField[];
-  caseDocContent: string[];
   activeAnalysis: ContractAnalysis | null;
   analysisLoading: boolean;
   selectedTemplate: string | null;
@@ -126,9 +124,7 @@ interface WorkspaceCtx extends WorkspaceState {
   removeFile: (id: string) => void;
   sendMessage: (text: string) => void;
   runTimeline: () => void;
-  clearTimeline: () => void;
   getTranscriptContent: (fileName: string) => string | undefined;
-  inconsistencies: TimelineInconsistency[];
   openArticle: (c: Citation) => void;
   closeArticle: () => void;
   setEditorHtml: (html: string) => void;
@@ -140,7 +136,6 @@ interface WorkspaceCtx extends WorkspaceState {
   setCaseAction: (action: { mode: "archive" | "delete"; caseId: string; caseName: string } | null) => void;
   activeCases: CaseSummary[];
   archivedCases: CaseSummary[];
-  isDespacho: boolean;
   analyzeContract: (file: File) => void;
   generateCustomDocument: (templateId: string, variables: Record<string, string>, notes: string) => void;
   setSelectedTemplate: (id: string | null) => void;
@@ -886,11 +881,6 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       setTimelineLoading(false);
     }, 900);
   }, [analizarInconsistencias]);
-  
-  const clearTimeline = useCallback(() => {
-    setTimeline(null);
-    setInconsistencies([]);
-  }, []);
 
   const getTranscriptContent = useCallback((fileId: string): string | undefined => {
     return transcriptMapRef.current.get(fileId);
@@ -1273,7 +1263,6 @@ ${notesHtml}
   }, [settings.secureSession]);
 
   const docKindsForBranch = useMemo(() => getDocKindsForBranch(branch), [branch]);
-  const isDespacho = settings.accountMode === "despacho";
   const activeCases = useMemo(() => cases.filter((c) => !c.archived), [cases]);
   const archivedCases = useMemo(() => cases.filter((c) => c.archived), [cases]);
 
@@ -1302,8 +1291,6 @@ ${notesHtml}
       activeArticle,
       settings,
       generatingDoc,
-      caseParties,
-      caseDocContent,
       goHome,
       openCase,
       openCaseModal,
@@ -1319,7 +1306,6 @@ ${notesHtml}
       removeFile,
       sendMessage,
       runTimeline,
-      clearTimeline,
       getTranscriptContent,
       inconsistencies,
       openArticle,
@@ -1333,7 +1319,6 @@ ${notesHtml}
       activeCases,
       archivedCases,
       members,
-      isDespacho,
       activeAnalysis,
       analysisLoading,
       selectedTemplate,
@@ -1351,7 +1336,6 @@ ${notesHtml}
       cases,
       recentCases,
       members,
-      isDespacho,
       caseAction,
       setCaseAction,
       caseModalOpen,
@@ -1371,8 +1355,6 @@ ${notesHtml}
       activeArticle,
       settings,
       generatingDoc,
-      caseParties,
-      caseDocContent,
       activeAnalysis,
       analysisLoading,
       selectedTemplate,
@@ -1393,7 +1375,6 @@ ${notesHtml}
       removeFile,
       sendMessage,
       runTimeline,
-      clearTimeline,
       getTranscriptContent,
       inconsistencies,
       openArticle,
