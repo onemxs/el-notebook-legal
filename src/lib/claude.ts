@@ -1,6 +1,7 @@
 import type { BranchId, ExtractedCase, ExtractedField } from "./types";
 import { BRANCHES } from "./branches";
 import { DOC_LABELS, type DocKind } from "./generators";
+import { authHeaders } from "./supabase";
 
 /**
  * Sends a dropped document to the local /api/analizar proxy (which calls Claude
@@ -86,7 +87,7 @@ export async function generateDocumentAI(ctx: DocGenContext): Promise<string | n
     console.log("[Generación AI Contexto]", { kind: ctx.kind, parties: ctx.parties, factsCount: ctx.facts?.length });
     const res = await fetch("/api/generar-documento", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(await authHeaders()) },
       body: JSON.stringify({
         kind: ctx.kind,
         kindLabel: DOC_LABELS[ctx.kind],
@@ -136,12 +137,14 @@ export async function analyzeDocument(
     }
     const res = await fetch("/api/analizar", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(await authHeaders()) },
       body: JSON.stringify({ ...payload, forceBranch: forceBranch ?? null }),
     });
     if (!res.ok) {
       console.error(
-        `[analyzeDocument] /api/analizar respondió HTTP ${res.status}. ¿El endpoint/servidor está activo? Se usarán datos de ejemplo.`,
+        res.status === 401
+          ? "[analyzeDocument] El análisis con IA requiere sesión — en modo demo se usan datos de ejemplo."
+          : `[analyzeDocument] /api/analizar respondió HTTP ${res.status}. ¿El endpoint/servidor está activo? Se usarán datos de ejemplo.`,
       );
       return null;
     }

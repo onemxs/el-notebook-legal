@@ -1,10 +1,14 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { buscarArticulos, buscarTesis } from "./_rag.js";
+import { requireUser } from "./_auth.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "method_not_allowed" });
   }
+
+  const auth = await requireUser(req);
+  if (auth.error) return res.status(auth.status).json({ error: auth.error });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
 

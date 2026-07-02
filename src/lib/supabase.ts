@@ -24,6 +24,19 @@ export function getSupabase(): SupabaseClient | null {
   return db();
 }
 
+/**
+ * Authorization header con el JWT vigente (auto-refrescado por el SDK) para los
+ * endpoints de IA — que ahora exigen sesión. Sin sesión devuelve {} y el server
+ * responde 401 (el cliente degrada a datos de ejemplo / generador local).
+ */
+export async function authHeaders(): Promise<Record<string, string>> {
+  const c = db();
+  if (!c) return {};
+  const { data } = await c.auth.getSession();
+  const token = data.session?.access_token;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 /** Exact-article lookup for the article viewer (no embedding needed). */
 export async function fetchArticulo(codigo: string, articulo: string): Promise<Article | null> {
   const c = db();

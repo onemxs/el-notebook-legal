@@ -1,8 +1,5 @@
 import type { Plugin } from "vite";
 import { loadEnv } from "vite";
-import * as fs from "fs";
-import * as path from "path";
-import * as os from "os";
 
 /**
  * Dev-only proxy: POST /api/analizar
@@ -122,69 +119,6 @@ function buildContent(b: ReqBody): unknown[] {
   return [];
 }
 
-async function transcribeWithWhisper(
-  filePath: string,
-  apiKey: string,
-  baseURL: string = "https://api.openai.com/v1",
-): Promise<string> {
-  const fileStream = fs.createReadStream(filePath);
-
-  const formData = new (await import("form-data")).default();
-  formData.append("file", fileStream);
-  formData.append("model", "whisper-1");
-  formData.append("language", "es");
-  formData.append("response_format", "verbose_json");
-
-  const response = await fetch(`${baseURL}/audio/transcriptions`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      ...formData.getHeaders(),
-    },
-    body: formData as never,
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Whisper API error: ${error}`);
-  }
-
-  const result = (await response.json()) as {
-    text: string;
-    segments?: Array<{ start: number; end: number; text: string }>;
-  };
-
-  if (result.segments && result.segments.length > 0) {
-    return result.segments
-      .map((seg) => {
-        const start = formatTimestamp(seg.start);
-        return `[${start}] ${seg.text.trim()}`;
-      })
-      .join("\n");
-  }
-
-  return result.text;
-}
-
-function formatTimestamp(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-}
-
-async function saveUploadedFile(req: any): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const tmpDir = os.tmpdir();
-    const tmpFile = path.join(tmpDir, `video-${Date.now()}.tmp`);
-    const stream = fs.createWriteStream(tmpFile);
-
-    stream.on("finish", () => resolve(tmpFile));
-    stream.on("error", reject);
-    req.pipe(stream);
-  });
-}
-
 export function claudeProxy(): Plugin {
   return {
     name: "claude-analizar-proxy",
@@ -194,53 +128,6 @@ export function claudeProxy(): Plugin {
       const anthropicKey = env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
       const model = env.ANTHROPIC_MODEL || process.env.ANTHROPIC_MODEL || "claude-opus-4-8";
       const anthropicBaseURL = env.ANTHROPIC_BASE_URL || process.env.ANTHROPIC_BASE_URL;
-      const openaiKey = env.OPENAI_API_KEY || process.env.OPENAI_API_KEY;
-      const openaiBaseURL = env.OPENAI_BASE_URL || process.env.OPENAI_BASE_URL;
-
-      server.middlewares.use("/api/transcribe-video", (req, res) => {
-        const send = (status: number, body: unknown) => {
-          res.statusCode = status;
-          res.setHeader("Content-Type", "application/json");
-          res.end(JSON.stringify(body));
-        };
-        if (req.method !== "POST") return send(405, { error: "method_not_allowed" });
-
-        (async () => {
-          if (!openaiKey) {
-            return send(200, { error: "not_configured", message: "OPENAI_API_KEY not set" });
-          }
-
-          const whistlebaseURL = openaiBaseURL || "https://api.openai.com/v1";
-
-          let tmpFile: string | null = null;
-          try {
-            tmpFile = await saveUploadedFile(req);
-
-            const transcription = await transcribeWithWhisper(tmpFile, openaiKey, whistlebaseURL);
-            const result = {
-              id: `transcription-${Date.now()}`,
-              fileName: "video",
-              duration: 0,
-              transcription,
-              language: "es-MX",
-              createdAt: Date.now(),
-            };
-
-            send(200, result);
-          } catch (e) {
-            const msg = e instanceof Error ? e.message : String(e);
-            console.error("[/api/transcribe-video]", msg);
-            send(200, { error: msg });
-          } finally {
-            if (tmpFile) {
-              try {
-                fs.unlinkSync(tmpFile);
-              } catch {
-              }
-            }
-          }
-        })();
-      });
 
       server.middlewares.use("/api/analizar", (req, res) => {
         const send = (status: number, body: unknown) => {

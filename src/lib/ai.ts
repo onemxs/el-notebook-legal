@@ -1,7 +1,7 @@
 import type { BranchId, Citation } from "./types";
 import { getArticle } from "./corpus";
 import { BRANCHES } from "./branches";
-import { SUPA_CONFIGURED } from "./supabase";
+import { SUPA_CONFIGURED, authHeaders } from "./supabase";
 
 /**
  * Assistant service. When authenticated, it answers via /api/asistente: a Claude
@@ -63,7 +63,7 @@ export async function askAssistant(query: string, ctx: AssistantContext): Promis
     try {
       const res = await fetch("/api/asistente", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(await authHeaders()) },
         body: JSON.stringify({ query, branch: ctx.branch, docContent: ctx.docContent ?? [] }),
       });
       if (res.ok) {
