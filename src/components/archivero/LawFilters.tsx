@@ -1,3 +1,4 @@
+import { ShieldCheck } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { BRANCHES } from "@/lib/branches";
 import { BranchIcon } from "@/components/branchIcons";
@@ -25,6 +26,18 @@ export function LawFilters() {
       <p className="mb-2 px-0.5 text-xs text-ink-muted">
         {active} de {laws.length} leyes activas en el marco regulatorio.
       </p>
+
+      {/* Indicador de Seguridad Jurídica — micro-tarjeta Liquid Glass */}
+      <div className="mb-3 flex items-start gap-2.5 rounded-xl border border-green-500/20 bg-green-500/5 px-3 py-2.5 backdrop-blur-md dark:bg-green-500/10">
+        <ShieldCheck size={16} className="mt-0.5 shrink-0 text-green-600 dark:text-green-400" />
+        <p className="text-[11px] leading-relaxed text-ink-muted">
+          <span className="font-semibold text-green-700 dark:text-green-400">
+            🟢 Certeza Jurídica:
+          </span>{" "}
+          Conectado al Semanario Judicial de la Federación (SJF) y SCJN. Tesis y Jurisprudencias
+          actualizadas en tiempo real con número de registro.
+        </p>
+      </div>
 
       <ul className="space-y-1.5">
         {laws.map((law) => (

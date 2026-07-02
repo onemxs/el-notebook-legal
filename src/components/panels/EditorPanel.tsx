@@ -7,12 +7,85 @@ import {
   Sparkles,
   FilePlus2,
   Loader2,
+  ShieldCheck,
+  X,
 } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { Timeline } from "@/components/editor/Timeline";
 import { ExportModal } from "@/components/export/ExportModal";
 import { DOC_LABELS, type DocKind } from "@/lib/generators";
+import { auditarVigencia, extraerCitas, type CitaAuditada } from "@/lib/vigencia";
+
+// Semáforo de la Auditoría de Vigencia Normativa (verde · amarillo · rojo).
+const VIGENCIA_DOT: Record<CitaAuditada["estado"], string> = {
+  vigente: "bg-green-500",
+  revisar: "bg-amber-500",
+  no_localizado: "bg-amber-500",
+  derogado: "bg-red-500",
+};
+
+function AuditoriaVigencia({
+  results,
+  running,
+  onClose,
+}: {
+  results: CitaAuditada[];
+  running: boolean;
+  onClose: () => void;
+}) {
+  const n = (e: CitaAuditada["estado"][]) => results.filter((r) => e.includes(r.estado)).length;
+  return (
+    <div className="border-b border-hairline bg-panel-solid/70 px-4 py-2.5 backdrop-blur-md animate-fade-in">
+      <div className="flex items-center gap-2">
+        <ShieldCheck size={15} className="shrink-0 text-accent" />
+        <p className="text-[12px] font-semibold text-ink">Auditoría de Vigencia Normativa</p>
+        {!running && results.length > 0 && (
+          <span className="flex items-center gap-2 text-[11px] text-ink-subtle">
+            <span className="flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-green-500" /> {n(["vigente"])}
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-amber-500" /> {n(["revisar", "no_localizado"])}
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-red-500" /> {n(["derogado"])}
+            </span>
+          </span>
+        )}
+        <button
+          onClick={onClose}
+          className="ml-auto flex h-6 w-6 items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-elevated hover:text-ink cursor-pointer"
+          aria-label="Cerrar auditoría"
+        >
+          <X size={13} />
+        </button>
+      </div>
+      {running ? (
+        <p className="mt-1.5 flex items-center gap-2 text-[12px] text-ink-muted">
+          <Loader2 size={13} className="animate-spin text-accent" />
+          Escaneando citas y cruzándolas con el corpus oficial…
+        </p>
+      ) : results.length === 0 ? (
+        <p className="mt-1.5 text-[12px] text-ink-muted">
+          No se detectaron citas de artículos en el escrito.
+        </p>
+      ) : (
+        <ul className="scroll-zone mt-2 max-h-36 space-y-1 overflow-y-auto">
+          {results.map((r) => (
+            <li key={`${r.codigo}-${r.articulo}`} className="flex items-start gap-2 text-[12px]">
+              <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${VIGENCIA_DOT[r.estado]}`} />
+              <span className="font-semibold text-ink">
+                {r.codigo} Art. {r.articulo}
+              </span>
+              <span className="min-w-0 truncate text-ink-muted">{r.nota}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 type View = "editor" | "timeline";
 
@@ -57,6 +130,13 @@ export function EditorPanel() {
   const [view, setView] = useState<View>("editor");
   const [menuOpen, setMenuOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+  const [audit, setAudit] = useState<{ running: boolean; results: CitaAuditada[] } | null>(null);
+
+  const runAudit = async () => {
+    setAudit({ running: true, results: [] });
+    const citas = extraerCitas(ref.current?.innerText ?? "");
+    setAudit({ running: false, results: await auditarVigencia(citas) });
+  };
 
   // Sync external content (generated documents / new case) into the editable DOM
   // only on version bumps to avoid clobbering the caret while typing.
@@ -119,6 +199,14 @@ export function EditorPanel() {
           <div className="flex items-center gap-2 border-b border-hairline px-4 py-2">
             <EditorToolbar exec={exec} />
             <div className="ml-auto flex items-center gap-2">
+              <button
+                onClick={runAudit}
+                title="Auditoría de vigencia normativa — valida los artículos citados contra el corpus oficial"
+                aria-label="Auditar vigencia"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-green-500/20 bg-green-500/5 text-green-600 transition-colors hover:bg-green-500/10 dark:bg-green-500/10 dark:text-green-400 cursor-pointer"
+              >
+                <ShieldCheck size={15} />
+              </button>
               <div className="relative">
                 <button
                   onClick={() => setMenuOpen((v) => !v)}
@@ -160,6 +248,14 @@ export function EditorPanel() {
               </button>
             </div>
           </div>
+
+          {audit && (
+            <AuditoriaVigencia
+              results={audit.results}
+              running={audit.running}
+              onClose={() => setAudit(null)}
+            />
+          )}
 
           <div className="scroll-zone flex-1 overflow-y-auto px-6 py-6">
             <div className="mx-auto max-w-[760px] rounded-2xl border border-hairline paper px-8 py-9 shadow-card sm:px-12 sm:py-12 min-h-[60vh] relative">

@@ -2,6 +2,26 @@
 // match_articulos vía PostgREST RPC (service role → sin CORS, bypassa RLS).
 // Server-side. Best-effort: devuelve [] si falta una credencial o el corpus.
 // El prefijo `_` evita que Vercel lo trate como un endpoint.
+// Tesis y jurisprudencias del SJF (corpus indexado propio, tabla `tesis`).
+// FTS en Postgres — no requiere OpenAI. Devuelve [] best-effort.
+export async function buscarTesis(query, materia) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key || !query) return [];
+  try {
+    const r = await fetch(`${url}/rest/v1/rpc/buscar_tesis`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: key, Authorization: `Bearer ${key}` },
+      body: JSON.stringify({ q: query.slice(0, 300), p_materia: materia ?? null, p_tipo: null, p_limit: 5 }),
+    });
+    if (!r.ok) return [];
+    const data = await r.json();
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
 export async function buscarArticulos(query, rama) {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;

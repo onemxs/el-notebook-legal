@@ -20,6 +20,7 @@ import { Onboarding } from "@/components/onboarding/Onboarding";
 import { AdminPanel } from "@/components/admin/AdminPanel";
 import { MembersPanel } from "@/components/equipo/MembersPanel";
 import { AcceptInvite } from "@/components/auth/AcceptInvite";
+import { BuscadorJuridico } from "@/components/juridico/BuscadorJuridico";
 import { UnirseDespacho } from "@/components/equipo/UnirseDespacho";
 import { ConfiguracionView } from "@/components/settings/ConfiguracionView";
 
@@ -210,6 +211,14 @@ export default function App() {
                 <RequireAuth>
                   <MembersPanel />
                 </RequireAuth>
+              }
+            />
+            <Route
+              path="/juridico"
+              element={
+                <RequireAccess>
+                  <BuscadorJuridico />
+                </RequireAccess>
               }
             />
             <Route path="/invitacion/:token" element={<AcceptInvite />} />

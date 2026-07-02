@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   CalendarClock,
   Sparkles,
@@ -9,11 +10,129 @@ import {
   RotateCw,
   Inbox,
   Printer,
+  X,
 } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import type { TimelineEvent, TimelineInconsistency, TimelineSeverity } from "@/lib/types";
 import { exportarReporteCronologia } from "@/lib/export";
 import { BRANCHES } from "@/lib/branches";
+import { calcularPlazo, PRESETS_PLAZO } from "@/lib/plazos";
+
+/* ──────────────────── Cálculo de Términos Procesales ──────────────────── */
+
+const inputPlazo =
+  "rounded-xl border border-hairline bg-panel-solid px-3 py-2 text-[13px] text-ink focus:border-accent focus:outline-none";
+
+function PlazoCalculator({ align = "right" }: { align?: "right" | "center" }) {
+  const [open, setOpen] = useState(false);
+  const [fecha, setFecha] = useState("");
+  const [preset, setPreset] = useState(0); // -1 = personalizado
+  const [custom, setCustom] = useState(9);
+
+  const dias = preset === -1 ? Math.max(1, custom) : PRESETS_PLAZO[preset].dias;
+  const r = fecha ? calcularPlazo(new Date(`${fecha}T12:00:00`), dias) : null;
+  const tone = !r
+    ? ""
+    : r.vencido || r.habilesRestantes <= 2
+      ? "bg-danger-soft text-danger"
+      : r.habilesRestantes <= 5
+        ? "bg-warning-soft text-warning"
+        : "border border-green-500/20 bg-green-500/5 text-green-700 dark:bg-green-500/10 dark:text-green-400";
+
+  return (
+    <div className={align === "center" ? "w-full max-w-md" : ""}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1.5 rounded-lg border border-hairline px-2.5 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-elevated hover:text-ink cursor-pointer"
+      >
+        <CalendarClock size={13} className="text-accent" />
+        Calcular Término Procesal
+      </button>
+
+      {open && (
+        <div className="mt-3 rounded-2xl border border-hairline bg-panel-solid/70 p-4 text-left shadow-card backdrop-blur-md animate-scale-in">
+          <div className="flex items-center gap-2">
+            <p className="text-[12px] font-semibold text-ink">Cómputo de días hábiles (PJF)</p>
+            <button
+              onClick={() => setOpen(false)}
+              className="ml-auto flex h-6 w-6 items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-elevated hover:text-ink cursor-pointer"
+              aria-label="Cerrar calculadora"
+            >
+              <X size={13} />
+            </button>
+          </div>
+
+          <div className="mt-3 flex flex-col gap-2.5">
+            <label className="flex flex-col gap-1 text-[11px] font-medium text-ink-subtle">
+              Fecha de notificación
+              <input
+                type="date"
+                value={fecha}
+                onChange={(e) => setFecha(e.target.value)}
+                className={inputPlazo}
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-[11px] font-medium text-ink-subtle">
+              Materia del escrito / término
+              <select
+                value={preset}
+                onChange={(e) => setPreset(Number(e.target.value))}
+                className={`${inputPlazo} cursor-pointer`}
+              >
+                {PRESETS_PLAZO.map((p, i) => (
+                  <option key={p.label} value={i}>
+                    {p.label}
+                  </option>
+                ))}
+                <option value={-1}>Personalizado (N días hábiles)</option>
+              </select>
+            </label>
+            {preset === -1 && (
+              <label className="flex flex-col gap-1 text-[11px] font-medium text-ink-subtle">
+                Días hábiles
+                <input
+                  type="number"
+                  min={1}
+                  max={365}
+                  value={custom}
+                  onChange={(e) => setCustom(Number(e.target.value))}
+                  className={inputPlazo}
+                />
+              </label>
+            )}
+          </div>
+
+          {r && (
+            <div className={`mt-3 rounded-xl px-4 py-3 ${tone} animate-fade-in`}>
+              <p className="text-xl font-bold leading-tight">
+                {r.vencido
+                  ? `Vencido hace ${Math.abs(r.habilesRestantes)} días hábiles`
+                  : r.habilesRestantes === 0
+                    ? "Vence HOY"
+                    : `${r.habilesRestantes} días hábiles restantes`}
+              </p>
+              <p className="mt-0.5 text-[12px] font-medium opacity-80">
+                Vence el{" "}
+                {r.vencimiento.toLocaleDateString("es-MX", {
+                  weekday: "long",
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
+            </div>
+          )}
+
+          <p className="mt-3 text-[10px] leading-relaxed text-ink-subtle">
+            Descuenta sábados, domingos, inhábiles oficiales (art. 19 Ley de Amparo · art. 74 LFT)
+            y recesos del PJF (16–31 jul, 16–31 dic). El cómputo inicia el día hábil siguiente a la
+            notificación — verifica cuándo surte efectos en tu materia. Cálculo conservador.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const DAY = 86400000;
 /** Above 7 events the horizontal layout gets cramped, so we switch to vertical. */
@@ -457,6 +576,9 @@ export function Timeline() {
           <Sparkles size={15} className="text-accent" />
           Ver cronología de referencia
         </button>
+        <div className="mt-4 flex flex-col items-center">
+          <PlazoCalculator align="center" />
+        </div>
       </div>
     );
   }
@@ -500,6 +622,10 @@ export function Timeline() {
             Regenerar
           </button>
         </div>
+      </div>
+
+      <div className="mb-4">
+        <PlazoCalculator />
       </div>
 
       <InconsistencyBanner inconsistencies={inconsistencies} />

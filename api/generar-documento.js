@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { buscarArticulos } from "./_rag.js";
+import { buscarArticulos, buscarTesis } from "./_rag.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -34,10 +34,21 @@ export default async function handler(req, res) {
       .replace(/\s+/g, " ")
       .slice(0, 1500);
 
-    const articles = await buscarArticulos(ragQuery, branch);
+    const [articles, tesis] = await Promise.all([
+      buscarArticulos(ragQuery, branch),
+      buscarTesis(`${kindLabel || ""} ${branchName || ""}`.trim(), branch ?? null),
+    ]);
     const articlesBlock = articles.length
       ? articles
           .map((a) => `**${a.codigo} — Art. ${a.articulo} (vigente):**\n${(a.texto || "").slice(0, 800)}`)
+          .join("\n\n")
+      : "";
+    const tesisBlock = tesis.length
+      ? tesis
+          .map(
+            (t) =>
+              `**Registro digital ${t.registro}** · ${t.tipo === "jurisprudencia" ? "Jurisprudencia" : "Tesis aislada"} ${t.clave || ""} (${t.instancia || ""}):\n${t.rubro}\n${(t.sintesis || "").slice(0, 400)}`,
+          )
           .join("\n\n")
       : "";
 
@@ -66,6 +77,8 @@ INYECCIÓN REAL DE HECHOS: Toma el arreglo de antecedentes y hechos extraídos d
 
 FUNDAMENTACIÓN ACTIVA: Utiliza el nombre de la ley de la materia (${lawName || "leyes aplicables"}) y las menciones en el expediente para estructurar los capítulos de DERECHO y los PUNTOS PETITORIOS de forma contundente y explícita, citando los artículos aplicables de manera literal si aparecen en el contexto.
 
+JURISPRUDENCIA VERIFICADA: Si invocas criterios jurisprudenciales, usa EXCLUSIVAMENTE las tesis de la sección TESIS Y JURISPRUDENCIAS, citándolas SIEMPRE con su Número de Registro Digital (p. ej. «Registro digital 2006224»). Si esa sección viene vacía o ninguna aplica, fundamenta solo con los artículos — está PROHIBIDO inventar tesis, rubros, claves o registros.
+
 MANTÉN EL DISEÑO DE MARGEN: Genera el contenido estructurado únicamente en HTML limpio (usando etiquetas <h2>, <h3>, <p>, <strong>), respetando el tono solemne del foro judicial mexicano y cerrando obligatoriamente con la frase de estilo "PROTESTO LO NECESARIO".
 
 - FORMATO: devuelve SOLO un FRAGMENTO HTML (sin <!DOCTYPE>, <html>, <head>, <body>, <title>, <meta>, <style> ni atributos style="..." ni class="..."). Do not wrap in markdown code fences.`;
@@ -86,6 +99,12 @@ ${
       articlesBlock
         ? `## ARTÍCULOS VIGENTES DEL CORPUS (intégralos TEXTUALMENTE en la sección de Derecho):\n${articlesBlock}`
         : "## ARTÍCULOS: el corpus legal no devolvió artículos para este caso. NO inventes números de artículo; cita los códigos aplicables por su nombre y deja el número como ______ donde no lo tengas verificado."
+    }
+
+${
+      tesisBlock
+        ? `## TESIS Y JURISPRUDENCIAS (índice SJF — únicas citables, con su Registro Digital):\n${tesisBlock}`
+        : "## TESIS Y JURISPRUDENCIAS: sin tesis indexadas para este caso — NO cites jurisprudencia."
     }
 
 ${estructura}

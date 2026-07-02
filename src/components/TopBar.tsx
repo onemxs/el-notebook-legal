@@ -13,6 +13,7 @@ import {
   Archive,
   Menu,
   ArrowLeft,
+  Landmark,
 } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
@@ -158,6 +159,14 @@ export function TopBar({ onMenuToggle }: { onMenuToggle?: () => void }) {
         >
           <FolderPlus size={15} />
           <span className="hidden sm:inline">Nuevo caso</span>
+        </button>
+        <button
+          onClick={() => navigate("/juridico")}
+          className={iconBtn}
+          aria-label="Buscador Jurídico"
+          title="Buscador Jurídico — SJF · CJF · Legislación"
+        >
+          <Landmark size={18} />
         </button>
         <button
           onClick={toggle}
