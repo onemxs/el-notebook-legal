@@ -11,6 +11,8 @@ import {
   Inbox,
   Printer,
   X,
+  Check,
+  CalendarPlus,
 } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import type { TimelineEvent, TimelineInconsistency, TimelineSeverity } from "@/lib/types";
@@ -24,13 +26,32 @@ const inputPlazo =
   "rounded-xl border border-hairline bg-panel-solid px-3 py-2 text-[13px] text-ink focus:border-accent focus:outline-none";
 
 function PlazoCalculator({ align = "right" }: { align?: "right" | "center" }) {
+  const { addPlazo } = useWorkspace();
   const [open, setOpen] = useState(false);
   const [fecha, setFecha] = useState("");
   const [preset, setPreset] = useState(0); // -1 = personalizado
   const [custom, setCustom] = useState(9);
+  const [added, setAdded] = useState(false);
 
   const dias = preset === -1 ? Math.max(1, custom) : PRESETS_PLAZO[preset].dias;
+  const label = preset === -1 ? `Término de ${dias} días hábiles` : PRESETS_PLAZO[preset].label;
   const r = fecha ? calcularPlazo(new Date(`${fecha}T12:00:00`), dias) : null;
+
+  const guardar = () => {
+    if (!r) return;
+    const notif = new Date(`${fecha}T12:00:00`).toLocaleDateString("es-MX", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+    addPlazo(
+      `Vence: ${label}`,
+      r.vencimiento.toISOString(),
+      `Término procesal de ${dias} días hábiles. Notificado el ${notif}.`,
+    );
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2500);
+  };
   const tone = !r
     ? ""
     : r.vencido || r.habilesRestantes <= 2
@@ -121,6 +142,24 @@ function PlazoCalculator({ align = "right" }: { align?: "right" | "center" }) {
                 })}
               </p>
             </div>
+          )}
+
+          {r && !r.vencido && (
+            <button
+              onClick={guardar}
+              disabled={added}
+              className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-[13px] font-semibold text-white shadow-tactile transition-all hover:bg-accent-hover active:translate-y-px disabled:opacity-60 cursor-pointer"
+            >
+              {added ? (
+                <>
+                  <Check size={14} /> Añadido a la cronología
+                </>
+              ) : (
+                <>
+                  <CalendarPlus size={14} /> Añadir a la cronología
+                </>
+              )}
+            </button>
           )}
 
           <p className="mt-3 text-[10px] leading-relaxed text-ink-subtle">

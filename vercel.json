@@ -2,8 +2,12 @@
   "functions": {
     "api/analizar.js": { "maxDuration": 30 },
     "api/generar-documento.js": { "maxDuration": 60 },
-    "api/asistente.js": { "maxDuration": 30 }
+    "api/asistente.js": { "maxDuration": 30 },
+    "api/recordatorios-plazos.js": { "maxDuration": 30 }
   },
+  "crons": [
+    { "path": "/api/recordatorios-plazos", "schedule": "0 14 * * *" }
+  ],
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]

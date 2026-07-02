@@ -124,6 +124,7 @@ interface WorkspaceCtx extends WorkspaceState {
   removeFile: (id: string) => void;
   sendMessage: (text: string) => void;
   runTimeline: () => void;
+  addPlazo: (titulo: string, iso: string, detalle: string) => void;
   getTranscriptContent: (fileName: string) => string | undefined;
   openArticle: (c: Citation) => void;
   closeArticle: () => void;
@@ -885,6 +886,31 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     }, 900);
   }, [analizarInconsistencias]);
 
+  // Añade un término procesal calculado a la cronología del caso (y a Supabase
+  // en la nube) como evento de tipo "deadline", para que alimente los avisos.
+  const addPlazo = useCallback((titulo: string, iso: string, detalle: string) => {
+    const fecha = new Date(iso).toLocaleDateString("es-MX", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+    const ev: TimelineEvent = {
+      id: uid("plazo"),
+      date: fecha,
+      iso,
+      title: titulo,
+      detail: detalle,
+      severity: "deadline",
+      source: "Cálculo de término procesal",
+    };
+    setTimeline((prev) => [...(prev ?? []), ev].sort(byChrono));
+    const caso = currentCaseIdRef.current;
+    if (caso)
+      void guardarTimelineEventos(caso, [
+        { fecha: ev.date, iso: ev.iso, titulo: ev.title, detalle: ev.detail, severidad: "deadline" },
+      ]);
+  }, []);
+
   const getTranscriptContent = useCallback((fileId: string): string | undefined => {
     return transcriptMapRef.current.get(fileId);
   }, []);
@@ -1309,6 +1335,7 @@ ${notesHtml}
       removeFile,
       sendMessage,
       runTimeline,
+      addPlazo,
       getTranscriptContent,
       inconsistencies,
       openArticle,
@@ -1380,6 +1407,7 @@ ${notesHtml}
       removeFile,
       sendMessage,
       runTimeline,
+      addPlazo,
       getTranscriptContent,
       inconsistencies,
       openArticle,
