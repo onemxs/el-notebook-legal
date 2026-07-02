@@ -11,7 +11,8 @@
     "lint": "tsc --noEmit",
     "corpus:build": "node scripts/construir_corpus.mjs",
     "corpus:ingest": "node --env-file=.env scripts/ingest_supabase.mjs",
-    "tesis:ingest": "node --env-file=.env scripts/ingest_tesis.mjs"
+    "tesis:ingest": "node --env-file=.env scripts/ingest_tesis.mjs",
+    "tesis:sjf": "node --env-file=.env scripts/ingest_sjf.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

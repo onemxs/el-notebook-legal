@@ -21,6 +21,7 @@ import { AdminPanel } from "@/components/admin/AdminPanel";
 import { MembersPanel } from "@/components/equipo/MembersPanel";
 import { AcceptInvite } from "@/components/auth/AcceptInvite";
 import { BuscadorJuridico } from "@/components/juridico/BuscadorJuridico";
+import { Terminos, Privacidad } from "@/components/legal/Legal";
 import { UnirseDespacho } from "@/components/equipo/UnirseDespacho";
 import { ConfiguracionView } from "@/components/settings/ConfiguracionView";
 
@@ -221,6 +222,8 @@ export default function App() {
                 </RequireAccess>
               }
             />
+            <Route path="/terminos" element={<Terminos />} />
+            <Route path="/privacidad" element={<Privacidad />} />
             <Route path="/invitacion/:token" element={<AcceptInvite />} />
             <Route
               path="/unirse"

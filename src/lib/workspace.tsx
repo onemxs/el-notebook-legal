@@ -136,6 +136,8 @@ interface WorkspaceCtx extends WorkspaceState {
   setCaseAction: (action: { mode: "archive" | "delete"; caseId: string; caseName: string } | null) => void;
   activeCases: CaseSummary[];
   archivedCases: CaseSummary[];
+  caseQuery: string;
+  setCaseQuery: (q: string) => void;
   analyzeContract: (file: File) => void;
   generateCustomDocument: (templateId: string, variables: Record<string, string>, notes: string) => void;
   setSelectedTemplate: (id: string | null) => void;
@@ -368,6 +370,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   const [view, setView] = useState<AppView>("dashboard");
   const [cases, setCases] = useState<CaseSummary[]>(SEED_CASES);
+  const [caseQuery, setCaseQuery] = useState("");
   const [recentCases, setRecentCases] = useState<CaseSummary[]>([]);
   const [caseAction, setCaseAction] = useState<{
     mode: "archive" | "delete";
@@ -1318,6 +1321,8 @@ ${notesHtml}
       deleteCase,
       activeCases,
       archivedCases,
+      caseQuery,
+      setCaseQuery,
       members,
       activeAnalysis,
       analysisLoading,
@@ -1387,6 +1392,7 @@ ${notesHtml}
       deleteCase,
       activeCases,
       archivedCases,
+      caseQuery,
     ],
   );
 

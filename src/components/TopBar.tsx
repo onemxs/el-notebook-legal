@@ -26,8 +26,8 @@ export function TopBar({ onMenuToggle }: { onMenuToggle?: () => void }) {
   const { theme, toggle } = useTheme();
   const { session, perfil, demo, isSuperadmin, signOut, exitDemo } = useAuth();
   const navigate = useNavigate();
-  const { view, branch, caseName, goHome, openCase, openCaseModal, recentCases } = useWorkspace();
-  const [searchQuery, setSearchQuery] = useState("");
+  const { view, branch, caseName, goHome, openCase, openCaseModal, recentCases, caseQuery, setCaseQuery } =
+    useWorkspace();
   const [acctOpen, setAcctOpen] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [recentOpen, setRecentOpen] = useState(false);
@@ -143,8 +143,8 @@ export function TopBar({ onMenuToggle }: { onMenuToggle?: () => void }) {
             <input
               type="text"
               placeholder="Buscar por expediente, cliente o materia..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={caseQuery}
+              onChange={(e) => setCaseQuery(e.target.value)}
               className="w-full pl-9 pr-3 py-2 rounded-lg border border-hairline bg-panel-solid text-[13px] text-ink placeholder:text-ink-subtle focus:border-accent focus:outline-none transition-colors"
             />
           </div>

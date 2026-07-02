@@ -155,7 +155,7 @@ function CaseCard({
 }
 
 export function DashboardView() {
-  const { activeCases, archivedCases, openCase, openCaseModal, startIntake, settings, setCaseAction } = useWorkspace();
+  const { activeCases, archivedCases, openCase, openCaseModal, startIntake, settings, setCaseAction, caseQuery } = useWorkspace();
   const despachoMode = settings.accountMode === "despacho";
   const upcoming = activeCases.filter((c) => c.deadlineLabel).length;
   const [dragging, setDragging] = useState(false);
@@ -173,9 +173,11 @@ export function DashboardView() {
 
   const displayCases = tab === "activos" ? activeCases : archivedCases;
 
+  const q = caseQuery.trim().toLowerCase();
   const filteredCases = displayCases.filter((c) => {
-    if (activeFilter === "all") return true;
-    if (activeFilter === "urgent") return c.deadlineLabel;
+    if (q && !`${c.name} ${BRANCHES[c.branch].name} ${c.asignadoA ?? ""}`.toLowerCase().includes(q))
+      return false;
+    if (activeFilter === "urgent") return !!c.deadlineLabel;
     if (activeFilter === "amparo") return c.branch === "amparo";
     if (activeFilter === "mercantil") return c.branch === "mercantil";
     if (activeFilter === "laboral") return c.branch === "laboral";
@@ -402,7 +404,11 @@ export function DashboardView() {
             </div>
             {filteredCases.length === 0 && (
               <div className="rounded-xl border border-hairline bg-panel-solid/50 p-6 text-center">
-                <p className="text-sm text-ink-muted">No hay expedientes que coincidan con el filtro seleccionado.</p>
+                <p className="text-sm text-ink-muted">
+                  {q
+                    ? `Ningún expediente coincide con “${caseQuery.trim()}”.`
+                    : "No hay expedientes que coincidan con el filtro seleccionado."}
+                </p>
               </div>
             )}
           </div>

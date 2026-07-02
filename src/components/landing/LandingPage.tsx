@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 interface LandingPageProps {
   onLogin: () => void;
@@ -224,8 +225,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         <div className="max-w-[1200px] mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center gap-4">
           <div>© 2026 PasantIA. Herramientas de litigación premium.</div>
           <div className="flex gap-6">
-            <span>Secreto Profesional</span>
-            <span>Términos</span>
+            <Link to="/privacidad" className="transition-colors hover:text-[#022448]">
+              Aviso de Privacidad
+            </Link>
+            <Link to="/terminos" className="transition-colors hover:text-[#022448]">
+              Términos
+            </Link>
           </div>
         </div>
       </footer>
