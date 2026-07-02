@@ -1,4 +1,5 @@
 import type { TimelineEvent, TimelineInconsistency } from "./types";
+import { buildDocx } from "./docx";
 
 export interface DocumentPayload {
   title: string;
@@ -46,14 +47,9 @@ export function buildDocumentHtml(p: DocumentPayload): string {
 </body></html>`;
 }
 
-/** Export as a Word-openable .doc (HTML with Office namespaces). */
+/** Export as a real .docx (OOXML) with judicial page margins. */
 export function exportToWord(p: DocumentPayload): void {
-  const html = buildDocumentHtml(p).replace(
-    "<html lang=\"es-MX\">",
-    "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40' lang='es-MX'>",
-  );
-  const blob = new Blob(["﻿", html], { type: "application/msword" });
-  triggerDownload(blob, `${slug(p.title)}-${slug(p.caseName)}.doc`);
+  triggerDownload(buildDocx(p), `${slug(p.title)}-${slug(p.caseName)}.docx`);
 }
 
 /** Export to PDF via the browser print pipeline (judicial @page margins). */

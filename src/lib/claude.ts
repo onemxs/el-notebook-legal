@@ -12,6 +12,9 @@ import { authHeaders } from "./supabase";
 const IMG_TYPES = ["image/png", "image/jpeg", "image/gif", "image/webp"];
 const DOCX_TYPE =
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+// Claude lee PDF escaneado (OCR nativo por visión). Pero base64 infla ~33% y la
+// API tope ~32 MB de request, así que acotamos el archivo original a 24 MB.
+const MAX_MEDIA_BYTES = 24 * 1024 * 1024;
 
 function isDocx(file: File): boolean {
   return file.type === DOCX_TYPE || /\.docx$/i.test(file.name);
@@ -66,6 +69,12 @@ async function buildPayload(file: File) {
     return { name: file.name, mediaType, text: await file.text() };
   }
   if (mediaType === "application/pdf" || IMG_TYPES.includes(mediaType)) {
+    if (file.size > MAX_MEDIA_BYTES) {
+      console.warn(
+        `[analyzeDocument] "${file.name}" pesa ${(file.size / 1048576).toFixed(1)} MB — excede el límite de ${MAX_MEDIA_BYTES / 1048576} MB para análisis con IA. Divide el expediente o comprime el escaneado.`,
+      );
+      return null;
+    }
     return { name: file.name, mediaType, base64: await toBase64(file) };
   }
   return null; // unsupported (e.g. old binary .doc) → fall back to demo
