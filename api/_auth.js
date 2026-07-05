@@ -32,8 +32,11 @@ export async function requireUser(req) {
       headers: { "Content-Type": "application/json", apikey: key, Authorization: `Bearer ${key}` },
       body: JSON.stringify({ p_user: user.id, p_limite: limite }),
     });
-    if (rl.ok && (await rl.json()) === false) {
-      return { error: "rate_limited", status: 429 };
+    if (rl.ok) {
+      // 'ok' | 'limite' | 'suspendida' — el RPC aplica cuota personalizada (perfiles.cuota_ia)
+      const estado = await rl.json();
+      if (estado === "suspendida") return { error: "account_suspended", status: 403 };
+      if (estado === "limite") return { error: "rate_limited", status: 429 };
     }
   } catch {
     /* cuota cae abierta */
