@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { buscarArticulos, buscarTesis } from "./_rag.js";
-import { requireUser } from "./_auth.js";
+import { requireUser, registrarTokensIA } from "./_auth.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -122,6 +122,8 @@ Redacta el HTML del escrito — extenso, meticuloso y elegante — sin un solo c
       system: SYSTEM,
       messages: [{ role: "user", content: prompt }],
     });
+
+    await registrarTokensIA(auth.user.id, response.model, response.usage);
 
     const rawText = response.content[0].text;
     const cleanHtml = toFragment(rawText);

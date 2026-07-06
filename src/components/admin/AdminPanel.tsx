@@ -14,9 +14,16 @@ import {
   Sparkles,
   Activity,
   ScrollText,
+  DollarSign,
 } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
-import { CuentaDetalle, hace } from "@/components/admin/CuentaDetalle";
+import {
+  CuentaDetalle,
+  hace,
+  costoUSD,
+  fmtUSD,
+  type ModeloTokens,
+} from "@/components/admin/CuentaDetalle";
 
 interface Cuenta {
   id: string;
@@ -32,6 +39,7 @@ interface Cuenta {
   organizacion: string | null;
   expedientes: number;
   ia_mes: number;
+  ia_modelos: ModeloTokens[];
 }
 interface Auditoria {
   accion: string;
@@ -46,6 +54,7 @@ interface Dashboard {
   expedientes: number;
   ia_hoy: number;
   ia_mes: number;
+  ia_modelos: ModeloTokens[];
   cuentas: Cuenta[];
   auditoria: Auditoria[];
 }
@@ -70,7 +79,7 @@ function Metric({
   label,
 }: {
   icon: React.ReactNode;
-  value: number;
+  value: number | string;
   label: string;
 }) {
   return (
@@ -78,7 +87,9 @@ function Metric({
       <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent">
         {icon}
       </span>
-      <p className="mt-3 font-serif text-3xl font-medium text-ink">{value.toLocaleString()}</p>
+      <p className="mt-3 font-serif text-3xl font-medium text-ink">
+        {typeof value === "number" ? value.toLocaleString() : value}
+      </p>
       <p className="text-[12px] uppercase tracking-wide text-ink-subtle">{label}</p>
     </div>
   );
@@ -135,12 +146,17 @@ export function AdminPanel() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               <Metric icon={<Users size={18} />} value={data.usuarios} label="Usuarios" />
               <Metric icon={<Building2 size={18} />} value={data.despachos} label="Despachos" />
               <Metric icon={<FolderArchive size={18} />} value={data.expedientes} label="Expedientes" />
               <Metric icon={<Sparkles size={18} />} value={data.ia_hoy} label="IA hoy" />
               <Metric icon={<Activity size={18} />} value={data.ia_mes} label="IA · 30 días" />
+              <Metric
+                icon={<DollarSign size={18} />}
+                value={fmtUSD(costoUSD(data.ia_modelos))}
+                label="Costo IA · 30 d"
+              />
             </div>
 
             <section className="mt-6 overflow-hidden rounded-2xl border border-hairline bg-panel-solid shadow-card">
@@ -197,6 +213,11 @@ export function AdminPanel() {
                           <td className="px-3 py-3 text-ink-muted">{hace(c.last_sign_in_at)}</td>
                           <td className="px-3 py-3 text-right">
                             <span className="font-medium text-ink">{c.ia_mes.toLocaleString()}</span>
+                            {costoUSD(c.ia_modelos) > 0 && (
+                              <p className="text-[10px] text-ink-subtle">
+                                ≈ {fmtUSD(costoUSD(c.ia_modelos))}
+                              </p>
+                            )}
                             {c.cuota_ia != null && (
                               <p className="text-[10px] text-ink-subtle">cuota {c.cuota_ia}/h</p>
                             )}

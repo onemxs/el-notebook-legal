@@ -44,3 +44,27 @@ export async function requireUser(req) {
 
   return { user };
 }
+
+// Contabilidad de tokens por llamada (ia_tokens_diario) — alimenta el costo
+// estimado del panel admin. Se llama tras cada respuesta de Anthropic con
+// response.model y response.usage. Falla en silencio: la contabilidad jamás
+// debe romper la respuesta al abogado.
+export async function registrarTokensIA(userId, modelo, usage) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key || !userId || !usage) return;
+  try {
+    await fetch(`${url}/rest/v1/rpc/registrar_tokens_ia`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: key, Authorization: `Bearer ${key}` },
+      body: JSON.stringify({
+        p_user: userId,
+        p_modelo: modelo || "desconocido",
+        p_in: usage.input_tokens || 0,
+        p_out: usage.output_tokens || 0,
+      }),
+    });
+  } catch {
+    /* la contabilidad no bloquea */
+  }
+}

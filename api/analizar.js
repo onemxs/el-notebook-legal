@@ -1,4 +1,4 @@
-import { requireUser } from "./_auth.js";
+import { requireUser, registrarTokensIA } from "./_auth.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -135,6 +135,8 @@ Si no encuentras un dato, usa un valor razonable o "No especificado". No invente
       messages: [{ role: "user", content }],
       output_config: { format: { type: "json_schema", schema: SCHEMA } },
     });
+
+    await registrarTokensIA(auth.user.id, message.model, message.usage);
 
     // A truncated response yields invalid JSON; surface it clearly instead of a
     // cryptic parse error so the client knows to retry / raise max_tokens.

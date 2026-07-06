@@ -14,6 +14,41 @@ import {
 } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 
+export interface ModeloTokens {
+  modelo: string;
+  tin: number;
+  tout: number;
+}
+
+// USD por millón de tokens [entrada, salida] — precios oficiales de Anthropic.
+// Actualizar aquí si cambian; el costo se calcula en la UI para no tocar la base.
+const PRECIOS_MTOK: [RegExp, [number, number]][] = [
+  [/^claude-opus/, [5, 25]],
+  [/^claude-sonnet/, [3, 15]],
+  [/^claude-haiku/, [1, 5]],
+];
+
+/** Costo estimado en USD de un desglose de tokens por modelo. */
+export function costoUSD(modelos: ModeloTokens[] | null | undefined): number {
+  return (modelos ?? []).reduce((acc, m) => {
+    // ponytail: modelo desconocido cotiza a precio Opus (sobreestima, nunca oculta costo)
+    const [, [pin, pout]] = PRECIOS_MTOK.find(([re]) => re.test(m.modelo)) ?? [null, [5, 25]];
+    return acc + (m.tin / 1e6) * pin + (m.tout / 1e6) * pout;
+  }, 0);
+}
+
+export function fmtUSD(n: number): string {
+  if (n === 0) return "$0";
+  if (n < 0.01) return "<$0.01";
+  return `$${n.toFixed(2)}`;
+}
+
+function fmtTok(n: number): string {
+  if (n >= 1e6) return `${(n / 1e6).toFixed(1)} M`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)} k`;
+  return String(n);
+}
+
 interface Detalle {
   perfil: {
     id: string;
@@ -37,6 +72,7 @@ interface Detalle {
   plazos_activos: number;
   materias: { rama: string; n: number }[];
   ia_serie: { dia: string; n: number }[];
+  ia_modelos: ModeloTokens[];
 }
 
 /** "hoy", "ayer", "hace 3 d", "hace 2 meses" — actividad relativa. */
@@ -216,6 +252,26 @@ export function CuentaDetalle({
                       />
                     );
                   })}
+                </div>
+              )}
+              {data.ia_modelos.length > 0 && (
+                <div className="mt-3 space-y-1">
+                  {data.ia_modelos.map((m) => (
+                    <p
+                      key={m.modelo}
+                      className="flex items-baseline justify-between gap-2 text-[12px] text-ink-muted"
+                    >
+                      <span className="truncate">{m.modelo}</span>
+                      <span className="shrink-0">
+                        {fmtTok(m.tin)} in · {fmtTok(m.tout)} out ·{" "}
+                        <span className="font-medium text-ink">{fmtUSD(costoUSD([m]))}</span>
+                      </span>
+                    </p>
+                  ))}
+                  <p className="flex items-baseline justify-between border-t border-hairline pt-1.5 text-[12px] font-semibold text-ink">
+                    <span>Costo estimado · 30 días</span>
+                    <span>{fmtUSD(costoUSD(data.ia_modelos))}</span>
+                  </p>
                 </div>
               )}
             </div>
