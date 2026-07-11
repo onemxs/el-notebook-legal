@@ -137,8 +137,10 @@ function Review({
           <div>
             <p className="text-[13px] font-semibold">No pude leer el documento con la IA</p>
             <p className="text-[12px] leading-relaxed opacity-90">
-              Lo de abajo son datos de ejemplo, no los de tu archivo. Revisa tu conexión o el
-              formato (PDF, imagen o texto) y vuelve a subirlo.
+              Lo de abajo son datos de ejemplo, no los de tu archivo. Suele pasar con expedientes
+              escaneados muy extensos (muchas páginas): tardan más de lo permitido. Prueba subiendo
+              las fojas clave o dividiéndolo en partes. También revisa el formato (PDF, imagen o
+              texto) y tu conexión.
             </p>
           </div>
         </div>
