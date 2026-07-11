@@ -1,6 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import { useWorkspace } from "@/lib/workspace";
 import { useAuth } from "@/lib/auth";
-import { Briefcase, FileSearch, FilePlus } from "lucide-react";
+import { Briefcase, FileSearch, FilePlus, UserPlus } from "lucide-react";
 
 const MODULES = [
   { id: "dashboard" as const, label: "Casos Activos", icon: Briefcase },
@@ -11,9 +12,11 @@ const MODULES = [
 export function Sidebar({ isMobileMenuOpen, onClose }: { isMobileMenuOpen: boolean; onClose: () => void }) {
   const { view, setView } = useWorkspace();
   const { session, demo } = useAuth();
+  const routerNav = useNavigate();
   if (!session && !demo) return null;
   const compact = view === "workspace";
   const navigate = (id: string) => { setView(id as any); onClose(); };
+  const irAProspectos = () => { routerNav("/prospectos"); onClose(); };
   const handleConfigClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -57,6 +60,17 @@ export function Sidebar({ isMobileMenuOpen, onClose }: { isMobileMenuOpen: boole
             </button>
           );
         })}
+        {/* CRM — solo para cuentas con sesión (no demo). */}
+        {session && (
+          <button
+            onClick={irAProspectos}
+            className={`flex w-full items-center rounded-xl text-ink-muted transition-all hover:bg-elevated hover:text-ink cursor-pointer ${compact ? 'justify-center p-3' : 'gap-3 px-4 py-3'}`}
+            title={compact ? "Prospectos" : undefined}
+          >
+            <UserPlus size={20} strokeWidth={1.75} className="shrink-0" />
+            <span className={`overflow-hidden whitespace-nowrap text-sm font-medium transition-all duration-300 ${compact ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>Prospectos</span>
+          </button>
+        )}
       </div>
 
       {/* Bottom — profile / config */}

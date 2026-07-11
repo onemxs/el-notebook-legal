@@ -23,6 +23,7 @@ import { AcceptInvite } from "@/components/auth/AcceptInvite";
 import { BuscadorJuridico } from "@/components/juridico/BuscadorJuridico";
 import { Calculadoras } from "@/components/juridico/Calculadoras";
 import { Agenda } from "@/components/juridico/Agenda";
+import { Prospectos } from "@/components/juridico/Prospectos";
 import { Terminos, Privacidad } from "@/components/legal/Legal";
 import { UnirseDespacho } from "@/components/equipo/UnirseDespacho";
 import { ConfiguracionView } from "@/components/settings/ConfiguracionView";
@@ -238,6 +239,14 @@ export default function App() {
                 <RequireAccess>
                   <Agenda />
                 </RequireAccess>
+              }
+            />
+            <Route
+              path="/prospectos"
+              element={
+                <RequireAuth>
+                  <Prospectos />
+                </RequireAuth>
               }
             />
             <Route path="/terminos" element={<Terminos />} />
