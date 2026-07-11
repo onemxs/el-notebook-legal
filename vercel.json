@@ -3,6 +3,7 @@
     "api/analizar.js": { "maxDuration": 30 },
     "api/generar-documento.js": { "maxDuration": 60 },
     "api/asistente.js": { "maxDuration": 30 },
+    "api/revisar-contrato.js": { "maxDuration": 60 },
     "api/recordatorios-plazos.js": { "maxDuration": 30 }
   },
   "crons": [

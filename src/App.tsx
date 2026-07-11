@@ -21,6 +21,8 @@ import { AdminPanel } from "@/components/admin/AdminPanel";
 import { MembersPanel } from "@/components/equipo/MembersPanel";
 import { AcceptInvite } from "@/components/auth/AcceptInvite";
 import { BuscadorJuridico } from "@/components/juridico/BuscadorJuridico";
+import { Calculadoras } from "@/components/juridico/Calculadoras";
+import { Agenda } from "@/components/juridico/Agenda";
 import { Terminos, Privacidad } from "@/components/legal/Legal";
 import { UnirseDespacho } from "@/components/equipo/UnirseDespacho";
 import { ConfiguracionView } from "@/components/settings/ConfiguracionView";
@@ -219,6 +221,22 @@ export default function App() {
               element={
                 <RequireAccess>
                   <BuscadorJuridico />
+                </RequireAccess>
+              }
+            />
+            <Route
+              path="/calculadoras"
+              element={
+                <RequireAccess>
+                  <Calculadoras />
+                </RequireAccess>
+              }
+            />
+            <Route
+              path="/agenda"
+              element={
+                <RequireAccess>
+                  <Agenda />
                 </RequireAccess>
               }
             />

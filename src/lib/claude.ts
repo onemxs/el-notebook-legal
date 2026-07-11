@@ -1,4 +1,4 @@
-import type { BranchId, ExtractedCase, ExtractedField } from "./types";
+import type { BranchId, ContractAnalysis, ExtractedCase, ExtractedField } from "./types";
 import { BRANCHES } from "./branches";
 import { DOC_LABELS, type DocKind } from "./generators";
 import { authHeaders } from "./supabase";
@@ -130,6 +130,42 @@ function stripDocumentChrome(html: string): string {
     .replace(/<style[\s\S]*?<\/style>/gi, "")
     .replace(/<script[\s\S]*?<\/script>/gi, "")
     .trim();
+}
+
+/**
+ * Auditoría de contrato vía /api/revisar-contrato (Claude server-side).
+ * Devuelve null si no hay sesión/IA o el formato no es legible — el caller
+ * cae al análisis de ejemplo, igual que analyzeDocument.
+ */
+export async function revisarContratoAI(file: File): Promise<ContractAnalysis | null> {
+  try {
+    const payload = await buildPayload(file);
+    if (!payload) {
+      console.warn(
+        `[revisarContrato] "${file.name}" no es un formato legible (PDF, imagen, texto o .docx). Se usará el análisis de ejemplo.`,
+      );
+      return null;
+    }
+    const res = await fetch("/api/revisar-contrato", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      console.error(
+        res.status === 401
+          ? "[revisarContrato] La auditoría con IA requiere sesión — en modo demo se usa el análisis de ejemplo."
+          : `[revisarContrato] /api/revisar-contrato respondió HTTP ${res.status}. Se usará el análisis de ejemplo.`,
+      );
+      return null;
+    }
+    const json = await res.json();
+    if (json?.error || typeof json?.riskScore !== "number") return null;
+    return json as ContractAnalysis;
+  } catch (e) {
+    console.error("[revisarContrato] Falló la auditoría (red o excepción):", e);
+    return null;
+  }
 }
 
 export async function analyzeDocument(

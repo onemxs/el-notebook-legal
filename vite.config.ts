@@ -11,7 +11,8 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    // Respeta PORT (preview/CI) y cae a 5173 en dev manual.
+    port: Number(process.env.PORT) || 5173,
     host: true,
   },
 });

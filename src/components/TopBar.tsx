@@ -14,6 +14,8 @@ import {
   Menu,
   ArrowLeft,
   Landmark,
+  Calculator,
+  CalendarDays,
 } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
@@ -167,6 +169,22 @@ export function TopBar({ onMenuToggle }: { onMenuToggle?: () => void }) {
           title="Buscador Jurídico — SJF · CJF · Legislación"
         >
           <Landmark size={18} />
+        </button>
+        <button
+          onClick={() => navigate("/calculadoras")}
+          className={iconBtn}
+          aria-label="Calculadoras jurídicas"
+          title="Calculadoras — Liquidación · Intereses · UMA"
+        >
+          <Calculator size={18} />
+        </button>
+        <button
+          onClick={() => navigate("/agenda")}
+          className={iconBtn}
+          aria-label="Agenda de plazos"
+          title="Agenda de plazos — calendario y exportación .ics"
+        >
+          <CalendarDays size={18} />
         </button>
         <button
           onClick={toggle}

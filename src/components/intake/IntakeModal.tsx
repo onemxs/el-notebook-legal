@@ -19,6 +19,7 @@ import { analyzeDocument } from "@/lib/claude";
 import { BRANCH_LIST, BRANCHES } from "@/lib/branches";
 import { BranchIcon } from "@/components/branchIcons";
 import { kindFromName } from "@/lib/files";
+import { buscarConflictos, type Conflicto } from "@/lib/conflictos";
 import type { BranchId, CaseFile, ExtractedCase } from "@/lib/types";
 
 let fid = 0;
@@ -94,6 +95,7 @@ function Review({
   setCaseName,
   selected,
   setSelected,
+  conflictos,
 }: {
   data: ExtractedCase;
   fileName: string;
@@ -101,10 +103,33 @@ function Review({
   setCaseName: (v: string) => void;
   selected: BranchId;
   setSelected: (b: BranchId) => void;
+  conflictos: Conflicto[];
 }) {
   const pct = Math.round(data.confidence * 100);
   return (
     <div className="animate-fade-in">
+      {/* Conflicto de interés: una parte ya figura en otro expediente del despacho. */}
+      {conflictos.length > 0 && (
+        <div className="mb-4 rounded-xl border border-danger/25 bg-danger-soft px-3.5 py-3">
+          <p className="flex items-center gap-2 text-[13px] font-semibold text-danger">
+            <AlertTriangle size={15} className="shrink-0" />
+            Posible conflicto de interés
+          </p>
+          <ul className="mt-1.5 space-y-1">
+            {conflictos.slice(0, 4).map((c, i) => (
+              <li key={i} className="text-[12px] leading-relaxed text-danger/90">
+                «{c.parte}» ya figura como <b>{c.rolExistente}</b> en el expediente
+                «{c.casoNombre}» (aquí aparece como {c.rolNuevo}).
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1.5 text-[11px] text-danger/75">
+            Verifica tu deber de lealtad antes de aceptar el asunto (puedes crear el expediente de
+            todos modos).
+          </p>
+        </div>
+      )}
+
       {/* Fallback warning: the AI couldn't read the file, so this is sample data. */}
       {data.source !== "ia" && (
         <div className="mb-4 flex items-start gap-2.5 rounded-xl bg-warning-soft px-3.5 py-3 text-warning">
@@ -225,6 +250,7 @@ export function IntakeModal() {
   const [data, setData] = useState<ExtractedCase | null>(null);
   const [caseName, setCaseName] = useState("");
   const [selected, setSelected] = useState<BranchId>("civil");
+  const [conflictos, setConflictos] = useState<Conflicto[]>([]);
   const fileName = intakeFile?.name ?? "";
 
   useEffect(() => {
@@ -232,6 +258,7 @@ export function IntakeModal() {
     let cancelled = false;
     setData(null);
     setCurrent(0);
+    setConflictos([]);
     // Animate the step checklist while the (single) request runs.
     let step = 0;
     const timer = setInterval(() => {
@@ -246,6 +273,9 @@ export function IntakeModal() {
       setData(res);
       setSelected(res.branch);
       setCaseName(res.caseName);
+      // Conflicto de interés: compara las partes contra los expedientes existentes.
+      const confl = await buscarConflictos(res.parties);
+      if (!cancelled) setConflictos(confl);
     })();
     return () => {
       cancelled = true;
@@ -313,6 +343,7 @@ export function IntakeModal() {
             setCaseName={setCaseName}
             selected={selected}
             setSelected={setSelected}
+            conflictos={conflictos}
           />
         ) : (
           <Analyzing fileName={fileName} current={current} />

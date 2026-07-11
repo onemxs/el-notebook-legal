@@ -27,7 +27,7 @@ import type {
 import { BRANCHES } from "./branches";
 import { askAssistant } from "./ai";
 import { analyzeExpediente } from "./intake";
-import { analyzeDocument, generateDocumentAI } from "./claude";
+import { analyzeDocument, generateDocumentAI, revisarContratoAI } from "./claude";
 import { kindFromName } from "./files";
 import { generateTimeline, generateDocument, getDocKindsForBranch, type DocKind } from "./generators";
 import { useAuth } from "./auth";
@@ -915,12 +915,33 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     return transcriptMapRef.current.get(fileId);
   }, []);
 
-  // ponytail: simulated analysis; replace with real Claude/OpenAI extraction when available
-  const analyzeContract = useCallback((_file: File) => {
+  // Auditoría real vía /api/revisar-contrato; sin sesión/IA cae al ejemplo demo.
+  const analyzeContract = useCallback((file: File) => {
     setAnalysisLoading(true);
     setActiveAnalysis(null);
+    void (async () => {
+      const real = await revisarContratoAI(file);
+      if (real) {
+        setActiveAnalysis(real);
+        setAnalysisLoading(false);
+        return;
+      }
+      demoContractAnalysis();
+    })();
+  }, []);
+
+  // ponytail: análisis ilustrativo para modo demo (sin sesión no hay endpoints de IA)
+  const demoContractAnalysis = () => {
     setTimeout(() => {
       setActiveAnalysis({
+        source: "demo",
+        tipoContrato: "Contrato de prestación de servicios (ejemplo)",
+        parties: [
+          { label: "Prestador", value: "Servicios Corporativos Delta, S.A. de C.V." },
+          { label: "Cliente", value: "Comercializadora del Bajío, S. de R.L." },
+        ],
+        vigencia: { inicio: "1 de enero de 2026", fin: "31 de diciembre de 2026", renovacion: "Renovación automática anual salvo aviso con 30 días" },
+        faltantes: ["Tope de responsabilidad", "Cláusula de caso fortuito y fuerza mayor", "Protección de datos personales (LFPDPPP)"],
         riskScore: 75,
         pros: [
           "Cláusula de arbitraje bien definida con sede en Ciudad de México",
@@ -936,19 +957,21 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         criticalClauses: [
           {
             title: "Penalización por rescisión",
+            risk: "alto",
             currentText: "En caso de rescisión anticipada, la parte incumplida pagará el 15% del monto total del contrato como penalización.",
             alternativeText: "En caso de rescisión anticipada, la parte incumplida pagará el 5% del monto total del contrato como penalización, con un tope máximo equivalente a 3 mensualidades del servicio contratado.",
           },
           {
             title: "Límite de responsabilidad",
+            risk: "medio",
             currentText: "La parte incumplida será responsable de todos los daños y perjuicios derivados, incluyendo daños indirectos, sin límite alguno.",
             alternativeText: "La responsabilidad total de cualquiera de las partes se limitará al 100% del valor total del contrato, quedando expresamente excluidos los daños indirectos o pérdida de oportunidades de negocio.",
           },
         ],
       });
       setAnalysisLoading(false);
-    }, 2000);
-  }, []);
+    }, 800);
+  };
 
   // ponytail: simulated per-template document generation; replace with LLM prompt + backend endpoint
   const generateCustomDocument = useCallback(

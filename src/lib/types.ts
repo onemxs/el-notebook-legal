@@ -122,16 +122,24 @@ export interface VideoTranscription {
 
 export type AppView = "dashboard" | "workspace" | "auditoria" | "escribania" | "configuracion";
 
+export interface ContractClause {
+  title: string;
+  risk?: "alto" | "medio" | "bajo"; // semáforo por cláusula (análisis con IA)
+  currentText: string;
+  alternativeText: string;
+}
+
 export interface ContractAnalysis {
   riskScore: number; // 0 a 100
+  tipoContrato?: string;
+  parties?: ExtractedField[];
+  vigencia?: { inicio: string; fin: string; renovacion: string };
   pros: string[];
   cons: string[];
   strategy: string;
-  criticalClauses: Array<{
-    title: string;
-    currentText: string;
-    alternativeText: string;
-  }>;
+  criticalClauses: ContractClause[];
+  faltantes?: string[]; // cláusulas recomendadas ausentes
+  source?: "ia" | "demo";
 }
 
 export interface CaseSummary {

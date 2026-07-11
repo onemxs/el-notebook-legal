@@ -9,8 +9,11 @@ import {
   ChevronDown,
   Loader2,
   ClipboardCopy,
+  CalendarClock,
+  ShieldAlert,
 } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
+import type { ContractClause } from "@/lib/types";
 
 export function AuditoriaContractual() {
   const { activeAnalysis, analysisLoading, analyzeContract } = useWorkspace();
@@ -108,10 +111,40 @@ export function AuditoriaContractual() {
           </div>
         ) : activeAnalysis ? (
           <div className="mx-auto max-w-5xl space-y-5">
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-ink">
-              <FileText size={16} className="text-accent" />
-              Resultados del análisis
-            </h3>
+            <div>
+              <h3 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ink">
+                <FileText size={16} className="text-accent" />
+                {activeAnalysis.tipoContrato || "Resultados del análisis"}
+                {activeAnalysis.source === "demo" && (
+                  <span className="rounded-full bg-elevated px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
+                    Ejemplo
+                  </span>
+                )}
+              </h3>
+              {(activeAnalysis.parties?.length ?? 0) > 0 && (
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  {activeAnalysis.parties!.map((p, i) => (
+                    <span
+                      key={i}
+                      className="rounded-full bg-accent-soft px-2.5 py-0.5 text-[11px] font-medium text-accent"
+                    >
+                      {p.label}: {p.value}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {activeAnalysis.vigencia && (
+                <p className="mt-2 flex flex-wrap items-center gap-1.5 text-[12px] text-ink-muted">
+                  <CalendarClock size={13} className="shrink-0 text-accent" />
+                  <span>
+                    Vigencia: {activeAnalysis.vigencia.inicio} — {activeAnalysis.vigencia.fin}
+                    {activeAnalysis.vigencia.renovacion !== "No especificado"
+                      ? ` · ${activeAnalysis.vigencia.renovacion}`
+                      : ""}
+                  </span>
+                </p>
+              )}
+            </div>
             <div className="grid gap-5 sm:grid-cols-2">
               {/* Block 1 — Pros */}
               <div className="rounded-xl border border-success/20 bg-success/[0.04] p-4">
@@ -170,6 +203,32 @@ export function AuditoriaContractual() {
                 ))}
               </div>
             </div>
+
+            {/* Block 5 — Missing clauses */}
+            {(activeAnalysis.faltantes?.length ?? 0) > 0 && (
+              <div className="rounded-xl border border-warning/25 bg-warning/[0.05] p-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning-soft text-warning">
+                    <ShieldAlert size={18} />
+                  </span>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-warning">
+                    Cláusulas faltantes recomendadas
+                  </span>
+                </div>
+                <ul className="space-y-2">
+                  {activeAnalysis.faltantes!.map((f, i) => (
+                    <li key={i} className="flex items-start gap-2 text-[13px] leading-snug text-ink">
+                      <span className="mt-0.5 shrink-0 text-warning">•</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <p className="pb-2 text-center text-[11px] text-ink-subtle">
+              Auditoría generada con IA como apoyo al criterio profesional — verifica cada cláusula antes de negociar.
+            </p>
           </div>
         ) : null}
       </div>
@@ -177,7 +236,13 @@ export function AuditoriaContractual() {
   );
 }
 
-function ClauseAccordion({ clause }: { clause: { title: string; currentText: string; alternativeText: string } }) {
+const RISK_BADGE: Record<NonNullable<ContractClause["risk"]>, string> = {
+  alto: "bg-danger-soft text-danger",
+  medio: "bg-warning-soft text-warning",
+  bajo: "bg-success/10 text-success",
+};
+
+function ClauseAccordion({ clause }: { clause: ContractClause }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -197,6 +262,13 @@ function ClauseAccordion({ clause }: { clause: { title: string; currentText: str
           <FileText size={14} />
         </span>
         <span className="min-w-0 flex-1 text-sm font-medium text-ink">{clause.title}</span>
+        {clause.risk && (
+          <span
+            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${RISK_BADGE[clause.risk]}`}
+          >
+            {clause.risk}
+          </span>
+        )}
         <ChevronDown
           size={16}
           className={`shrink-0 text-ink-muted transition-transform ${open ? "rotate-180" : ""}`}
