@@ -122,7 +122,7 @@ Devuelve EXCLUSIVAMENTE el objeto JSON del esquema, en español, sin texto adici
     · detail: una frase de contexto o de su relevancia procesal.
     · severity: "deadline" para plazos, vencimientos, prescripciones o términos procesales; "warning" para contradicciones de fecha o riesgos; "info" para hechos ordinarios.
   Incluye tanto los hechos narrados como los plazos legales que se deriven del tipo de asunto (con su fecha estimada). Si no hay ninguna fecha en el documento, devuelve cronologia como arreglo vacío [].
-- transcripcion: un RESUMEN breve y fiel del documento (máximo 4-5 frases). NO copies el texto completo del documento, solo resúmelo.
+- transcripcion: una RELACIÓN FIEL, ORDENADA Y COMPLETA del contenido sustantivo del documento, pensada para que otro abogado pueda CONTESTARLO punto por punto. Si es una demanda o escrito con hechos y prestaciones, enuméralos TODOS tal como se narran (Hecho 1: …, Hecho 2: …; Prestación a): …, b): …), conservando fechas, cantidades, nombres y fundamentos exactos. No lo reduzcas a 4-5 frases; sé completo pero sin relleno, hasta un máximo de ~450 palabras (si el documento es muy extenso, prioriza los hechos y prestaciones esenciales sin exceder ese límite).
 Si no encuentras un dato, usa un valor razonable o "No especificado". No inventes nombres.`;
 
     const { Anthropic } = await import("@anthropic-ai/sdk");

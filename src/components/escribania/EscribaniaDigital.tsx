@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FileText,
   FileSignature,
@@ -13,9 +13,17 @@ import {
   Gavel,
   Scale,
   Landmark,
+  FolderOpen,
+  Trash2,
 } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { exportarTranscripcion } from "@/lib/export";
+import { getSupabase } from "@/lib/supabase";
+import {
+  listarDocumentosGenerados,
+  borrarDocumentoGenerado,
+  type DocumentoGenerado,
+} from "@/lib/documentosGenerados";
 
 interface Field {
   key: string;
@@ -240,7 +248,8 @@ const TEMPLATES: Template[] = [
 ];
 
 export function EscribaniaDigital() {
-  const { selectedTemplate, setSelectedTemplate, documentPreview, docGenLoading, generateCustomDocument } = useWorkspace();
+  const { selectedTemplate, setSelectedTemplate, documentPreview, docGenLoading, generateCustomDocument, docsGeneradosVersion, mostrarDocumentoGuardado } = useWorkspace();
+  const [guardados, setGuardados] = useState<DocumentoGenerado[]>([]);
   const [variables, setVariables] = useState<Record<string, string>>({});
   const [notes, setNotes] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
@@ -249,6 +258,17 @@ export function EscribaniaDigital() {
   const [wizardVars, setWizardVars] = useState<Record<string, string>>({});
   const [wizardToggles, setWizardToggles] = useState<Record<string, boolean>>({});
   const [wizardJurisdiccion, setWizardJurisdiccion] = useState(JURISDICCIONES[0]);
+
+  // Documentos de Notaría Express guardados (se refresca al guardar uno nuevo).
+  useEffect(() => {
+    if (!getSupabase()) return;
+    void listarDocumentosGenerados().then(setGuardados);
+  }, [docsGeneradosVersion]);
+
+  const eliminarGuardado = async (id: string) => {
+    setGuardados((prev) => prev.filter((d) => d.id !== id));
+    await borrarDocumentoGenerado(id);
+  };
 
   const CATEGORIES = ["Todos", "Civil/Familiar", "Mercantil", "Penal/Amparo"] as const;
   const CATEGORY_MAP: Record<string, string> = { "Civil/Familiar": "civil", Mercantil: "mercantil", "Penal/Amparo": "penal" };
@@ -298,6 +318,38 @@ export function EscribaniaDigital() {
         <h2 className="font-serif text-base font-semibold text-ink">Notaría Express</h2>
         <p className="text-xs text-ink-muted">Selecciona un documento y llénalo con los datos del caso</p>
       </div>
+
+      {/* Documentos guardados */}
+      {guardados.length > 0 && (
+        <div className="shrink-0 border-b border-hairline bg-elevated/40 px-5 py-2.5">
+          <div className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-ink-subtle">
+            <FolderOpen size={12} /> Documentos guardados ({guardados.length})
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {guardados.slice(0, 12).map((d) => (
+              <span
+                key={d.id}
+                className="group inline-flex items-center gap-1 rounded-full border border-hairline bg-panel-solid py-1 pl-2.5 pr-1 text-[11px] text-ink"
+              >
+                <button
+                  onClick={() => mostrarDocumentoGuardado(d.contenido)}
+                  className="max-w-[220px] truncate hover:text-accent cursor-pointer"
+                  title={`Ver: ${d.nombre}`}
+                >
+                  {d.nombre}
+                </button>
+                <button
+                  onClick={() => eliminarGuardado(d.id)}
+                  className="rounded-full p-0.5 text-ink-subtle transition-colors hover:bg-danger-soft hover:text-danger cursor-pointer"
+                  aria-label="Eliminar"
+                >
+                  <Trash2 size={11} />
+                </button>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Category tabs */}
       <div className="shrink-0 border-b border-hairline">

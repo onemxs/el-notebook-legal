@@ -28,7 +28,19 @@ import { BRANCHES } from "./branches";
 import { askAssistant } from "./ai";
 import { analyzeExpediente } from "./intake";
 import { analyzeDocument, generateDocumentAI, revisarContratoAI } from "./claude";
+import { guardarDocumentoGenerado } from "./documentosGenerados";
 import { kindFromName } from "./files";
+
+// Etiquetas legibles de las plantillas de Notaría Express (para nombrar lo guardado).
+const NOTARIA_LABELS: Record<string, string> = {
+  arrendamiento: "Contrato de Arrendamiento",
+  servicios: "Contrato de Prestación de Servicios",
+  nda: "Acuerdo de Confidencialidad (NDA)",
+  pagare: "Pagaré",
+  compraventa: "Contrato de Compraventa",
+  divorcio: "Convenio de Divorcio",
+  contestacion: "Contestación de Demanda",
+};
 import { generateTimeline, generateDocument, getDocKindsForBranch, DOC_LABELS, type DocKind } from "./generators";
 import { useAuth } from "./auth";
 import {
@@ -105,6 +117,8 @@ interface WorkspaceState {
   selectedTemplate: string | null;
   documentPreview: string;
   docGenLoading: boolean;
+  docsGeneradosVersion: number;
+  mostrarDocumentoGuardado: (html: string) => void;
 }
 
 interface WorkspaceCtx extends WorkspaceState {
@@ -419,6 +433,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [documentPreview, setDocumentPreview] = useState("");
   const [docGenLoading, setDocGenLoading] = useState(false);
+  // Se incrementa al guardar un documento de Notaría Express; la lista lo observa.
+  const [docsGeneradosVersion, setDocsGeneradosVersion] = useState(0);
   const [members, setMembers] = useState<Miembro[]>([]);
   const [referralData] = useState({
     inviteCode: "PAS-ONESIMO-78",
@@ -1245,15 +1261,25 @@ ${SIG(demandado, "DEMANDADO")}
           ? `<p style="font-family:Georgia,serif;font-size:10pt;line-height:1.6;margin-bottom:12px;color:#475569;border-left:3px solid #1E3A5F;padding-left:12px"><em>Notas del abogado: ${notes}</em></p>`
           : "";
 
-        setDocumentPreview(
-          `${body}
+        const previewHtml = `${body}
 ${notesHtml}
 <hr style="border:none;border-top:1px solid #cbd5e1;margin:24px 0" />
 <p style="font-family:Arial,sans-serif;font-size:9pt;color:#64748b;text-align:center">
   Documento generado por PasantIA · Notaría Express · ${new Date().toLocaleDateString("es-MX")}
-</p>`,
-        );
+</p>`;
+        setDocumentPreview(previewHtml);
         setDocGenLoading(false);
+        // Persistir el contrato de Notaría Express (tabla propia, sin expediente).
+        if (cloudRef.current) {
+          const label = NOTARIA_LABELS[templateId] ?? "Documento";
+          void guardarDocumentoGenerado({
+            tipo: templateId,
+            nombre: `${label} — ${new Date().toLocaleDateString("es-MX")}`,
+            contenido: previewHtml,
+          }).then((id) => {
+            if (id) setDocsGeneradosVersion((v) => v + 1);
+          });
+        }
       }, 1500);
     },
     [],
@@ -1261,6 +1287,9 @@ ${notesHtml}
 
   const openArticle = useCallback((c: Citation) => setActiveArticle(c), []);
   const closeArticle = useCallback(() => setActiveArticle(null), []);
+
+  // Reabrir un documento de Notaría Express guardado en el visor.
+  const mostrarDocumentoGuardado = useCallback((html: string) => setDocumentPreview(html), []);
 
   const setEditorHtml = useCallback((html: string) => setEditorHtmlState(html), []);
 
@@ -1400,6 +1429,8 @@ ${notesHtml}
       selectedTemplate,
       documentPreview,
       docGenLoading,
+      docsGeneradosVersion,
+      mostrarDocumentoGuardado,
       analyzeContract,
       generateCustomDocument,
       setSelectedTemplate,
@@ -1436,6 +1467,8 @@ ${notesHtml}
       selectedTemplate,
       documentPreview,
       docGenLoading,
+      docsGeneradosVersion,
+      mostrarDocumentoGuardado,
       goHome,
       openCase,
       openCaseModal,
