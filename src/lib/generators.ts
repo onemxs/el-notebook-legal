@@ -198,7 +198,7 @@ export function generateDocument(
 <p><strong>TERCERO.</strong> Señalar día y hora para la celebración de la audiencia incidental en la que se resuelva la suspensión del acto reclamado, solicitando desde ahora la suspensión provisional para el efecto de que el quejoso recobre su libertad mientras se resuelve el juicio constitucional.</p>
 <p><strong>CUARTO.</strong> En su oportunidad, conceder el amparo y protección de la Justicia Federal al quejoso, ordenando la inmediata libertad del mismo y la reposición del procedimiento.</p>
 <p style="margin-top:2rem">PROTESTO LO NECESARIO</p>
-<p>Ciudad de México, a la fecha de su presentación.</p>
+<p>__________, a la fecha de su presentación.</p>
 `.trim();
   }
 
@@ -215,6 +215,6 @@ export function generateDocument(
 <p><strong>PRIMERO.</strong> Tenerme por presentado en los términos del presente escrito.</p>
 <p><strong>SEGUNDO.</strong> Acordar de conformidad lo solicitado, con fundamento en el derecho invocado.</p>
 <p style="margin-top:2rem">PROTESTO LO NECESARIO</p>
-<p>Ciudad de México, a la fecha de su presentación.</p>
+<p>__________, a la fecha de su presentación.</p>
 `.trim();
 }

@@ -22,6 +22,10 @@ export interface Perfil {
   tema: "claro" | "oscuro" | "auto";
   onboarding_completo: boolean;
   ultima_conexion: string | null;
+  ciudad_despacho: string | null;
+  entidad_despacho: string | null;
+  domicilio_despacho: string | null;
+  telefono_despacho: string | null;
 }
 
 interface AuthState {

@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { UserRound, Building2, ShieldCheck, Users, Copy, CheckCheck, Upload, Award, Save } from "lucide-react";
+import { UserRound, Building2, ShieldCheck, Users, Copy, CheckCheck, Upload, Award, Save, MapPin } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace";
 import { useAuth } from "@/lib/auth";
+import { actualizarPerfil } from "@/lib/supabase";
 import { Toggle } from "@/components/ui/Toggle";
 
 function Bar({ used, limit, label, detail }: { used: number; limit: number; label: string; detail: string }) {
@@ -28,17 +29,41 @@ const MIEMBROS_SIMULADOS = [
 
 export function ConfiguracionView() {
   const { settings, updateSettings, systemUsage, members, referralData } = useWorkspace();
-  const { perfil } = useAuth();
+  const { perfil, refreshPerfil } = useAuth();
   const [nombreDespacho, setNombreDespacho] = useState("Mi Despacho");
   const [especialidad, setEspecialidad] = useState(perfil?.especialidad ?? "");
-  const [cedula, setCedula] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [direccion, setDireccion] = useState("");
+  const [cedula, setCedula] = useState(perfil?.cedula ?? "");
+  const [telefono, setTelefono] = useState(perfil?.telefono_despacho ?? "");
+  const [direccion, setDireccion] = useState(perfil?.domicilio_despacho ?? "");
+  const [ciudad, setCiudad] = useState(perfil?.ciudad_despacho ?? "");
+  const [entidad, setEntidad] = useState(perfil?.entidad_despacho ?? "");
   const [copiado, setCopiado] = useState(false);
   const [referralCopied, setReferralCopied] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const isDespacho = settings.accountMode === "despacho";
+
+  const guardarPerfil = async () => {
+    setIsSaving(true);
+    setSaveError(null);
+    const { error } = await actualizarPerfil({
+      cedula: cedula.trim() || null,
+      especialidad: especialidad.trim() || null,
+      ciudad_despacho: ciudad.trim() || null,
+      entidad_despacho: entidad.trim() || null,
+      domicilio_despacho: direccion.trim() || null,
+      telefono_despacho: telefono.trim() || null,
+    });
+    await refreshPerfil();
+    setIsSaving(false);
+    if (error) {
+      setSaveError(error);
+    } else {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    }
+  };
 
   const copiarCodigo = () => {
     navigator.clipboard.writeText("PAS-47D2-K9M8").then(() => {
@@ -118,10 +143,40 @@ export function ConfiguracionView() {
                     name="direccion_despacho"
                     value={direccion}
                     onChange={(e) => setDireccion(e.target.value)}
-                    placeholder="Ej. Av. Reforma 222, Col. Juárez, CDMX"
+                    placeholder="Ej. Calle Hidalgo 43, Col. Centro, CP 95700"
                     className="w-full rounded-lg border border-hairline bg-white/80 px-3 py-2 text-sm text-[#022448] placeholder:text-gray-300 focus:border-[#022448] focus:outline-none dark:bg-black/40 dark:border-white/10 dark:text-white focus:dark:border-blue-500/50"
                   />
                 </div>
+                {/* Ubicación: se usa para FECHAR y FIRMAR los escritos en el lugar real (no CDMX). */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="input-ciudad" className="mb-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                      <MapPin size={11} /> Ciudad / Municipio
+                    </label>
+                    <input
+                      id="input-ciudad"
+                      name="ciudad_despacho"
+                      value={ciudad}
+                      onChange={(e) => setCiudad(e.target.value)}
+                      placeholder="Ej. San Andrés Tuxtla"
+                      className="w-full rounded-lg border border-hairline bg-white/80 px-3 py-2 text-sm text-[#022448] placeholder:text-gray-300 focus:border-[#022448] focus:outline-none dark:bg-black/40 dark:border-white/10 dark:text-white focus:dark:border-blue-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="input-entidad" className="mb-1 block text-[11px] font-medium text-gray-500 dark:text-gray-400">Estado</label>
+                    <input
+                      id="input-entidad"
+                      name="entidad_despacho"
+                      value={entidad}
+                      onChange={(e) => setEntidad(e.target.value)}
+                      placeholder="Ej. Veracruz"
+                      className="w-full rounded-lg border border-hairline bg-white/80 px-3 py-2 text-sm text-[#022448] placeholder:text-gray-300 focus:border-[#022448] focus:outline-none dark:bg-black/40 dark:border-white/10 dark:text-white focus:dark:border-blue-500/50"
+                    />
+                  </div>
+                </div>
+                <p className="text-[10px] leading-relaxed text-gray-400 dark:text-gray-500">
+                  Esta ubicación se usa para fechar y firmar tus escritos en tu ciudad real (no "Ciudad de México").
+                </p>
                 <div className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-gray-300 bg-white/40 px-4 py-5 text-center transition-colors hover:border-[#022448]/50 dark:border-white/20 dark:bg-white/[0.04] dark:hover:border-white/40">
                   <Upload size={20} className="text-[#022448]/60 dark:text-white/60" />
                   <div>
@@ -284,14 +339,7 @@ export function ConfiguracionView() {
         </div>
         <div className="mt-8 flex justify-end">
           <button
-            onClick={() => {
-              setIsSaving(true);
-              setTimeout(() => {
-                setIsSaving(false);
-                setSaveSuccess(true);
-                setTimeout(() => setSaveSuccess(false), 2500);
-              }, 1200);
-            }}
+            onClick={guardarPerfil}
             disabled={isSaving}
             className="flex items-center gap-2 rounded-xl bg-[#022448] px-6 py-2.5 font-medium text-white shadow-md transition-all hover:bg-[#022448]/90 active:scale-95 disabled:opacity-60 dark:bg-accent dark:text-[#090D16]"
           >
@@ -304,6 +352,11 @@ export function ConfiguracionView() {
       {saveSuccess && (
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 animate-fade-in rounded-xl bg-green-600 px-5 py-3 text-sm font-medium text-white shadow-float">
           Configuración guardada con éxito
+        </div>
+      )}
+      {saveError && (
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 animate-fade-in rounded-xl bg-danger px-5 py-3 text-sm font-medium text-white shadow-float">
+          No se pudo guardar: {saveError}
         </div>
       )}
       {referralCopied && (

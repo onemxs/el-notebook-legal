@@ -80,12 +80,19 @@ async function buildPayload(file: File) {
   return null; // unsupported (e.g. old binary .doc) → fall back to demo
 }
 
+export interface Despacho {
+  ciudad?: string | null;
+  entidad?: string | null;
+  domicilio?: string | null;
+}
+
 export interface DocGenContext {
   kind: DocKind;
   branch: BranchId;
   caseName: string;
   parties: ExtractedField[];
   facts: string[];
+  despacho?: Despacho;
 }
 
 export async function generateDocumentAI(ctx: DocGenContext): Promise<string | null> {
@@ -106,6 +113,7 @@ export async function generateDocumentAI(ctx: DocGenContext): Promise<string | n
         parties: ctx.parties,
         facts: ctx.facts,
         lawName: b.laws[0]?.name ?? "",
+        despacho: ctx.despacho ?? null,
       }),
     });
     if (!res.ok) return null;

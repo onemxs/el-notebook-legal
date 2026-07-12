@@ -29,7 +29,7 @@ import { askAssistant } from "./ai";
 import { analyzeExpediente } from "./intake";
 import { analyzeDocument, generateDocumentAI, revisarContratoAI } from "./claude";
 import { kindFromName } from "./files";
-import { generateTimeline, generateDocument, getDocKindsForBranch, type DocKind } from "./generators";
+import { generateTimeline, generateDocument, getDocKindsForBranch, DOC_LABELS, type DocKind } from "./generators";
 import { useAuth } from "./auth";
 import {
   crearCaso,
@@ -360,11 +360,18 @@ const demoNote = (): ChatMessage => ({
 });
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
-  const { session, demo } = useAuth();
+  const { session, demo, perfil } = useAuth();
   // Cloud-backed when authenticated (not the "explorar sin cuenta" demo mode).
   const cloud = !!session && !demo;
   const cloudRef = useRef(cloud);
   cloudRef.current = cloud;
+  // Ubicación real del despacho para fechar/firmar los escritos (nunca CDMX por defecto).
+  const despachoRef = useRef({ ciudad: "", entidad: "", domicilio: "" });
+  despachoRef.current = {
+    ciudad: perfil?.ciudad_despacho ?? "",
+    entidad: perfil?.entidad_despacho ?? "",
+    domicilio: perfil?.domicilio_despacho ?? "",
+  };
   // Supabase id of the open case (null in demo/local). Set synchronously via the
   // ref so persistence side-effects fire against the right case immediately.
   const currentCaseIdRef = useRef<string | null>(null);
@@ -980,7 +987,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       setDocumentPreview("");
       setTimeout(() => {
         const today = new Date().toLocaleDateString("es-MX");
-        const city = "Ciudad de México";
+        // Lugar de firma: ubicación real del despacho; si no está configurada,
+        // línea en blanco para que el abogado la complete (nunca CDMX por defecto).
+        const d = despachoRef.current;
+        const city = d.ciudad && d.entidad ? `${d.ciudad}, ${d.entidad}` : d.ciudad || "__________";
 
         const fmt = (k: string) => variables[k] || `[${k}]`;
 
@@ -1008,7 +1018,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
             const vigencia = variables.vigencia || "12";
 body = `${TITLE("CONTRATO DE ARRENDAMIENTO")}
 ${H("P R O E M I O")}
-${P(`En la ${city}, siendo las ___ horas del día ___ de ______________ de 20___, comparecen por una parte <strong>${arrendador}</strong>, a quien en lo sucesivo se le denominará "EL ARRENDADOR", y por otra parte <strong>${arrendatario}</strong>, a quien en lo sucesivo se le denominará "EL ARRENDATARIO", quienes manifiestan su voluntad de celebrar el presente Contrato de Arrendamiento, al tenor de las siguientes declaraciones y cláusulas.`)}
+${P(`En ${city}, siendo las ___ horas del día ___ de ______________ de 20___, comparecen por una parte <strong>${arrendador}</strong>, a quien en lo sucesivo se le denominará "EL ARRENDADOR", y por otra parte <strong>${arrendatario}</strong>, a quien en lo sucesivo se le denominará "EL ARRENDATARIO", quienes manifiestan su voluntad de celebrar el presente Contrato de Arrendamiento, al tenor de las siguientes declaraciones y cláusulas.`)}
 ${H("D E C L A R A C I O N E S")}
 ${P("<strong>I.</strong> EL ARRENDADOR declara bajo protesta de decir verdad:")}
 ${P(`a) Ser legítimo propietario del inmueble ubicado en <strong>${inmueble}</strong>, mismo que se encuentra libre de gravámenes, hipotecas, embargos, litigios o cualquier limitación de dominio que pudiera afectar el presente arrendamiento.<br/>b) Tener capacidad jurídica y poder de disposición plena para celebrar este contrato.<br/>c) Que el inmueble cuenta con las condiciones de habitabilidad, seguridad sanitaria y servicios necesarios para su uso como vivienda habitual.`, "20px")}
@@ -1030,7 +1040,7 @@ ${fiadorIncluido ? CLS("DÉCIMA PRIMERA", "FIADOR / OBLIGADO SOLIDARIO", `En est
 ${extincion ? CLS("DÉCIMA SEGUNDA", "EXTINCIÓN DE DOMINIO", `EL ARRENDATARIO y, en su caso, EL FIADOR, declaran bajo protesta de decir verdad que los recursos económicos con los que cubrirán las obligaciones derivadas del presente contrato provienen de actividades lícitas y debidamente declaradas ante las autoridades fiscales competentes. En caso de que se inicie un procedimiento de extinción de dominio sobre el inmueble o sobre los recursos de cualquiera de las partes, el presente contrato quedará rescindido de pleno derecho sin responsabilidad para EL ARRENDADOR.`) : ""}
 ${P(`<strong>${fiadorIncluido && extincion ? "DÉCIMA TERCERA" : fiadorIncluido || extincion ? "DÉCIMA SEGUNDA" : "DÉCIMA PRIMERA"}. — JURISDICCIÓN.</strong> Para la interpretación y cumplimiento del presente contrato, las partes se someten expresamente a la competencia de los <strong>${juris}</strong>, renunciando a cualquier otro fuero que pudiera corresponderles en razón de su domicilio presente o futuro.`)}
 ${P(`<strong>${fiadorIncluido && extincion ? "DÉCIMA CUARTA" : fiadorIncluido || extincion ? "DÉCIMA TERCERA" : "DÉCIMA SEGUNDA"}. — LEGISLACIÓN APLICABLE.</strong> El presente contrato se rige por las disposiciones del Código Civil Federal, el Código de Comercio y las leyes supletorias aplicables en el territorio mexicano.`)}
-${P(`<strong>${fiadorIncluido && extincion ? "DÉCIMA QUINTA" : fiadorIncluido || extincion ? "DÉCIMA CUARTA" : "DÉCIMA TERCERA"}. — FIRMAS.</strong> Leído que fue el presente contrato y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en la Ciudad de México, a la fecha de su presentación.`)}
+${P(`<strong>${fiadorIncluido && extincion ? "DÉCIMA QUINTA" : fiadorIncluido || extincion ? "DÉCIMA CUARTA" : "DÉCIMA TERCERA"}. — FIRMAS.</strong> Leído que fue el presente contrato y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en ${city}, a la fecha de su presentación.`)}
 ${SIGS({ r: arrendador, n: "ARRENDADOR" }, { r: arrendatario, n: "ARRENDATARIO" })}
 <div style="display:flex;justify-content:space-between;margin-top:60px">
 ${SIG("TESTIGO", "")}${SIG("TESTIGO", "")}${SIG(fiadorIncluido ? "FIADOR" : "", "")}
@@ -1044,7 +1054,7 @@ ${SIG("TESTIGO", "")}${SIG("TESTIGO", "")}${SIG(fiadorIncluido ? "FIADOR" : "", 
             const fechaInicio = fmt("fechaInicio");
 body = `${TITLE("CONTRATO DE PRESTACIÓN DE SERVICIOS PROFESIONALES")}
 ${H("P R O E M I O")}
-${P(`En la ${city}, siendo las ___ horas del día ___ de ______________ de 20___, comparecen por una parte <strong>${prestador}</strong>, a quien en lo sucesivo se le denominará "EL PRESTADOR", y por otra parte <strong>${cliente}</strong>, a quien en lo sucesivo se le denominará "EL CLIENTE", quienes celebran el presente Contrato de Prestación de Servicios Profesionales, al tenor de las siguientes declaraciones y cláusulas.`)}
+${P(`En ${city}, siendo las ___ horas del día ___ de ______________ de 20___, comparecen por una parte <strong>${prestador}</strong>, a quien en lo sucesivo se le denominará "EL PRESTADOR", y por otra parte <strong>${cliente}</strong>, a quien en lo sucesivo se le denominará "EL CLIENTE", quienes celebran el presente Contrato de Prestación de Servicios Profesionales, al tenor de las siguientes declaraciones y cláusulas.`)}
 ${H("D E C L A R A C I O N E S")}
 ${P("<strong>I.</strong> EL PRESTADOR declara bajo protesta de decir verdad:")}
 ${P(`a) Tener capacidad jurídica, experiencia y conocimientos técnicos suficientes para prestar los servicios objeto del presente contrato.<br/>b) Encontrarse al corriente en sus obligaciones fiscales y contar con la cédula profesional y registros que exige la ley para el ejercicio de su profesión.<br/>c) Que los servicios serán prestados de manera personal, salvo autorización expresa en contrario de EL CLIENTE.`, "20px")}
@@ -1062,7 +1072,7 @@ ${CL("SÉPTIMA", "RESPONSABILIDAD", `EL PRESTADOR responderá por la calidad té
 ${CL("OCTAVA", "CAUSAS DE RESCISIÓN", `Son causas de rescisión del presente contrato: a) El incumplimiento de cualquiera de las obligaciones esenciales; b) La falta de pago oportuno de los honorarios; c) La violación de la confidencialidad; d) El dolo, mala fe o negligencia grave de cualquiera de las partes en el cumplimiento de sus obligaciones.`)}
 ${CL("NOVENA", "JURISDICCIÓN", `Para la interpretación y cumplimiento del presente contrato, las partes se someten expresamente a la competencia de los Tribunales de la Ciudad de México, renunciando a cualquier otro fuero que pudiera corresponderles en razón de su domicilio presente o futuro.`)}
 ${CL("DÉCIMA", "LEGISLACIÓN APLICABLE", `El presente contrato se rige por las disposiciones del Código Civil Federal y, en lo conducente, por el Código de Comercio, así como por las leyes supletorias aplicables en el territorio mexicano.`)}
-${P(`<strong>DÉCIMA PRIMERA. — FIRMAS.</strong> Leído que fue el presente contrato y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en la Ciudad de México, a la fecha de su presentación.`)}
+${P(`<strong>DÉCIMA PRIMERA. — FIRMAS.</strong> Leído que fue el presente contrato y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en ${city}, a la fecha de su presentación.`)}
 ${SIGS({ r: prestador, n: "EL PRESTADOR" }, { r: cliente, n: "EL CLIENTE" })}
 <div style="display:flex;justify-content:space-between;margin-top:60px">
 ${SIG("TESTIGO", "")}${SIG("TESTIGO", "")}
@@ -1075,7 +1085,7 @@ ${SIG("TESTIGO", "")}${SIG("TESTIGO", "")}
             const vigenciaNda = fmt("vigencia");
 body = `${TITLE("ACUERDO DE CONFIDENCIALIDAD (NDA)")}
 ${H("P R O E M I O")}
-${P(`En la ${city}, siendo las ___ horas del día ___ de ______________ de 20___, comparecen <strong>${reveladora}</strong>, a quien en lo sucesivo se le denominará "PARTE REVELADORA", y <strong>${receptora}</strong>, a quien en lo sucesivo se le denominará "PARTE RECEPTORA", quienes celebran el presente Acuerdo de Confidencialidad, al tenor de las siguientes declaraciones y cláusulas.`)}
+${P(`En ${city}, siendo las ___ horas del día ___ de ______________ de 20___, comparecen <strong>${reveladora}</strong>, a quien en lo sucesivo se le denominará "PARTE REVELADORA", y <strong>${receptora}</strong>, a quien en lo sucesivo se le denominará "PARTE RECEPTORA", quienes celebran el presente Acuerdo de Confidencialidad, al tenor de las siguientes declaraciones y cláusulas.`)}
 ${H("D E C L A R A C I O N E S")}
 ${P("<strong>I.</strong> La PARTE REVELADORA declara bajo protesta de decir verdad:")}
 ${P(`a) Ser titular legítima de la información confidencial que será divulgada en el marco de la relación comercial entre las partes.<br/>b) Que la información que se divulgue tiene el carácter de confidencial y constituye un activo estratégico de su negocio.<br/>c) Que el presente acuerdo es necesario para proteger dicha información frente a su divulgación no autorizada.`, "20px")}
@@ -1092,7 +1102,7 @@ ${CL("SEXTA", "DEVOLUCIÓN DE INFORMACIÓN", `Al término del presente acuerdo o
 ${CL("SÉPTIMA", "PROPIEDAD", `Ninguna disposición del presente acuerdo confiere a la PARTE RECEPTORA derecho de propiedad, licencia o explotación sobre la información confidencial, cuyo titular exclusivo es y seguirá siendo la PARTE REVELADORA.`)}
 ${CL("OCTAVA", "JURISDICCIÓN", `Para la interpretación y cumplimiento del presente acuerdo, las partes se someten expresamente a la competencia de los Tribunales de la Ciudad de México, renunciando a cualquier otro fuero que pudiera corresponderles.`)}
 ${CL("NOVENA", "LEGISLACIÓN APLICABLE", `El presente acuerdo se rige por la Ley Federal de Protección a la Propiedad Industrial, el Código Civil Federal y las disposiciones supletorias aplicables en el territorio mexicano.`)}
-${P(`<strong>DÉCIMA. — FIRMAS.</strong> Leído que fue el presente acuerdo y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en la Ciudad de México, a la fecha de su presentación.`)}
+${P(`<strong>DÉCIMA. — FIRMAS.</strong> Leído que fue el presente acuerdo y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en ${city}, a la fecha de su presentación.`)}
 ${SIGS({ r: reveladora, n: "PARTE REVELADORA" }, { r: receptora, n: "PARTE RECEPTORA" })}
 <div style="display:flex;justify-content:space-between;margin-top:60px">
 ${SIG("TESTIGO", "")}${SIG("TESTIGO", "")}
@@ -1106,7 +1116,7 @@ ${SIG("TESTIGO", "")}${SIG("TESTIGO", "")}
             const intereses = fmt("intereses");
 body = `${TITLE("PAGARÉ EJECUTIVO")}
 ${H("P R O E M I O")}
-${P(`En la ${city}, siendo las ___ horas del día ___ de ______________ de 20___, <strong>${deudor}</strong>, a quien en lo sucesivo se le denominará "EL DEUDOR", y <strong>${acreedor}</strong>, a quien en lo sucesivo se le denominará "EL ACREEDOR", celebran el presente Pagaré Ejecutivo, al tenor de las siguientes declaraciones y cláusulas.`)}
+${P(`En ${city}, siendo las ___ horas del día ___ de ______________ de 20___, <strong>${deudor}</strong>, a quien en lo sucesivo se le denominará "EL DEUDOR", y <strong>${acreedor}</strong>, a quien en lo sucesivo se le denominará "EL ACREEDOR", celebran el presente Pagaré Ejecutivo, al tenor de las siguientes declaraciones y cláusulas.`)}
 ${H("D E C L A R A C I O N E S")}
 ${P("<strong>I.</strong> EL DEUDOR declara bajo protesta de decir verdad:")}
 ${P(`a) Haber recibido de EL ACREEDOR la cantidad de <strong>$${cantidad} MXN</strong> en este acto, en [efectivo / transferencia bancaria], a su entera satisfacción.<br/>b) Tener capacidad jurídica y solvencia económica para hacer frente a la obligación de pago aquí contenida.<br/>c) Que el presente pagaré constituye un título ejecutivo mercantil y que renuncia al beneficio de plazo y condición.`, "20px")}
@@ -1122,7 +1132,7 @@ ${CL("QUINTA", "MORA AUTOMÁTICA", `EL DEUDOR se constituye en mora sin necesida
 ${CL("SEXTA", "GASTOS DE COBRANZA", `Todos los gastos y costas judiciales y extrajudiciales en que incurra EL ACREEDOR para el cobro del presente pagaré serán por cuenta exclusiva de EL DEUDOR, incluyendo honorarios de abogados, los cuales se fijan en un [___]% del monto total adeudado.`)}
 ${CL("SÉPTIMA", "DOMICILIO", `EL DEUDOR señala como domicilio para ser requerido de pago el ubicado en [domicilio del deudor], lugar donde se tendrán por surtidas todas las notificaciones. EL ACREEDOR podrá requerir el pago en cualquiera de los domicilios conocidos de EL DEUDOR.`)}
 ${CL("OCTAVA", "JURISDICCIÓN", `Para la interpretación, cumplimiento y ejecución del presente pagaré, las partes se someten expresamente a la competencia de los Tribunales de la Ciudad de México, renunciando expresamente a cualquier otro fuero.`)}
-${P(`<strong>NOVENA. — FIRMAS.</strong> Leído que fue el presente pagaré y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en la Ciudad de México, a la fecha de su presentación.`)}
+${P(`<strong>NOVENA. — FIRMAS.</strong> Leído que fue el presente pagaré y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en ${city}, a la fecha de su presentación.`)}
 ${SIGS({ r: deudor, n: "EL DEUDOR" }, { r: acreedor, n: "EL ACREEDOR" })}
 <div style="display:flex;justify-content:space-between;margin-top:60px">
 ${SIG("TESTIGO", "")}${SIG("TESTIGO", "")}
@@ -1136,7 +1146,7 @@ ${SIG("TESTIGO", "")}${SIG("TESTIGO", "")}
             const fechaCierre = fmt("fechaCierre");
 body = `${TITLE("CONTRATO DE COMPRAVENTA DE BIENES")}
 ${H("P R O E M I O")}
-${P(`En la ${city}, siendo las ___ horas del día ___ de ______________ de 20___, comparecen <strong>${vendedor}</strong>, a quien en lo sucesivo se le denominará "EL VENDEDOR", y <strong>${comprador}</strong>, a quien en lo sucesivo se le denominará "EL COMPRADOR", quienes celebran el presente Contrato de Compraventa, al tenor de las siguientes declaraciones y cláusulas.`)}
+${P(`En ${city}, siendo las ___ horas del día ___ de ______________ de 20___, comparecen <strong>${vendedor}</strong>, a quien en lo sucesivo se le denominará "EL VENDEDOR", y <strong>${comprador}</strong>, a quien en lo sucesivo se le denominará "EL COMPRADOR", quienes celebran el presente Contrato de Compraventa, al tenor de las siguientes declaraciones y cláusulas.`)}
 ${H("D E C L A R A C I O N E S")}
 ${P("<strong>I.</strong> EL VENDEDOR declara bajo protesta de decir verdad:")}
 ${P(`a) Ser legítimo propietario del bien consistente en <strong>${bien}</strong>, mismo que se encuentra libre de gravámenes, hipotecas, embargos, vicios ocultos, adeudos, litigios o cualquier limitación de dominio.<br/>b) Tener capacidad jurídica y poder de disposición plena para celebrar la presente compraventa.<br/>c) Que el bien se encuentra en condiciones óptimas para su transmisión y uso conforme a su naturaleza.`, "20px")}
@@ -1154,7 +1164,7 @@ ${CL("SÉPTIMA", "DECLARACIONES FISCALES", `EL VENDEDOR se obliga a presentar la
 ${CL("OCTAVA", "INCUMPLIMIENTO", `En caso de incumplimiento de cualquiera de las obligaciones derivadas del presente contrato, la parte afectada podrá exigir su cumplimiento forzoso o la rescisión del mismo, más el pago de daños y perjuicios.`)}
 ${CL("NOVENA", "JURISDICCIÓN", `Para la interpretación y cumplimiento del presente contrato, las partes se someten expresamente a la competencia de los Tribunales de la Ciudad de México, renunciando a cualquier otro fuero.`)}
 ${CL("DÉCIMA", "LEGISLACIÓN APLICABLE", `El presente contrato se rige por las disposiciones del Código Civil Federal y las leyes supletorias aplicables en el territorio mexicano.`)}
-${P(`<strong>DÉCIMA PRIMERA. — FIRMAS.</strong> Leído que fue el presente contrato y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en la Ciudad de México, a la fecha de su presentación.`)}
+${P(`<strong>DÉCIMA PRIMERA. — FIRMAS.</strong> Leído que fue el presente contrato y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en ${city}, a la fecha de su presentación.`)}
 ${SIGS({ r: vendedor, n: "EL VENDEDOR" }, { r: comprador, n: "EL COMPRADOR" })}
 <div style="display:flex;justify-content:space-between;margin-top:60px">
 ${SIG("TESTIGO", "")}${SIG("TESTIGO", "")}
@@ -1168,7 +1178,7 @@ ${SIG("TESTIGO", "")}${SIG("TESTIGO", "")}
             const pension = fmt("pension");
 body = `${TITLE("CONVENIO DE DIVORCIO VOLUNTARIO")}
 ${H("P R O E M I O")}
-${P(`En la ${city}, siendo las ___ horas del día ___ de ______________ de 20___, comparecen <strong>${conyuge1}</strong> y <strong>${conyuge2}</strong>, a quienes en lo sucesivo se les denominará conjuntamente "LOS CÓNYUGES", quienes manifiestan su voluntad de disolver el vínculo matrimonial que los une de manera voluntaria y sin mediar causa de responsabilidad, al tenor de las siguientes declaraciones y cláusulas.`)}
+${P(`En ${city}, siendo las ___ horas del día ___ de ______________ de 20___, comparecen <strong>${conyuge1}</strong> y <strong>${conyuge2}</strong>, a quienes en lo sucesivo se les denominará conjuntamente "LOS CÓNYUGES", quienes manifiestan su voluntad de disolver el vínculo matrimonial que los une de manera voluntaria y sin mediar causa de responsabilidad, al tenor de las siguientes declaraciones y cláusulas.`)}
 ${H("D E C L A R A C I O N E S")}
 ${P("<strong>I.</strong> LOS CÓNYUGES declaran bajo protesta de decir verdad:")}
 ${P(`a) Que contrajeron matrimonio civil bajo el régimen de <strong>${regimen}</strong> el día [___] de [___________] de [___].<br/>b) Que su domicilio conyugal estuvo ubicado en <strong>${domicilioConyugal}</strong>.<br/>c) Que es su voluntad expresa y libre disolver el vínculo matrimonial de común acuerdo, sin que exista coacción, dolo o violencia de ninguna naturaleza.`, "20px")}
@@ -1186,7 +1196,7 @@ ${CL("SÉPTIMA", "GASTOS Y COSTAS", `Cada cónyuge cubrirá sus propios gastos y
 ${CL("OCTAVA", "DOMICILIOS FUTUROS", `LOS CÓNYUGES señalan como sus domicilios particulares para recibir notificaciones los siguientes: [nombre]: [domicilio]; [nombre]: [domicilio].`)}
 ${CL("NOVENA", "JURISDICCIÓN", `Para la interpretación y cumplimiento del presente convenio, LOS CÓNYUGES se someten expresamente a la competencia de los Juzgados Familiares de la Ciudad de México, renunciando a cualquier otro fuero que pudiera corresponderles.`)}
 ${CL("DÉCIMA", "LEGISLACIÓN APLICABLE", `El presente convenio se rige por las disposiciones del Código Civil Federal, el Código Familiar y las leyes supletorias aplicables.`)}
-${P(`<strong>DÉCIMA PRIMERA. — FIRMAS.</strong> Leído que fue el presente convenio y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en la Ciudad de México, a la fecha de su presentación.`)}
+${P(`<strong>DÉCIMA PRIMERA. — FIRMAS.</strong> Leído que fue el presente convenio y enteradas las partes de su contenido y alcance legal, lo firman de conformidad en ${city}, a la fecha de su presentación.`)}
 ${SIGS({ r: conyuge1, n: "CÓNYUGE 1" }, { r: conyuge2, n: "CÓNYUGE 2" })}
 <div style="display:flex;justify-content:space-between;margin-top:60px">
 ${SIG("TESTIGO", "")}${SIG("TESTIGO", "")}
@@ -1282,10 +1292,21 @@ ${notesHtml}
             caseName: currentName,
             parties: currentParties,
             facts: currentDocs,
+            despacho: despachoRef.current,
           });
           const html = aiHtml ?? generateDocument(kind, currentBranch, currentName);
           setEditorHtmlState((prev) => (prev ? `${prev}<hr/>${html}` : html));
           setEditorVersion((v) => v + 1);
+          // Persistir el escrito generado en el expediente (nube).
+          const caso = currentCaseIdRef.current;
+          if (caso && aiHtml) {
+            void guardarDocumento({
+              caso_id: caso,
+              nombre: `${DOC_LABELS[kind] ?? "Escrito"} — ${new Date().toLocaleDateString("es-MX")}`,
+              tipo: "escrito",
+              contenido: html,
+            });
+          }
         } finally {
           setGeneratingDoc(false);
         }

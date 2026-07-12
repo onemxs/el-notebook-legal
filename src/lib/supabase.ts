@@ -172,7 +172,7 @@ export async function obtenerCaso(id: string): Promise<CasoRow | null> {
 export async function guardarDocumento(datos: {
   caso_id: string;
   nombre: string;
-  tipo: "pdf" | "video" | "transcription" | "text" | "image";
+  tipo: "pdf" | "video" | "transcription" | "text" | "image" | "escrito";
   contenido?: string;
   duracion_segundos?: number;
   timestamps?: boolean;
@@ -209,6 +209,24 @@ export async function obtenerDocumentosCaso(caso_id: string): Promise<DocumentoR
     .eq("caso_id", caso_id)
     .order("creado_en", { ascending: false });
   return error ? [] : (data as DocumentoRow[]);
+}
+
+/** Actualiza campos editables del perfil del abogado (solo columnas con GRANT). */
+export async function actualizarPerfil(patch: {
+  cedula?: string | null;
+  especialidad?: string | null;
+  ciudad_despacho?: string | null;
+  entidad_despacho?: string | null;
+  domicilio_despacho?: string | null;
+  telefono_despacho?: string | null;
+}): Promise<{ error?: string }> {
+  const c = db();
+  if (!c) return { error: "Sin conexión al Servidor Seguro." };
+  const { data: userData } = await c.auth.getUser();
+  const uid = userData.user?.id;
+  if (!uid) return { error: "No autenticado." };
+  const { error } = await c.from("perfiles").update(patch).eq("id", uid);
+  return error ? { error: error.message } : {};
 }
 
 export interface TimelineRow {
